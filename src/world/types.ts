@@ -1,0 +1,28 @@
+import type { LifeState,MetaProgress } from './lifeTypes';
+export type Locale = 'ru' | 'en';
+export type ContentMode = 'clean' | 'adult';
+export type Stat = 'money'|'energy'|'stress'|'reputation'|'xp';
+export type Skill = 'craft'|'debugging'|'communication'|'leadership';
+export type Effect = {target:Stat|Skill|'techDebt'|'stability'|'securityLevel'|'processMaturity';value:number};
+export type Relationship = {characterId:string;trust:number};
+export type WorldEvent = {id:string;day:number;kind:string;key:string;actorId?:string;projectId?:string;problemId?:string;values?:Record<string,string|number>};
+export type Character = {roleTenure?:number;performanceMilestones?:number;reviewStage?:number;personality?:string;communicationStyle?:string;conversations?:Record<string,string>;conversationRewardDay?:number;orders?:{itemId:string;orderedDay:number;deliveryDay:number;received:boolean}[];home?:{owned:string[];eveningDay:number;paidDay:number;lastPay:number};id:string;name:string;avatarId:string;profession:string;careerNodeId:string;skills:Record<Skill,number>;traits:string[];relationships:Relationship[];careerHistory:WorldEvent[];currentProjectIds:string[];playable:boolean;employed:boolean;stats:Record<Stat,number>;discoveredTerms:string[];completedWork:string[];milestones:string[];scenarioCounts:Record<string,number>};
+export type CareerNode = {id:string;titleKey:string;next:string[];leadership:boolean;requirements:{work:number;craft:number;reputation:number;communication:number;leadership:number;milestone?:string}};
+export type Profession = {id:string;titleKey:string;descriptionKey:string;family:string;icon:string;careers:CareerNode[];scenarioIds:string[];startingNode:string};
+export type Problem = {id:string;titleKey:string;category:'interface'|'payment'|'performance'|'access'|'delivery';severity:number;affectedSystems:string[];rootCause:string;discovered:boolean;status:'unknown'|'investigating'|'planned'|'in-progress'|'resolved';contributions:string[];history:WorldEvent[];causedBy?:string;workaround?:boolean};
+export type Project = {id:string;nameKey:string;archetype:string;stack:string[];systems:{id:string;name:string;dependsOn:string[]}[];maturity:number;techDebt:number;stability:number;securityLevel:number;trafficLevel:number;features:string[];problems:Problem[];history:WorldEvent[]};
+export type Company = {id:string;nameKey:string;seed:number;archetype:string;culture:string;stage:string;employeeIds:string[];projects:Project[];reputation:number;stability:number;techDebt:number;processMaturity:number;incidents:{id:string;day:number;resolved:boolean;projectId:string}[];history:WorldEvent[];currentDay:number};
+export type AppId = 'ide'|'browser'|'console'|'chat';
+export type Mechanic = 'choice'|'file-browser'|'search'|'code-choice'|'terminal'|'review'|'console'|'bug-reproduction'|'visual-compare'|'log-analysis'|'incident-response'|'planning'|'dependency-map'|'architecture-diagram'|'security-review'|'query-analysis'|'metric-analysis'|'release-check'|'resource-allocation'|'estimate'|'stakeholder-dialog';
+export type Option = {id:string;labelKey:string;detailKey?:string;responseKey:string;correct?:boolean;effects?:Effect[];minutes?:number};
+export type Step = {id:string;type:Mechanic;app:AppId;speaker?:string;titleKey:string;bodyKey:string;code?:string;resultCode?:string;options?:Option[];effects:Effect[];minutes:number;wrongMinutes:number;wrongEffects:Effect[];terms?:string[];items?:{id:string;labelKey:string;value?:number;detailKey?:string;before?:number;after?:number}[];preview?:'checkout'|'keyboard'|'accessibility';solution?:string[]|Record<string,number>;budget?:number;fixed?:boolean};
+export type TaskTemplate = {id:string;titleKey:string;descriptionKey:string;author:string;estimate:number;steps:Step[];rewards:Effect[];contribution:string;category:Problem['category']};
+export type TaskStatus = 'available'|'active'|'review'|'qa'|'blocked'|'completed';
+export type StepStatus = 'locked'|'active'|'completed';
+export type StepProgress = {status:StepStatus;choiceId?:string;responseKey?:string;draft:string[];allocation:Record<string,number>;clicks:number;run:'idle'|'running'|'done';charged:boolean};
+export type Task = {id:string;templateId:string;projectId:string;problemId:string;characterId:string;status:TaskStatus;currentStepId:string;completedStepIds:string[];attemptsByStep:Record<string,number>;taskStartedAtGameTime:number;taskElapsedMinutes:number;progress:Record<string,StepProgress>;rewarded:boolean;legacyActorId?:string};
+export type DayEvent = {id:string;type:'sync'|'task'|'dialogue'|'incident'|'career'|'company'|'survey';status:'pending'|'completed';key:string;choiceId?:string};
+export type Campaign = {life?:LifeState;meta?:MetaProgress;schemaVersion:3;company:Company|null;characters:Character[];activeCharacterId:string;tasks:Task[];activeTaskId:string|null;schedule:DayEvent[];phase:'start'|'create'|'office'|'reward'|'home'|'ended';time:number;dayStart:Record<Stat,number>;dayWorkStart:number;survey:'unseen'|'pending'|'answered'|'skipped';surveyAnswer?:string;candidateRound:number;saveWarning:boolean};
+export type Feedback = {id:number;key:string;value?:number;good:boolean};
+
+

@@ -1,0 +1,9 @@
+# Office art
+
+Production asset: `public/art/office-premium.png`.
+
+Generated with the built-in image_gen tool. The original SVG home illustration remains in use. Office interactions are HTML controls above the generated scene; no game state is encoded in the raster asset.
+
+## Final generation prompt
+
+Use case: stylized-concept. Asset type: high-end cozy career simulation game office scene, not a UI mockup. Create a beautifully art-directed orthographic isometric miniature open-plan IT office diorama, 4:3 composition. A sophisticated handcrafted 3D animated-film look with matte surfaces, fine bevels, natural oak grain, soft fabric upholstery, ceramic plant pots, extremely soft global illumination and warm late-afternoon sunlight entering a large window on the left wall. Muted sage walls, warm ivory, caramel oak, dark forest green details, restrained terracotta. Full cutaway room with two back walls and an open front, floating on a pale warm-sage studio background. Composition intentionally matches an interactive game: woman coworker with short brown hair at a desk near upper left (about x30% y45%); man coworker at desk upper right (x70% y50%); player's empty chair and desk in the foreground center (x50% y73%), with a small open dark-green laptop clearly visible on that desk at x53% y66%. Exactly three desks, two seated human coworkers, player chair empty. Large leafy plant at right wall, smaller plant between desks, low green couch at left front, tiny coffee table at right front, restrained wall artwork. Warm long diagonal window shadows. Camera fairly close; room occupies 90% width and 85% height, no large blank margin. Elegant, tactile, inviting, grounded; not low-poly, not flat vector, not noisy, not childish plastic toys. Keep laptop screen a dark blank green for UI overlay. No text, no letters, no labels, no buttons, no watermark. Render a production-ready scene asset.

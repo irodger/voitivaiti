@@ -1,0 +1,7 @@
+import { useState } from 'react';
+import { useWorld } from '../world/store';
+import { activeCharacter } from '../world/simulation';
+import { availableTopics } from '../content/contextDialogue';
+import { useI18n } from '../content/localization';
+import { Modal,Speech,Button,characterName } from './shared';
+export function Conversation({npcId,onClose}:{npcId:string;onClose:()=>void}){const w=useWorld(),ch=activeCharacter(w),npc=w.characters.find(x=>x.id===npcId)!,{t}=useI18n(),[topicId,setTopic]=useState<string|null>(null),topics=availableTopics(w,npc),topic=topics.find(x=>x.id===topicId),choice=topic?.choices.find(x=>x.id===ch.conversations?.[npcId+':'+topic.id]);return <Modal title={characterName(npc,t)} onClose={onClose}>{!topic?<><p>{t('chat.topics')}</p><div className="conversation-choices">{topics.map(x=><Button secondary key={x.id} onClick={()=>setTopic(x.id)}>{t(x.titleKey)}{ch.conversations?.[npcId+':'+x.id]?' ✓':''}</Button>)}</div></>:<><Speech speaker={npcId}>{t(topic.bodyKey)}</Speech>{choice?<><p className="conversation-answer">{t(choice.labelKey)}</p><Speech speaker={npcId}>{t(choice.responseKey)}</Speech><p className="fine-print">{t('chat.remember')}</p></>:<div className="conversation-choices">{topic.choices.map(x=><Button secondary key={x.id} onClick={()=>w.dispatch({type:'conversation',npcId,topicId:topic.id,choiceId:x.id})}>{t(x.labelKey)}</Button>)}</div>}<Button secondary onClick={()=>setTopic(null)}>{t('chat.again')}</Button></>}</Modal>}

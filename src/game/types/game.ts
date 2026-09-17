@@ -1,0 +1,16 @@
+export type Profession = 'frontend' | 'backend' | 'qa' | 'designer' | 'analyst' | 'product';
+export type CareerLevel = 'Junior' | 'Middle' | 'Senior' | 'Lead';
+export type Character = { id: string; name: string; avatarId: string; profession: Profession; careerLevel: CareerLevel; playable: boolean };
+export type Stats = { money: number; energy: number; stress: number; reputation: number; xp: number };
+export type Skills = { htmlCss: number; javascript: number; debugging: number; communication: number };
+export type Stat = keyof Stats | keyof Skills;
+export type GameEffect = { stat: Stat; value: number };
+export type TaskStatus = 'not-started' | 'in-progress' | 'review' | 'qa' | 'completed';
+export type StepStatus = 'locked' | 'active' | 'completed';
+export type Choice = { id: string; label: string; description?: string; response?: string; effects?: GameEffect[]; correct?: boolean; timeCostMinutes?: number };
+export type TaskStep = { id: string; title: string; group: number; type: 'dialog' | 'choice' | 'search' | 'file-picker' | 'code-choice' | 'terminal' | 'review' | 'bug-preview' | 'reproduce' | 'console'; text: string; speaker?: string; cta?: string; code?: string; resultCode?: string; choices?: Choice[]; effects?: GameEffect[]; timeCostMinutes: number; wrongAttemptTimeCostMinutes?:number; wrongEffects?:GameEffect[] };
+export type GameTask = { id: string; title: string; description: string; profession: Profession; difficulty: number; author: string; estimate: number; groups: string[]; steps: TaskStep[]; rewards: GameEffect[] };
+export type GamePhase = 'start' | 'creation' | 'profession' | 'welcome' | 'daily' | 'task' | 'reward' | 'event' | 'day-end' | 'home' | 'finished';
+export type Feedback = { id: number; text: string; positive: boolean };
+export type HistoryEvent = { id: number; day: number; time: number; text: string; effects: GameEffect[] };
+export type Progress = { playerStats: Stats; skills: Skills };
