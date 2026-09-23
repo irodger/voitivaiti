@@ -1,0 +1,3 @@
+const KEY='voiti-vaiti-last-player-name';
+export function rememberPlayerName(name:string){const clean=name.trim().slice(0,24);if(!clean)return;try{localStorage.setItem(KEY,clean);}catch{/* Memory is optional; the campaign still stores the name. */}}
+export function lastPlayerName(){try{const saved=localStorage.getItem(KEY);if(saved)return saved.trim().slice(0,24);const raw=JSON.parse(localStorage.getItem('voiti-vaiti-campaign')??'null');const state=raw?.state;const ch=state?.characters?.find((c:{id:string})=>c.id===state.activeCharacterId);return ch&&(!ch.firstDay||ch.firstDay.currentOnboardingStep!=='arrival')?String(ch.name).slice(0,24):'';}catch{return '';}}

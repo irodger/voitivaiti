@@ -16,3 +16,13 @@ text('ui.currentProject','Твой текущий проект','Your current pr
 text('ui.joinProject','Присоединиться к проекту','Join this project');
 text('ui.problemReaction','Почему оно опять упало?','Why did it crash again?',{ru:'Да какого хуя оно опять упало?',en:'Why the hell did it crash again?'});
 text('ui.deadlineReaction','Это маленькая правка. Календарь пока об этом не знает.','It is a tiny change. The calendar has not been told yet.',{ru:'Правка маленькая. А сроки опять поехали к чертям.',en:'Tiny change. The schedule has gone to hell again.'});
+
+text('decision.help','Не знаешь, что выбрать?','Not sure what to choose?');
+text('decision.hint','Здесь нет неправильных ответов. Выбирай любой.','There are no wrong answers here. Choose any option.');
+text('decision.committed','Решение принято. Команда продолжает работу с этим планом.','Decision recorded. The team continues with this plan.');
+text('decision.followup.title','К нашему решению','About our decision');
+text('decision.followup.risk','На днях ты выбрал «{choice}». Сегодня проявился риск: сервис стал менее устойчивым. Давай учтём это в следующей работе.','You chose “{choice}” the other day. The risk surfaced today: the service is less stable. Let us factor that into our next work.');
+text('decision.followup.speed','На днях ты выбрал «{choice}». В этот раз обошлось без осложнений, результат пригодился вовремя.','You chose “{choice}” the other day. This time there were no complications and the result arrived in time.');
+text('decision.followup.care','На днях ты выбрал «{choice}». Работа над устойчивостью дала результат; время команды тоже пришлось учесть.','You chose “{choice}” the other day. The stability work paid off; we also had to account for the team’s time.');
+
+text('decision.pending','Выбор ещё не зафиксирован. Выбери вариант, с которым продолжим.','The decision is not committed yet. Choose how to continue.');

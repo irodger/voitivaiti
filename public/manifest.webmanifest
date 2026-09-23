@@ -1,0 +1,11 @@
+{
+  "id": "./", "name": "Войти Вайти", "short_name": "Войти Вайти",
+  "description": "Жизнь, работа и карьера внутри IT-компании",
+  "lang": "ru", "start_url": "./", "scope": "./", "display": "standalone",
+  "background_color": "#f5f5eb", "theme_color": "#233b32",
+  "icons": [
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}
