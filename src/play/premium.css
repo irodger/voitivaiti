@@ -121,3 +121,5 @@ button.decision-help { display: block; border: 0; padding: 0; background: none; 
 /* Supplied game artwork, kept square and uncropped. */
 .world-game .brand-logo{display:block;width:52px;height:52px;flex:none;object-fit:contain;border-radius:12px;box-shadow:0 2px 6px #14251e20}
 @media(max-width:500px){.world-game .brand-logo{width:40px;height:40px;border-radius:9px}}
+
+.coffee-break{display:flex;flex-direction:column;gap:8px;min-width:0;padding:10px;font-size:12px}.coffee-break p{font-size:11px;line-height:1.5}.coffee-break button{width:100%}
