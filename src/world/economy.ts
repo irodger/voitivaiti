@@ -6,4 +6,4 @@ const mid:Record<string,number>={frontend:180000,backend:220000,mobile:240000,qa
 export const monthlySalary=(ch:Character)=>{const rank=Math.max(0,professionById[ch.profession].careers.findIndex(n=>n.id===ch.careerNodeId));return Math.round((mid[ch.profession]??160000)*([.5,1,1.45,1.8,2.1,2.25][rank]??2.25)/1000)*1000;};
 export const dailySalary=(ch:Character)=>Math.round(monthlySalary(ch)/22);
 export const homeState=(ch:Character)=>ch.home??{owned:[],eveningDay:0,paidDay:0,lastPay:0};
-export const recovery=(ch:Character)=>homeUpgrades.filter(u=>homeState(ch).owned.includes(u.id)).reduce((r,u)=>({energy:r.energy+u.energy,stress:r.stress+u.stress}),{energy:65+(homeState(ch).owned.includes('router')?5:0),stress:18+(homeState(ch).owned.includes('keyboard')?2:0)+(homeState(ch).owned.includes('headphones')?4:0)});
+export const recovery=(ch:Character)=>({energy:65+homeUpgrades.filter(u=>homeState(ch).owned.includes(u.id)).reduce((n,u)=>n+u.energy,0)+(homeState(ch).owned.includes('router')?5:0),stress:Math.min(12,6+homeUpgrades.filter(u=>homeState(ch).owned.includes(u.id)).reduce((n,u)=>n+Math.min(2,u.stress),0)+(homeState(ch).owned.includes('headphones')?1:0))});

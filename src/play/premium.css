@@ -112,3 +112,12 @@ button.decision-help { display: block; border: 0; padding: 0; background: none; 
  .world-game { height: calc(100dvh - env(safe-area-inset-top)); padding-bottom: 0; }
  .world-game .bottom-nav { height: calc(60px + env(safe-area-inset-bottom)); flex-basis: calc(60px + env(safe-area-inset-bottom)); }
 }
+@media (max-width:1023px) { .world-game input,.world-game select,.world-game textarea,.world-modal input,.world-modal select,.world-modal textarea { font-size:16px; } }
+.inline-definition.term-overlay { position:fixed; inset:auto; margin:0; width:min(280px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); overflow:auto; z-index:500; }
+.inline-definition.term-overlay:popover-open { display:flex; }
+.world-hud { grid-template-columns:1.2fr 1fr; }
+@media(max-width:1023px){.world-hud{grid-template-columns:1fr 1fr;}}
+
+/* Supplied game artwork, kept square and uncropped. */
+.world-game .brand-logo{display:block;width:52px;height:52px;flex:none;object-fit:contain;border-radius:12px;box-shadow:0 2px 6px #14251e20}
+@media(max-width:500px){.world-game .brand-logo{width:40px;height:40px;border-radius:9px}}

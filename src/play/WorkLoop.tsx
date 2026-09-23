@@ -1,0 +1,11 @@
+import '../content/workLoop';
+import {useWorld} from '../world/store';
+import {activeCharacter,activeTask,plannedTemplateId} from '../world/simulation';
+import {autonomy,workOwner} from '../world/workLoop';
+import {templateById} from '../content/scenarios';
+import {useI18n} from '../content/localization';
+import {Button,Speech,characterName} from './shared';
+import {WorkQueue} from './LifePanels';
+export function MorningSync({eventId}:{eventId:string}){const w=useWorld(),ch=activeCharacter(w),task=activeTask(w),{t}=useI18n(),level=autonomy(ch),current=task&&!task.rewarded,template=templateById[current?task.templateId:plannedTemplateId(w)];return <><Speech>{t(current?'loop.current':level===0?'loop.assigned':level===4?'loop.lead':'loop.independent',{task:t(template.titleKey)})}</Speech><p>{t('loop.autonomy'+level)}</p>{level===0&&<p>{t(template.descriptionKey)}</p>}{(['plan','clarify','help'] as const).map(id=><Button secondary={id!=='plan'} key={id} onClick={()=>w.dispatch({type:'event',id:eventId,choiceId:id})}>{t('loop.'+(id==='plan'?'accept':id))}</Button>)}</>}
+export function EndWorkButton(){const w=useWorld(),ch=activeCharacter(w),{t}=useI18n();if(!ch.firstDay?.onboardingCompleted||w.phase!=='office'||w.schedule.some(e=>e.type==='sync'&&e.status==='pending'))return null;return <Button secondary onClick={()=>w.dispatch({type:'end-day'})}>{t('loop.finish')}</Button>}
+export function WorkRemainder(){const w=useWorld(),ch=activeCharacter(w),{t}=useI18n(),level=autonomy(ch);return <><h1>{t('loop.remaining')}</h1><p>{t(w.time>=1020?'loop.late':'loop.pressure')}</p>{level>0&&w.time<1020&&<><WorkQueue/><Button disabled={!w.life!.queue.some(q=>q.status==='selected'&&!q.delegatedTo)} onClick={()=>w.dispatch({type:'take-task'})}>{t('ui.takeTask')}</Button></>}{w.life!.queue.filter(q=>q.status==='waiting'&&w.time+q.minutes<=1080).map(q=>{const npc=w.characters.find(n=>n.id===workOwner[q.id]);return <div className="queue-followup" key={q.id}><Button secondary onClick={()=>w.dispatch({type:'help-work',id:q.id})}>{t('loop.helpWork',{work:t('life.work.'+q.id)})}</Button>{level===4&&npc&&<Button secondary onClick={()=>w.dispatch({type:'delegate-work',id:q.id,npcId:npc.id})}>{t('loop.delegate',{name:characterName(npc,t),work:t('life.work.'+q.id)})}</Button>}</div>})}</>}

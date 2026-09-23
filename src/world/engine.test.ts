@@ -13,7 +13,7 @@ import type { Action } from './engine';
 let c:Campaign;
 const act=(a:Action)=>{c=transition(c,a).campaign;};
 function start(role='frontend'){c=emptyCampaign();act({type:'new',name:'Test player',avatarId:'2',professionId:role,seed:1427});delete activeCharacter(c).firstDay;sync();}
-function sync(){const e=c.schedule.find(e=>e.type==='sync')!;act({type:'event',id:e.id,choiceId:'plan'});if(c.company!.currentDay>=3)act({type:'priority',id:'bug',explained:true});if(c.life?.reviewDue)act({type:'performance',accept:true});act({type:'take-task'});}
+function sync(){const e=c.schedule.find(e=>e.type==='sync')!;act({type:'event',id:e.id,choiceId:'plan'});if(c.company!.currentDay>=3||activeCharacter(c).careerNodeId!=='level-0')act({type:'priority',id:'bug',explained:true});if(c.life?.reviewDue)act({type:'performance',accept:true});act({type:'take-task'});}
 function finishStep(){let task=activeTask(c)!,step=templateById[task.templateId].steps.find(s=>s.id===task.currentStepId)!;
  if(['terminal','review','console'].includes(step.type)){act({type:'run'});act({type:'finish-run',taskId:task.id,stepId:step.id});}
  if(step.type==='bug-reproduction'){act({type:'click'});act({type:'click'});}
