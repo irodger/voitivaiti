@@ -62,3 +62,7 @@ text('consequence.foundation','Ты выбрал: «{choice}». Техничес
 text('consequence.choice','Дальше работа пойдёт по выбранному варианту: «{choice}». Что получится, покажет следующая проверка.','The work will follow your chosen approach: “{choice}”. The next check will show how it works out.');
 
 text('queue.start','Начать работу','Start work');
+
+text('plan.reorderHelp','Все действия уже в плане. Нажми на действие, чтобы переместить его на первое место. Затем подтверди порядок.','All actions are included. Click an action to move it to the top, then confirm the order.');
+text('plan.moveFirst','Переместить на первое место: {item}','Move to top: {item}');
+text('plan.confirm','Подтвердить порядок','Confirm order');

@@ -1,3 +1,4 @@
+import {GAME_VERSION} from './content/releases';
 import {saveBeforeUpdate} from './world/store';
 import {useSyncExternalStore} from 'react';
 type InstallPrompt=Event&{prompt:()=>Promise<{outcome:string}>};
@@ -12,11 +13,12 @@ let registrationPromise:Promise<ServiceWorkerRegistration>|undefined;
 let checkPromise:Promise<void>|undefined;
 const watched=new WeakSet<ServiceWorker>();
 function inspectUpdate(r:ServiceWorkerRegistration){
+ if(r.installing&&r.installing.state!=='installed'){change({update:null,checkStatus:'downloading'});return;}
  const worker=navigator.serviceWorker.controller?r.waiting:null;if(!worker){if(!state.applying)change({update:null});return;}
  change({checkStatus:'available'});if(worker===state.update)return;
  change({update:worker,availableVersion:undefined});
  const channel=new MessageChannel(),timer=setTimeout(()=>channel.port1.close(),3000);
- channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();if(state.update===worker&&typeof event.data?.version==='string'&&event.data.version!=='unknown')change({availableVersion:event.data.version});};
+ channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();if(state.update!==worker)return;const version=event.data?.version;if(typeof version!=='string'||!/^\d+\.\d+\.\d+$/.test(version))return;const current=GAME_VERSION.split('.').map(Number),next=version.split('.').map(Number);const difference=next.map((n,i)=>n-current[i]).find(n=>n!==0)??0;if(difference<=0)change({update:null,availableVersion:undefined,checkStatus:'current'});else change({availableVersion:version});};
  try{worker.postMessage({type:'GET_VERSION'},[channel.port2]);}catch{clearTimeout(timer);channel.port1.close();}
 }
 function watchInstall(r:ServiceWorkerRegistration){

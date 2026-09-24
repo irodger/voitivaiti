@@ -19,3 +19,19 @@ export function pwaPlugin(){let config;return {name:'voiti-vaiti-offline',apply:
 const walk=dir=>{for(const file of readdirSync(dir,{withFileTypes:true})){const path=join(dir,file.name);if(file.isDirectory())walk(path);else{files.push(base+relative(config.publicDir,path).replaceAll('\\','/'));hash.update(readFileSync(path));}}};walk(config.publicDir);
 this.emitFile({type:'asset',fileName:'sw.js',source:workerSource(hash.digest('hex').slice(0,16),files,readFileSync(join(config.root,'src/content/releases.ts'),'utf8').match(/GAME_VERSION='([^']+)'/)[1])});
 }};}
+
+// A previously installed PWA must also be able to leave its cached production
+// worker when this origin is serving Vite development pages.
+export function developmentPwaRecovery(){
+ let root,base;
+ return {name:'voiti-vaiti-dev-pwa-recovery',apply:'serve',configResolved(config){root=config.root;base=config.base;},
+ configureServer(server){server.middlewares.use((req,res,next)=>{
+  if(req.url?.split('?')[0]!==base+'sw.js')return next();
+  const version=readFileSync(join(root,'src/content/releases.ts'),'utf8').match(/GAME_VERSION='([^']+)'/)[1];
+  res.setHeader('Content-Type','application/javascript');
+  res.setHeader('Cache-Control','no-store');
+  res.end(`self.addEventListener('message',event=>{if(event.data?.type==='GET_VERSION')event.ports?.[0]?.postMessage({version:${JSON.stringify(version)}});if(event.data?.type==='ACTIVATE_UPDATE')self.skipWaiting();});
+self.addEventListener('activate',event=>event.waitUntil((async()=>{await self.clients.claim();await self.registration.unregister();})()));
+self.addEventListener('fetch',event=>{if(event.request.method==='GET')event.respondWith(fetch(new Request(event.request,{cache:'no-store'})));});`);
+ });}};
+}

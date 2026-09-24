@@ -13,3 +13,14 @@ it('discovers a waiting update on startup without opening the version panel',asy
 it('does not announce a first installation as an update',async()=>{Object.assign(navigator.serviceWorker,{controller:null});const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();pwa.applyUpdate();expect(worker.postMessage).not.toHaveBeenCalled();expect(save).not.toHaveBeenCalled();});
 it('discovers an update installed during the session',async()=>{registration.waiting=null;const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();const installing=Object.assign(new EventTarget(),{state:'installing'});Object.assign(registration,{installing});registration.dispatchEvent(new Event('updatefound'));registration.waiting=worker;installing.state='installed';installing.dispatchEvent(new Event('statechange'));expect(worker.postMessage).toHaveBeenCalledWith({type:'GET_VERSION'},expect.any(Array));expect(reload).not.toHaveBeenCalled();});
 it('checks when returning to the app without reloading',async()=>{const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();document.dispatchEvent(new Event('visibilitychange'));await pwa.checkForUpdate();expect(registration.update).toHaveBeenCalledTimes(2);expect(reload).not.toHaveBeenCalled();});
+
+it.each(['0.10.6','0.10.8'])('does not offer an update to current or older version %s',async(version)=>{
+ let reply:((event:{data:{version:string}})=>void)|undefined;
+ vi.stubGlobal('MessageChannel',class{port1={close:vi.fn(),set onmessage(fn:typeof reply){reply=fn;}};port2={};});
+ const pwa=await import('./pwa');await pwa.checkForUpdate();reply!({data:{version}});pwa.applyUpdate();
+ expect(save).not.toHaveBeenCalled();expect(worker.postMessage.mock.calls.some(([m])=>m.type==='ACTIVATE_UPDATE')).toBe(false);
+});
+it('does not apply an older waiting worker while the new one is downloading',async()=>{
+ Object.assign(registration,{installing:Object.assign(new EventTarget(),{state:'installing'})});
+ const pwa=await import('./pwa');await pwa.checkForUpdate();pwa.applyUpdate();expect(save).not.toHaveBeenCalled();
+});

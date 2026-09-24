@@ -1,3 +1,4 @@
+import {isOrderedPlan,planOrder} from './planOrder';
 import { rememberPlayerName } from './playerName';
 import { ensureLife,emptyMeta,archiveCareer } from './life';
 import type { MetaProgress } from './lifeTypes';
@@ -34,7 +35,7 @@ export const useWorld=create<Store>()(persist<Store, [], [], Campaign>((set,get)
 export function saveBeforeUpdate(){try{const current=snapshot(useWorld.getState());localStorage.setItem('voiti-vaiti-campaign',JSON.stringify({state:current,version:3}));saveMeta(current.meta);return true;}catch{return false;}}
 
 function restoreActionProgress(c:Campaign){
- for(const task of c.tasks){for(const step of templateById[task.templateId].steps){const p=task.progress[step.id];if(!step.actionFlow||!p||p.status!=='active'||p.actionHistory!==undefined)continue;
+ for(const task of c.tasks){for(const step of templateById[task.templateId].steps){const p=task.progress[step.id];if(p&&p.status!=='completed'&&isOrderedPlan(step))p.draft=planOrder(step,p.draft);if(!step.actionFlow||!p||p.status!=='active'||p.actionHistory!==undefined)continue;
   if(p.choiceId||task.attemptsByStep[step.id]){const previous=step.actionFlow.actions.find(a=>a.id===p.choiceId&&!a.completes);p.actionHistory=[previous?.id??'resume'];p.responseKey=undefined;}
  }}return c;
 }
