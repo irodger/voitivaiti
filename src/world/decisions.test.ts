@@ -17,3 +17,13 @@ describe('professional decisions',()=>{
  });
  it('backfills old saves without changing completed work or mechanical progress',()=>{const c=start();delete c.life!.professionalDecisions;const old=JSON.parse(JSON.stringify(c));const restored=migrateLegacy(old);expect(restored.life!.professionalDecisions).toEqual([]);expect(restored.tasks).toEqual(c.tasks);expect(activeCharacter(restored).stats).toEqual(activeCharacter(c).stats);});
 });
+
+it('accepts incomplete UX observations and persists specific later feedback',()=>{
+ let c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;
+ delete activeCharacter(c).firstDay;c=transition(c,{type:'event',id:c.schedule[0].id,choiceId:'plan'}).campaign;c=transition(c,{type:'take-task'}).campaign;
+ expect(activeTask(c)!.templateId).toBe('design-checkout');c=transition(c,{type:'draft',id:'item-0'}).campaign;c=transition(c,{type:'submit'}).campaign;
+ expect(activeTask(c)!.progress.investigate.status).toBe('completed');expect(activeTask(c)!.attemptsByStep.investigate??0).toBe(1);
+ c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.life!.professionalDecisions![0].explanationKey).toBe('fix.missedTotal');
+ expect(c.life!.professionalDecisions![0].selection).toHaveLength(1);c=transition(c,{type:'advance'}).campaign;expect(activeTask(c)!.currentStepId).toBe('resolve');
+ for(let i=0;i<5;i++)advanceCalendar(c);expect(c.life!.professionalDecisions![0].resolved).toBe(true);
+});

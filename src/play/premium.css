@@ -122,4 +122,10 @@ button.decision-help { display: block; border: 0; padding: 0; background: none; 
 .world-game .brand-logo{display:block;width:52px;height:52px;flex:none;object-fit:contain;border-radius:12px;box-shadow:0 2px 6px #14251e20}
 @media(max-width:500px){.world-game .brand-logo{width:40px;height:40px;border-radius:9px}}
 
-.coffee-break{display:flex;flex-direction:column;gap:8px;min-width:0;padding:10px;font-size:12px}.coffee-break p{font-size:11px;line-height:1.5}.coffee-break button{width:100%}
+.world-game .office-shortcuts>button:only-child{grid-column:1 / -1}
+
+.decision-help-popover{position:fixed;inset:auto;margin:0;width:max-content;max-width:min(300px,calc(100vw - 24px));padding:14px 16px;border:1px solid #dfe4d6;border-radius:12px;background:#fffef8;color:#314c3e;font:inherit;font-size:13px;line-height:1.5;box-shadow:0 8px 24px #293e2424;overflow-wrap:anywhere}.decision-help-popover::backdrop{background:transparent;pointer-events:none}
+.first-day .speech p{white-space:pre-line}.onboarding-role{padding:12px 15px;border-left:2px solid #bbc9a8;font-size:13px}.onboarding-role p{margin:5px 0 0}.first-day .office-content{gap:16px}
+.work-remainder{display:flex;flex-direction:column;gap:14px}.world-game .work-remainder h1{font-size:clamp(24px,2vw,30px);margin:0}.work-remainder>p{margin:0}.work-remainder .queue-items{gap:8px}.work-remainder .queue-followup{margin:0}.work-remainder>small{color:#5d7055}.current-status{font-weight:600}.version-update-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#8ba55f;margin-left:5px}.version-update{padding:12px;border:1px solid #dfe4d6;border-radius:10px;margin:12px 0}.version-update p{margin:0 0 10px}
+
+.decision-help{align-self:flex-start;width:fit-content;text-align:left}
