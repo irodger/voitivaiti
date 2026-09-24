@@ -15,3 +15,11 @@ text('fix.reply','пришёл ответ коллеги','a colleague has repli
 text('fix.readyReview','работа готова к отправке на review','work is ready to send for review');
 
 text('fix.observations','Отметь, на что будешь опираться в своём решении.','Select the observations you will base your decision on.');
+
+text('pwa.check.checking','Проверяем обновления…','Checking for updates…');
+text('pwa.check.downloading','Загружаем обновление… Можно продолжать игру.','Downloading the update… You can keep playing.');
+text('pwa.check.current','Установлена последняя доступная сборка.','The latest available build is installed.');
+text('pwa.check.failed','Не удалось проверить или загрузить обновление. Проверь подключение и попробуй снова.','Could not check or download the update. Check your connection and try again.');
+text('pwa.check.development','Это режим разработки: изменения приходят с локального сервера. Установленное приложение обновляется из опубликованной сборки.','Development mode: changes come from the local server. Installed apps update from the published build.');
+text('pwa.check.retry','Проверить ещё раз','Check again');
+text('pwa.check.applying','Применяем обновление…','Applying the update…');
