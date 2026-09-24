@@ -23,3 +23,16 @@ text('pwa.check.failed','Не удалось проверить или загр�
 text('pwa.check.development','Это режим разработки: изменения приходят с локального сервера. Установленное приложение обновляется из опубликованной сборки.','Development mode: changes come from the local server. Installed apps update from the published build.');
 text('pwa.check.retry','Проверить ещё раз','Check again');
 text('pwa.check.applying','Применяем обновление…','Applying the update…');
+
+text('queue.take','Взять задачу','Take task');
+text('queue.action.bug','Разобраться вместе','Investigate together');
+text('queue.action.feature','Доработать с коллегой','Work on it together');
+text('queue.action.review','Сделать review','Review the work');
+text('queue.action.debt','Привести в порядок','Clean it up');
+text('queue.action.support','Ответить на запрос','Reply to the request');
+text('queue.delegate','Передать: {name}','Delegate to {name}');
+text('queue.delegated','Передано коллеге','Assigned to a colleague');
+text('queue.reason.time','Сегодня не осталось времени на эту работу. Очередь сохранится на завтра.','There is not enough time today. This work will remain for tomorrow.');
+text('queue.reason.late','После 17:00 новые самостоятельные задачи не начинаем.','No new individual tasks after 17:00.');
+text('queue.reason.review','Сначала обсуди итоги работы с руководителем.','Discuss your performance with your lead first.');
+text('queue.agree','Как сообщишь команде о смене приоритета?','How will you communicate the priority change?');

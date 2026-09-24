@@ -131,3 +131,42 @@ button.decision-help { display: block; border: 0; padding: 0; background: none; 
 .decision-help{align-self:flex-start;width:fit-content;text-align:left}
 
 .technical-scene,.technical-actions{display:grid;gap:12px}.technical-observations article{padding:10px 0;border-bottom:1px solid #dfe4d6}.technical-observations article p{margin:6px 0;line-height:1.6}.technical-observations article:not(.latest-observation){font-size:12px;color:#71806a}.latest-observation{color:#314c3e}.technical-actions>button{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:14px 16px;background:#fffef8;border:1px solid #dfe4d6;border-radius:10px;color:#314c3e}.technical-actions>button:hover{background:#eef3e3}.technical-actions>button small{white-space:nowrap;color:#71806a}
+
+/* Keep desktop placement; group the mobile brand and controls. */
+.header-brand-group,.header-actions{display:contents}
+.world-game .panel-day-end .office-content:has(.work-remainder){text-align:left;align-items:stretch;justify-content:flex-start}
+.world-game .work-remainder{width:100%;gap:9px}
+.world-game .work-remainder h1{font-size:24px;line-height:1.2}
+.world-game .work-remainder>p{font-size:12px;line-height:1.5}
+.remainder-queue{display:grid;gap:10px;margin-top:5px}
+.remainder-card{border:1px solid var(--line);border-radius:12px;padding:14px;text-align:left;background:var(--paper)}
+.world-game .remainder-card h2{font-size:15px;line-height:1.35;margin:0 0 5px}
+.remainder-card>small{display:block;font-size:10px;color:var(--muted);line-height:1.5}
+.remainder-card>p,.queue-agreement>p{font-size:12px;line-height:1.5;margin:8px 0}
+.remainder-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.remainder-actions button{border:1px solid var(--line);background:#eff3e6;border-radius:8px;padding:9px 12px;font-size:11px;min-height:36px;text-align:left}
+.remainder-actions button:disabled{opacity:.5}
+.remainder-card .queue-unavailable{margin-top:8px}
+.queue-agreement{border-top:1px solid var(--line);margin-top:10px;padding-top:4px}
+.world-game .office-content:has(.work-remainder)>button{margin-top:5px;background:transparent;box-shadow:none;border:0;font-size:12px;text-align:left}
+@media(max-width:1023px){
+ .world-game .app-header{gap:8px}
+ .header-brand-group{display:flex;align-items:center;gap:5px;min-width:0}
+ .header-actions{display:flex;align-items:center;gap:5px;margin-left:auto;flex:none}
+ .header-actions .version-trigger{order:-1;min-height:44px;padding:8px;font-size:11px;color:var(--muted)}
+ .world-game .header-actions .settings-button{width:44px;height:44px;flex:none;background:transparent;box-shadow:none}
+ .world-game .brand{font-size:17px;gap:7px;white-space:nowrap}
+ .world-game .brand-logo{width:36px;height:36px}
+ .world-game .brand small{font-size:6px;letter-spacing:1px}
+ .world-game .adult-toggle{padding:4px 0;font-size:9px;margin:0}
+ .world-game .header-clock{margin-left:auto;margin-right:0;padding:3px;font-size:9px}
+ .remainder-actions button{min-height:44px}
+}
+@media(max-width:430px){
+ .world-game .app-header{position:relative;height:78px}
+ .world-game .header-clock{position:absolute;bottom:3px;right:0;flex-direction:row;gap:6px;padding:0;font-size:9px}
+ .world-game .brand{font-size:15px;letter-spacing:-.7px}
+ .world-game .brand small{letter-spacing:.7px}
+ .header-actions .version-trigger{padding:6px}
+}
+@media(max-width:350px){.world-game .brand small{display:none}.world-game .brand-logo{width:30px;height:30px}.header-actions{gap:1px}.world-game .brand{font-size:14px;gap:4px}}

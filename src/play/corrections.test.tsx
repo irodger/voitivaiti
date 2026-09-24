@@ -21,5 +21,5 @@ it('review response appears exactly once and only after sending',()=>{
 it('remainder has one heading and no duplicate queue introduction',async()=>{
  const {WorkRemainder}=await import('./WorkLoop');const {LifeStatus}=await import('./LifePanels');
  const c=useWorld.getState();activeCharacter(c).careerNodeId='level-1';activeCharacter(c).firstDay!.onboardingCompleted=true;c.schedule.forEach(e=>e.status='completed');c.time=850;useWorld.setState(c);
- const markup=renderToStaticMarkup(<WorkRemainder/>);expect(markup).toContain('Что возьмёшь дальше?');expect(markup.match(/<h1/g)).toHaveLength(1);expect(markup).not.toContain('<h2');expect(renderToStaticMarkup(<LifeStatus/>)).toContain('Сейчас:');
+ const markup=renderToStaticMarkup(<WorkRemainder/>);expect(markup).toContain('Что возьмёшь дальше?');expect(markup.match(/<h1/g)).toHaveLength(1);expect(markup).not.toContain('Помочь:');expect(markup).toContain('remainder-card');expect(renderToStaticMarkup(<LifeStatus/>)).toContain('Сейчас:');
 });

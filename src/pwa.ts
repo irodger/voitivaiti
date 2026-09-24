@@ -12,7 +12,7 @@ let registrationPromise:Promise<ServiceWorkerRegistration>|undefined;
 let checkPromise:Promise<void>|undefined;
 const watched=new WeakSet<ServiceWorker>();
 function inspectUpdate(r:ServiceWorkerRegistration){
- const worker=r.waiting;if(!worker){if(!state.applying)change({update:null});return;}
+ const worker=navigator.serviceWorker.controller?r.waiting:null;if(!worker){if(!state.applying)change({update:null});return;}
  change({checkStatus:'available'});if(worker===state.update)return;
  change({update:worker,availableVersion:undefined});
  const channel=new MessageChannel(),timer=setTimeout(()=>channel.port1.close(),3000);
@@ -55,7 +55,7 @@ export function startPwa(){
  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();change({install:event as InstallPrompt});});
  window.addEventListener('appinstalled',()=>change({installed:true,install:null}));
  if(!import.meta.env.PROD||!('serviceWorker' in navigator)||!window.isSecureContext)return;
- void registration().catch(()=>change({error:true,checkStatus:'failed'}));void navigator.serviceWorker.ready.then(()=>change({ready:true}));
+ void checkForUpdate();void navigator.serviceWorker.ready.then(()=>change({ready:true}));
  window.addEventListener('online',()=>void checkForUpdate());
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void checkForUpdate();});
 }
