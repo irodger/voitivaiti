@@ -170,3 +170,7 @@ button.decision-help { display: block; border: 0; padding: 0; background: none; 
  .header-actions .version-trigger{padding:6px}
 }
 @media(max-width:350px){.world-game .brand small{display:none}.world-game .brand-logo{width:30px;height:30px}.header-actions{gap:1px}.world-game .brand{font-size:14px;gap:4px}}
+
+.queue-pick-hint,.task-start-reason{font-size:12px;line-height:1.5;color:var(--muted);margin:10px 0}
+.queue-pick-action{display:block;font-size:11px;margin:6px 0;color:var(--green)}
+.task-start{width:100%}.task-start>.primary-button{width:100%}

@@ -23,3 +23,24 @@ it('remainder has one heading and no duplicate queue introduction',async()=>{
  const c=useWorld.getState();activeCharacter(c).careerNodeId='level-1';activeCharacter(c).firstDay!.onboardingCompleted=true;c.schedule.forEach(e=>e.status='completed');c.time=850;useWorld.setState(c);
  const markup=renderToStaticMarkup(<WorkRemainder/>);expect(markup).toContain('Что возьмёшь дальше?');expect(markup.match(/<h1/g)).toHaveLength(1);expect(markup).not.toContain('Помочь:');expect(markup).toContain('remainder-card');expect(renderToStaticMarkup(<LifeStatus/>)).toContain('Сейчас:');
 });
+
+it('explains an omitted check and still allows continuing after reload',()=>{
+ let c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;delete activeCharacter(c).firstDay;
+ c=transition(c,{type:'event',id:c.schedule[0].id,choiceId:'plan'}).campaign;c=transition(c,{type:'take-task'}).campaign;
+ c=transition(c,{type:'draft',id:'item-0'}).campaign;c=transition(c,{type:'submit'}).campaign;c=migrateLegacy(JSON.parse(JSON.stringify(c)));
+ const task=activeTask(c)!,step=templateById[task.templateId].steps[0];useWorld.setState(c);
+ const markup=renderToStaticMarkup(<StepRenderer step={step}/>);
+ expect(markup).toContain('Пока без внимания осталось:');expect(markup).toContain('Продолжить');
+ expect(markup).not.toContain('Команда продолжает работу с этим планом');
+ const next=transition(c,{type:'advance'}).campaign;expect(activeTask(next)!.currentStepId).not.toBe(step.id);
+});
+it('shows start only after priority confirmation and replaces unavailable actions with guidance',async()=>{
+ const {TaskStartButton}=await import('./LifePanels');
+ let c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;
+ c.schedule.forEach(e=>e.status='completed');c.life!.queue.forEach(q=>q.status='waiting');activeCharacter(c).careerNodeId='level-1';c.time=600;useWorld.setState(c);
+ expect(renderToStaticMarkup(<TaskStartButton/>)).toBe('');
+ c.life!.queue[0].status='selected';useWorld.setState(c);
+ expect(renderToStaticMarkup(<TaskStartButton/>)).toContain('Начать работу');
+ expect(renderToStaticMarkup(<TaskStartButton/>)).not.toContain('disabled');
+ c.time=1030;useWorld.setState(c);expect(renderToStaticMarkup(<TaskStartButton/>)).toContain('завтра она снова будет доступна');expect(renderToStaticMarkup(<TaskStartButton/>)).not.toContain('<button');
+});
