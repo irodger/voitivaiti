@@ -71,3 +71,16 @@ it('keeps promotion discussion available and exposes the hidden requirements',as
  expect(markup).toContain('Положительные итоги работы');expect(markup).toContain('Нет действующих предупреждений');
  expect(markup).not.toContain('Подтвердить повышение');
 });
+
+it('shows choice help only for an active decision with alternatives',()=>{
+ let c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;delete activeCharacter(c).firstDay;
+ c=transition(c,{type:'event',id:c.schedule[0].id,choiceId:'plan'}).campaign;c=transition(c,{type:'take-task'}).campaign;
+ const task=activeTask(c)!,step=templateById[task.templateId].steps.find(s=>s.options&&s.type!=='review')!;
+ task.currentStepId=step.id;task.progress[step.id].status='active';useWorld.setState(c);
+ const render=(candidate=step,readOnly=false)=>renderToStaticMarkup(<StepRenderer step={candidate} readOnly={readOnly}/>);
+ expect(render()).toContain('decision-help');
+ expect(render({...step,options:step.options!.slice(0,1)})).not.toContain('decision-help');
+ expect(render({...step,type:'review'})).not.toContain('decision-help');
+ expect(render(step,true)).not.toContain('decision-help');
+ task.progress[step.id].status='completed';useWorld.setState(c);expect(render()).not.toContain('decision-help');
+});

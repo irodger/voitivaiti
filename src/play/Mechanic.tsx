@@ -22,7 +22,7 @@ export function StepRenderer({step,readOnly=false,viewProgress}:{step:Step;readO
  const displayOrder=ordered&& !done?planOrder(step,p.draft):p.draft;
  const items=ordered&&displayOrder.length?[...displayOrder.map(id=>step.items!.find(i=>i.id===id)!),...step.items!.filter(i=>!displayOrder.includes(i.id))]:step.items;
  return <section className={`mechanic mechanic-${step.type}`}><div className="step-label">{t('ui.step',{step:templateById[task.templateId].steps.indexOf(step)+1,total:templateById[task.templateId].steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div><h2>{t(step.titleKey)}</h2>{step.type==='search'?<div className="search-input"><Search size={18}/>{t(step.bodyKey)}</div>:<p className="mechanic-brief"><TermText>{t(step.type==='review'?'fix.ready':step.bodyKey)}</TermText></p>}
- {consequential&&<DecisionHelp/>}
+ {consequential&&!disabled&&p.run!=='running'&&step.type!=='review'&&((step.options?.length??0)>1||(step.items?.length??0)>1)&&<DecisionHelp/>}
  {step.type==='file-browser'&&<div className="file-path">src / pages / Home</div>}
  {step.preview&&<VisualPreview kind={step.preview} done={done}/>}
  {step.items?.some(i=>i.before!==undefined)&&<MetricChart items={step.items}/>}
