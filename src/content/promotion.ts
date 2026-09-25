@@ -1,0 +1,13 @@
+import {text} from './localization';
+text('promotion.tenure','Дней в текущей роли','Days in current role');
+text('promotion.review','Положительные итоги работы','Positive performance results');
+text('promotion.warning','Нет действующих предупреждений','No active warnings');
+text('promotion.task','Текущая задача завершена','Current task finished');
+text('promotion.ready','Все условия выполнены. Можно оформить переход на следующую роль.','All requirements are met. You can confirm the move to the next role.');
+text('promotion.notYet','Обсудить рост можно уже сейчас. Для самого повышения пока не все условия выполнены — вот что учитывается.','We can discuss growth now. Promotion still has unmet requirements; here is what counts.');
+text('promotion.tenureHint','Засчитываются игровые календарные дни, а не количество закрытых задач. Дома можно использовать существующую перемотку рутинных дней.','This counts in-game calendar days, not completed tasks. At home you can use the existing routine-day fast-forward.');
+text('promotion.warningHint','До снижения уровня предупреждения — ещё {days} качественных рабочих дней подряд. Для повышения нужно снять все предупреждения.','The warning level decreases after {days} more consecutive good workdays. Promotion requires clearing all warnings.');
+text('promotion.reviewHint','Положительный итог засчитывается при завершении рабочего дня: нужен стаж для следующей роли, минимум четыре задачи и отсутствие предупреждений.','Positive results are recorded at the end of a workday with the required tenure, at least four completed tasks and no warnings.');
+text('promotion.taskHint','Перед переходом на новую роль заверши текущую задачу.','Finish your current task before moving to the new role.');
+text('promotion.confirm','Подтвердить повышение','Confirm promotion');
+text('promotion.close','Понятно, продолжу работу','Got it, back to work');

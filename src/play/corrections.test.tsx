@@ -60,3 +60,14 @@ it('shows the chosen approach and accurate timing in laptop results without inte
  c=transition(c,{type:'reward-close'}).campaign;c=transition(c,{type:'reward-close'}).campaign;
  expect(c.phase).toBe('office');expect(activeCharacter(c).stats.money).toBe(money);
 });
+
+it('keeps promotion discussion available and exposes the hidden requirements',async()=>{
+ const {PromotionCard}=await import('./PromotionCard');
+ const c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;
+ const ch=activeCharacter(c);ch.roleTenure=5;ch.reviewStage=1;ch.performanceMilestones=0;useWorld.setState(c);
+ const markup=renderToStaticMarkup(<PromotionCard nodeId="level-1"/>);
+ expect(markup).toContain('Обсудить повышение');expect(markup).not.toContain('disabled');
+ expect(markup).toContain('Дней в текущей роли');expect(markup).toContain('5 / 90');
+ expect(markup).toContain('Положительные итоги работы');expect(markup).toContain('Нет действующих предупреждений');
+ expect(markup).not.toContain('Подтвердить повышение');
+});
