@@ -44,3 +44,19 @@ it('shows start only after priority confirmation and replaces unavailable action
  expect(renderToStaticMarkup(<TaskStartButton/>)).not.toContain('disabled');
  c.time=1030;useWorld.setState(c);expect(renderToStaticMarkup(<TaskStartButton/>)).toContain('завтра она снова будет доступна');expect(renderToStaticMarkup(<TaskStartButton/>)).not.toContain('<button');
 });
+
+it('shows the chosen approach and accurate timing in laptop results without internal ids',async()=>{
+ const {TaskResult}=await import('./TaskResult');
+ let c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;delete activeCharacter(c).firstDay;
+ c=transition(c,{type:'event',id:c.schedule[0].id,choiceId:'plan'}).campaign;c=transition(c,{type:'take-task'}).campaign;
+ const task=activeTask(c)!;task.templateId='priority.bug';task.rewarded=true;task.status='completed';task.taskElapsedMinutes=110;c.phase='reward';
+ task.progress=Object.fromEntries(templateById[task.templateId].steps.map(s=>[s.id,{status:'completed',draft:s.items?.map(i=>i.id)??[],allocation:{},clicks:0,run:'done',charged:true}]));
+ task.progress.tradeoff.choiceId='shared';
+ c=migrateLegacy(JSON.parse(JSON.stringify(c)));useWorld.setState(c);
+ const markup=renderToStaticMarkup(<TaskResult onClose={()=>{}}/>);
+ expect(markup).toContain('На 10 мин быстрее оценки');expect(markup).toContain('Поддержка просит не оставлять обход навсегда');
+ expect(markup).toContain('Закрыть ноутбук');expect(markup).not.toContain('priority.bug');expect(markup).not.toContain('Вернуться в офис');
+ const money=activeCharacter(c).stats.money;
+ c=transition(c,{type:'reward-close'}).campaign;c=transition(c,{type:'reward-close'}).campaign;
+ expect(c.phase).toBe('office');expect(activeCharacter(c).stats.money).toBe(money);
+});

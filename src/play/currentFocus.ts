@@ -10,7 +10,7 @@ export function currentFocus(w:Campaign){
  if(ch.firstDay&&!ch.firstDay.onboardingCompleted&&ch.firstDay.currentOnboardingStep!=='work')return result('onboarding','work');
  if(w.schedule.some(e=>e.type==='incident'&&e.status==='pending'))return result('incident'); // No guaranteed event target in the current panel.
  if(w.life?.reviewDue)return result('performance','work');
- if(w.phase==='reward')return result('complete','work');
+ if(w.phase==='reward')return result('complete','task');
  if(task&&!task.rewarded&&step){
   const progress=task.progress[step.id];
   if(task.status==='blocked')return result('blocked');

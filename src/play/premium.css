@@ -214,3 +214,14 @@ button.focus-bar:hover{background:#e3ecd7}
  .focus-hud .focus-bar{min-height:58px}
  .world-game .focus-only>.life-status{grid-row:1}
 }
+
+.task-result{display:flex;flex-direction:column;gap:18px;max-width:760px;margin:0 auto;text-align:left}
+.task-result>small{color:var(--muted);font-size:11px}
+.task-result h2{font-size:28px;line-height:1.25}
+.task-result p{font-size:13px;line-height:1.6}
+.result-outcome h3{font-size:13px;margin-bottom:8px}
+.result-outcome p+p{margin-top:8px;color:var(--muted)}
+.task-result>.primary-button{margin-top:8px}
+@media(max-width:600px){.task-result{gap:14px}.task-result h2{font-size:23px}}
+
+.evening-completed{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);padding:8px 0}.evening-clock{font-size:12px}

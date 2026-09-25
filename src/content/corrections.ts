@@ -86,3 +86,13 @@ text('focus.available','В очереди есть работа на сегод�
 text('focus.queue','Основная работа закрыта · в очереди {count}','Main work complete · {count} queued');
 text('focus.clear','Обязательная работа закончена','Required work is finished');
 text('focus.ambient','В офисе идёт рабочий день','The workday is underway');
+
+text('result.label','Итоги работы','Work results');
+text('result.approach','Выбранный подход','Chosen approach');
+text('result.scope','Что учтено и что осталось','Coverage and remaining limitations');
+text('result.finished','Все шаги задачи завершены, результат передан на проверку.','All task steps are complete and the result has been submitted for review.');
+text('result.over','На {minutes} мин дольше оценки.','Took {minutes} min longer than estimated.');
+text('result.under','На {minutes} мин быстрее оценки.','Finished {minutes} min sooner than estimated.');
+text('result.onTime','Уложились ровно в оценку.','Finished exactly within the estimate.');
+text('result.close','Закрыть ноутбук','Close laptop');
+text('result.open','Посмотреть итоги в ноутбуке','View results in the laptop');
