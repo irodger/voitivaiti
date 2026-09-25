@@ -1,0 +1,23 @@
+import {it,expect} from 'vitest';
+import {currentFocus} from './currentFocus';
+import {transition} from '../world/engine';
+import {emptyCampaign,activeCharacter,activeTask} from '../world/simulation';
+import {templateById} from '../content/scenarios';
+it('follows the active step, review, reply, queue and home without changing game state',()=>{
+ let w=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'frontend',seed:1427}).campaign;
+ expect(currentFocus(w).key).toBe('focus.onboarding');
+ delete activeCharacter(w).firstDay;
+ w=transition(w,{type:'event',id:w.schedule[0].id,choiceId:'plan'}).campaign;
+ expect(currentFocus(w).key).toBe('focus.available');
+ w=transition(w,{type:'take-task'}).campaign;
+ const task=activeTask(w)!;
+ expect(currentFocus(w)).toMatchObject({key:'focus.step',target:'task',stepKey:templateById[task.templateId].steps[0].titleKey});
+ const review=templateById[task.templateId].steps.find(s=>s.type==='review')!;
+ task.currentStepId=review.id;task.progress[review.id].run='running';
+ expect(currentFocus(w).key).toBe('focus.waiting');
+ task.progress[review.id].run='done';expect(currentFocus(w)).toMatchObject({key:'focus.reply',target:'task'});
+ task.rewarded=true;w.schedule.forEach(e=>e.status='completed');
+ expect(currentFocus(w)).toMatchObject({key:'focus.queue',target:'work'});
+ w.life!.queue.forEach(q=>q.status='done');expect(currentFocus(w).key).toBe('focus.clear');
+ w.phase='home';expect(currentFocus(w)).toMatchObject({key:'focus.home',target:'home'});
+});
