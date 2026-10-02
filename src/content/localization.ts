@@ -26,3 +26,5 @@ text('decision.followup.speed','На днях ты выбрал «{choice}». В
 text('decision.followup.care','На днях ты выбрал «{choice}». Работа над устойчивостью дала результат; время команды тоже пришлось учесть.','You chose “{choice}” the other day. The stability work paid off; we also had to account for the team’s time.');
 
 text('decision.pending','Выбор ещё не зафиксирован. Выбери вариант, с которым продолжим.','The decision is not committed yet. Choose how to continue.');
+
+text('ui.loading','Загружаем…','Loading…');
