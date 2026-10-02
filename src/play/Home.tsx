@@ -6,7 +6,7 @@ import '../content/evening';
 import {eveningActivities,eveningDone,canSpendEvening} from '../world/evening';
 import { dayPhase } from '../world/workLoop';
 import '../content/workLoop';
-import { RoutinePanel } from './LifePanels';
+import { RoutinePanel } from './RoutinePanel';
 import { Marketplace } from './Marketplace';
 import { ApartmentScene } from './ApartmentScene';
 import { useEffect,useRef,useState } from 'react';

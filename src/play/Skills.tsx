@@ -1,0 +1,6 @@
+import {useWorld} from '../world/store';
+import {activeCharacter} from '../world/simulation';
+import {glossary} from '../content/world';
+import {useI18n} from '../content/localization';
+
+export function Skills(){const ch=useWorld(activeCharacter),{t}=useI18n();return <section className="collection-view world-collection"><h1>{t('ui.skills')}</h1><div className="skills-grid world-skills">{Object.entries(ch.skills).map(([id,value])=><article className="world-card" key={id}><span className="eyebrow">{t('ui.level',{value})}</span><h2>{t(`ui.${id}`)}</h2><div className="skill-pips">{Array.from({length:12},(_,i)=><i key={i} className={i<value?'filled':''}/>)}</div></article>)}</div><h2>{t('ui.glossary')}</h2>{!ch.discoveredTerms.length&&<p>{t('ui.termsEmpty')}</p>}<div className="glossary-grid">{glossary.filter(term=>ch.discoveredTerms.includes(term.id)).map(term=><article className={`world-card ${ch.discoveredTerms.includes(term.id)?'':'undiscovered'}`} key={term.id}><h3>{ch.discoveredTerms.includes(term.id)?t(term.titleKey):'???'}</h3><p>{t(term.explanationKey)}</p>{ch.termMemories?.[term.id]&&<><small>{t('first.memory',{day:ch.termMemories[term.id].discoveredAt})}</small><p>«{ch.termMemories[term.id].firstSeenContext}»</p></>}</article>)}</div></section>}
