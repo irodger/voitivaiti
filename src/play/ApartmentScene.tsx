@@ -1,3 +1,5 @@
+import {TechArt} from './TechArt';
+import './marketplace.css';
 import {canBeginWalk} from '../world/walk';
 import {BookOpen, Check, CookingPot, DoorOpen, Gamepad2, Moon, Package, ShoppingBag, Sun} from 'lucide-react';
 import {homeUpgrades} from '../content/home';
@@ -30,7 +32,7 @@ export function ApartmentScene({onShop,onMarket}:{onShop:()=>void;onMarket:()=>v
       {homeUpgrades.filter(u=>owned.includes(u.id)).map(u=><div key={u.id} className={`apartment-furniture furniture-${u.id}`} role="img" aria-label={t(u.titleKey)}>
         <img src={`${import.meta.env.BASE_URL}art/apartment-furnished.webp`} alt=""/>
       </div>)}
-      {marketItems.filter(i=>owned.includes(i.id)).map(i=><div key={i.id} className={`apartment-tech tech-${i.id}`} role="img" aria-label={t(i.titleKey)}><span/><i/><b/></div>)}
+      {marketItems.filter(i=>owned.includes(i.id)).map(i=><div key={i.id} className={`apartment-tech tech-${i.id}`} role="img" aria-label={t(i.titleKey)}><TechArt id={i.id}/></div>)}
       {atHome && <>
         {activities.map(({id,icon:Icon})=>done.includes(id)?
           <span key={id} className={`apartment-action spot-${id} finished`} title={t('evening.done.'+id)}><Check size={13}/><span>{t('apartment.'+id)}</span></span>:
