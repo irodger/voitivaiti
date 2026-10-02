@@ -30,7 +30,7 @@ it('places only arrived parcels at the door and installs tech only after unpacki
 it('reflects completed activities and prevents exposing activities that cannot fit before midnight',()=>{
  let c=home();c=transition(c,{type:'evening',id:'cook'}).campaign;c=migrateLegacy(JSON.parse(JSON.stringify(c)));useWorld.setState(c);
  expect(markup()).toContain('spot-cook finished');expect(markup()).not.toContain('aria-label="Ужин"');
- c.time=1420;useWorld.setState(c);const html=markup();
+ c.time=1421;useWorld.setState(c);const html=markup();
  expect(html).not.toContain('spot-walk');expect(html).not.toContain('spot-read');expect(html).toContain('spot-sleep');
 });
 it('does not offer evening actions while the player is at work',()=>{

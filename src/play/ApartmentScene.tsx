@@ -1,3 +1,4 @@
+import {canBeginWalk} from '../world/walk';
 import {BookOpen, Check, CookingPot, DoorOpen, Gamepad2, Moon, Package, ShoppingBag, Sun} from 'lucide-react';
 import {homeUpgrades} from '../content/home';
 import {marketItems} from '../content/marketplace';
@@ -18,9 +19,10 @@ export function ApartmentScene({onShop,onMarket}:{onShop:()=>void;onMarket:()=>v
   const w=useWorld(), ch=activeCharacter(w), {t}=useI18n(), owned=homeState(ch).owned;
   const phase=dayPhase(w.time), atHome=w.phase==='home', day=w.company!.currentDay;
   const done=eveningDone(ch,day);
-  const hasActivity=activities.some(({id})=>canSpendEvening(ch,day,w.time,id));
+  const available=(id:EveningActivity)=>id==='walk'?canBeginWalk(ch,day,w.time):canSpendEvening(ch,day,w.time,id);
+  const hasActivity=activities.some(({id})=>available(id));
   const parcels=(ch.orders??[]).filter(o=>!o.received && o.deliveryDay<=w.life!.calendarDay);
-  const act=(id:EveningActivity)=>w.dispatch({type:'evening',id});
+  const act=(id:EveningActivity)=>w.dispatch(id==='walk'?{type:'start-walk'}:{type:'evening',id});
   return <div className={`home-room apartment-scene phase-${phase}`}>
     <div className="apartment-frame">
       <img className="apartment-art" src={`${import.meta.env.BASE_URL}art/apartment-premium.webp`} alt={t('home.roomAlt')}/>
@@ -32,7 +34,7 @@ export function ApartmentScene({onShop,onMarket}:{onShop:()=>void;onMarket:()=>v
       {atHome && <>
         {activities.map(({id,icon:Icon})=>done.includes(id)?
           <span key={id} className={`apartment-action spot-${id} finished`} title={t('evening.done.'+id)}><Check size={13}/><span>{t('apartment.'+id)}</span></span>:
-          canSpendEvening(ch,day,w.time,id) && <button key={id} className={`apartment-action spot-${id}`} onClick={()=>act(id)} aria-label={t('apartment.'+id)} title={`${t('apartment.'+id)} · ${t('ui.min',{value:eveningActivities[id]})}`}><Icon size={14}/><span>{t('apartment.'+id)}</span><small>{eveningActivities[id]}′</small></button>)}
+          available(id) && <button key={id} className={`apartment-action spot-${id}`} onClick={()=>act(id)} aria-label={t('apartment.'+id)} title={id==='walk'?t('walk.range'):`${t('apartment.'+id)} · ${t('ui.min',{value:eveningActivities[id]})}`}><Icon size={14}/><span>{t('apartment.'+id)}</span>{id!=='walk'&&<small>{eveningActivities[id]}′</small>}</button>)}
         <button className="apartment-action spot-sleep" onClick={()=>w.dispatch({type:'sleep'})}><Moon size={14}/>{t('ui.sleep')}</button>
       </>}
       {parcels.length>0 && <button className="apartment-parcel" onClick={onMarket} aria-label={t('apartment.parcels',{count:parcels.length})} title={t('apartment.parcels',{count:parcels.length})}><Package size={24}/><span>{parcels.length}</span></button>}
