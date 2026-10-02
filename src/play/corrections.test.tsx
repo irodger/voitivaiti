@@ -67,8 +67,8 @@ it('keeps promotion discussion available and exposes the hidden requirements',as
  const ch=activeCharacter(c);ch.roleTenure=5;ch.reviewStage=1;ch.performanceMilestones=0;useWorld.setState(c);
  const markup=renderToStaticMarkup(<PromotionCard nodeId="level-1"/>);
  expect(markup).toContain('Обсудить повышение');expect(markup).not.toContain('disabled');
- expect(markup).toContain('Дней в текущей роли');expect(markup).toContain('5 / 90');
- expect(markup).toContain('Положительные итоги работы');expect(markup).toContain('Нет действующих предупреждений');
+ expect(markup).toContain('Самостоятельно исследовать рабочую проблему');expect(markup).not.toContain('5 / 90');
+ expect(markup).toContain('Разобраться в разных типах проблем');expect(markup).toContain('Нет действующих предупреждений');
  expect(markup).not.toContain('Подтвердить повышение');
 });
 

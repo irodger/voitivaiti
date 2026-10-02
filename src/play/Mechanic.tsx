@@ -16,12 +16,14 @@ import type { Step,StepProgress } from '../world/types';
 import { VisualPreview,MetricChart,DependencyGraph } from './VisualMechanics';
 export function StepRenderer({step,readOnly=false,viewProgress}:{step:Step;readOnly?:boolean;viewProgress?:StepProgress}){const world=useWorld(),{t}=useI18n(),task=activeTask(world)!,p=viewProgress??task.progress[step.id],done=p.status==='completed',disabled=readOnly||done;
  useEffect(()=>{if(readOnly||p.run!=='running')return;const timer=setTimeout(()=>useWorld.getState().dispatch({type:'finish-run',taskId:task.id,stepId:step.id}),step.type==='terminal'?1700:1200);return()=>clearTimeout(timer);},[p.run,readOnly,task.id,step.id,step.type]);
+ const priorOutcome=task.templateId.startsWith('lens.')&&templateById[task.templateId].steps[0].id===step.id?world.company?.projects.find(project=>project.id===task.projectId)?.problems.find(problem=>problem.id===task.problemId)?.latestOutcomeKey:undefined;
  const consequential=isConsequential(step);
  const response=p.responseKey==='decision.committed'?decisionFeedback(step,p,t):t(p.responseKey??'ui.success');
  const ordered=isOrderedPlan(step),allocation=step.type==='resource-allocation';
  const displayOrder=ordered&& !done?planOrder(step,p.draft):p.draft;
  const items=ordered&&displayOrder.length?[...displayOrder.map(id=>step.items!.find(i=>i.id===id)!),...step.items!.filter(i=>!displayOrder.includes(i.id))]:step.items;
- return <section className={`mechanic mechanic-${step.type}`}><div className="step-label">{t('ui.step',{step:templateById[task.templateId].steps.indexOf(step)+1,total:templateById[task.templateId].steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div><h2>{t(step.titleKey)}</h2>{step.type==='search'?<div className="search-input"><Search size={18}/>{t(step.bodyKey)}</div>:<p className="mechanic-brief"><TermText>{t(step.type==='review'?'fix.ready':step.bodyKey)}</TermText></p>}
+ return <section className={`mechanic mechanic-${step.type}`}><div className="step-label">{t('ui.step',{step:templateById[task.templateId].steps.indexOf(step)+1,total:templateById[task.templateId].steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div><h2>{t(step.titleKey)}</h2>{step.type==='search'?<div className="search-input"><Search size={18}/><TermText>{t(step.bodyKey)}</TermText></div>:<p className="mechanic-brief"><TermText>{t(step.type==='review'?'fix.ready':step.bodyKey)}</TermText></p>}
+ {priorOutcome&&<p className="mechanic-brief"><TermText>{t(priorOutcome)}</TermText></p>}
  {consequential&&!disabled&&p.run!=='running'&&step.type!=='review'&&((step.options?.length??0)>1||(step.items?.length??0)>1)&&<DecisionHelp/>}
  {step.type==='file-browser'&&<div className="file-path">src / pages / Home</div>}
  {step.preview&&<VisualPreview kind={step.preview} done={done}/>}

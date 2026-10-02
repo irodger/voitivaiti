@@ -1,0 +1,20 @@
+[
+  {
+    "round": 0,
+    "grade": "level-1",
+    "calendar": 3,
+    "stories": 4
+  },
+  {
+    "round": 1,
+    "grade": "level-2",
+    "calendar": 3,
+    "stories": 7
+  },
+  {
+    "round": 2,
+    "grade": "level-3",
+    "calendar": 3,
+    "stories": 11
+  }
+]

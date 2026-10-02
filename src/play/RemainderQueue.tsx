@@ -21,8 +21,8 @@ export function RemainderQueue(){
    <p>{t('life.work.'+q.id+'.body')}</p>
    {delegated?<small>{t('queue.delegated')}</small>:<div className="remainder-actions">
     {canTake&&!takeReason&&<button onClick={()=>selected?w.dispatch({type:'take-task'}):setChosen(chosen===q.id?null:q.id)}>{t(selected?'queue.start':'queue.choose')}</button>}
-    {q.status==='waiting'&&!helpReason&&<button onClick={()=>w.dispatch({type:'help-work',id:q.id})}>{t('queue.action.'+q.id)}</button>}
-    {!helpReason&&level===4&&npc&&npc.employed&&npc.id!==ch.id&&!queue.some(item=>item.delegatedTo===npc.id)&&<button onClick={()=>w.dispatch({type:'delegate-work',id:q.id,npcId:npc.id})}>{t('queue.delegate',{name:characterName(npc,t)})}</button>}
+    {q.status==='waiting'&&availableWork(ch).includes(q.id)&&!helpReason&&<button onClick={()=>w.dispatch({type:'help-work',id:q.id})}>{t('queue.action.'+q.id)}</button>}
+    {!helpReason&&level>=3&&npc&&npc.employed&&npc.id!==ch.id&&!queue.some(item=>item.delegatedTo===npc.id)&&<button onClick={()=>w.dispatch({type:'delegate-work',id:q.id,npcId:npc.id})}>{t('queue.delegate',{name:characterName(npc,t)})}</button>}
    </div>}
    {!delegated&&((canTake&&takeReason)||helpReason)&&<small className="queue-unavailable">{t('queue.reason.'+(canTake&&takeReason?takeReason:helpReason))}</small>}
    {chosen===q.id&&!selected&&canTake&&!takeReason&&<div className="queue-agreement"><p>{t('queue.agree')}</p><div className="remainder-actions"><button onClick={()=>choose(true)}>{t('life.explain')}</button><button onClick={()=>choose(false)}>{t('life.dismiss')}</button></div></div>}

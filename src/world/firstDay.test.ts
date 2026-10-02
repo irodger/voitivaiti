@@ -11,3 +11,5 @@ it.each(['frontend','qa','devops'])('introduces %s before work and resumes every
 it('does not send existing careers back through onboarding',()=>{const c=start();delete activeCharacter(c).firstDay;c.company!.currentDay=8;const old=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(activeCharacter(old).firstDay!.onboardingCompleted).toBe(true);expect(old.company!.currentDay).toBe(8);});
 });
 
+
+it('continues with a fallback name and allows later renaming',()=>{let c=start();c=transition(c,{type:'onboarding',name:'   '}).campaign;expect(activeCharacter(c).name).toBe('Саша');expect(activeCharacter(c).firstDay!.currentOnboardingStep).toBe('order');c=transition(c,{type:'rename',name:'Лена'}).campaign;expect(activeCharacter(c).name).toBe('Лена');});

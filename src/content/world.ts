@@ -31,6 +31,13 @@ export const npcDefinitions=[
 export const traitIds=['curious','careful','social','patient'];
 [['curious','Любопытный','Curious'],['careful','Внимательный','Careful'],['social','Общительный','Sociable'],['patient','Терпеливый','Patient']].forEach(([id,ru,en])=>text(`trait.${id}`,ru,en));
 export const glossary=[
+ ['regression','Regression','Проверка, что после изменения прежние рабочие действия не сломались.','Checking that changes did not break existing behavior.'],
+ ['idempotency','Идемпотентность','Повтор одного действия даёт тот же результат, а не создаёт второй заказ или списание.','Repeating an operation returns the same result rather than creating another order or charge.'],
+ ['lead','Lead','Коллега, который помогает команде договориться о работе и разобраться в сложных случаях.','A colleague who helps the team agree on work and resolve difficult cases.'],
+ ['backend','Backend','Серверная часть продукта: хранит данные и обрабатывает действия за экраном.','The server side: stores data and processes actions behind the screen.'],
+ ['post','POST','Отправка данных на сервер: например, формы или заказа. Это один из способов обращения к API.','Sending data to a server, such as a form or order. A way of calling an API.'],
+ ['requestId','requestId','Номер конкретного обращения к системе. По нему находят связанные записи и расследуют ошибку без пароля пользователя.','An identifier for one request. It links relevant logs without needing a user password.'],
+ ['reconnect','reconnect','Восстановление связи после разрыва. Повторная отправка при этом может создать дубликат.','Reconnecting after a connection drops. Sending again can create a duplicate.'],
  ['frontend','Frontend','То, что пользователь видит и нажимает: экраны, кнопки и их поведение.','The screens, buttons and behavior a user sees and interacts with.'],
  ['bug','Bug','Программа делает не то, что от неё ожидают. Такую ошибку называют багом.','When software does not behave as expected, we call it a bug.'],
  ['daily','Daily','Короткая встреча команды: что сделали, что планируют и где нужна помощь.','A short team meeting: what happened, what comes next and who needs help.'],
