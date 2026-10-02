@@ -6,7 +6,7 @@ import '../content/expectations';
 
 export function ensureWorkExpectations(c:Campaign){
  const ch=c.characters.find(x=>x.id===c.activeCharacterId);
- if(!ch||!c.life||ch.completedWork.length<2)return;
+ if(!ch||!c.life||ch.completedWork.length<1||!ch.firstDay?.onboardingCompleted)return;
  for(const q of c.life.queue){
   if(q.status==='done'||!availableWork(ch).includes(q.id))continue;
   const {project,problem}=ordinaryProblem(c,q.id);
