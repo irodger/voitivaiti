@@ -1,0 +1,20 @@
+# Apartment art — v0.11.0
+
+Generated with the built-in `image_gen` tool in image-reference mode. Encoded as WebP for delivery, preserving the generated composition. Existing artwork was not overwritten.
+
+## Shipped assets
+
+- `public/art/apartment-premium.webp` — starter room, 1448 × 1086. Style reference: `public/art/office-premium.png`.
+- `public/art/apartment-furnished.webp` — furnished variant, 1448 × 1086. Reference: the starter room. CSS masks reveal only owned upgrades in a shared 4:3 frame.
+
+## Starter room prompt
+
+Use case: stylized-concept. Asset type: production game environment background for existing Russian life sim Войти Вайти. Create one polished isometric cutaway SMALL STARTER STUDIO APARTMENT. Landscape 4:3 image. Style reference: supplied office illustration ONLY for consistent handcrafted premium 3D miniature aesthetic, warm oak, sage walls, realistic soft textiles, tactile materials, soft cinematic sunset light, ambient occlusion, crisp detailed diorama, readable game environment. This is a HOME for one junior IT worker, not another office. No people. Full room floor and two walls visible, centered diorama filling image with narrow sage background margin, no interface or text. Composition MUST place simple low single bed with offwhite blanket in LEFT FRONT at 30% x 65% y; large window and view of quiet city on LEFT BACK at 20% x 30% y; compact kitchen counter with small stove on BACK RIGHT at 76% x 34% y; plain desk with closed laptop and BASIC wooden stool at RIGHT FRONT at 76% x 65% y. A small door recess in center of back wall. Interior intentionally clean, lived-in but inexpensive: modest desk, bare warm floor, one small rug by bed, subtle book stack. Leave space around desk and beside bed for future upgrade overlays. Do NOT include standing lamp, large plants, office chair, external monitors, wall shelving, headset, keyboard, router, coffee maker, elaborate bed headboard; those will be purchased in game. Rich rendering and inviting light, no luxury penthouse, no watermarks, no lettering, no rendered UI. Reference image 1 is STYLE reference only, do not copy its room composition or characters.
+
+## Furnished room prompt
+
+Edit this apartment game background as a PRECISE SAME-CAMERA FURNISHED VARIANT for layered game upgrades. KEEP exact camera, framing, image aspect ratio 4:3, room geometry, sunset lighting, colors, wall/window/door/kitchen locations and desk position, every existing element unchanged except specified purchases. Objects must be fixed in the following exact screen percentage locations, do not move any existing furniture apart from replacements: 1) REPLACE existing single bed on front left with a higher quality single bed, better cream linen, sage duvet, upholstered headboard, EXACT SAME FOOTPRINT and orientation (pillow/head at upper-left and foot at lower-right). Bed must fit inside x8–43%, y44–76%. 2) REPLACE the BASIC stool at front-right desk with a comfortable sage ergonomic chair, footprint x76–92%, y60–80%; tuck it at existing desk, do not move desk. 3) ADD slim brass warm floor lamp in the space to RIGHT of bed, x38–47%, y43–69%. 4) ADD a tall lush ficus in terracotta pot on center floor left of desk, x53–65%, y49–72%. 5) ADD a narrow low walnut bookcase in empty back-wall space to LEFT of door, x39–47%, y28–44%. 6) ADD a muted sage cooking pot and wooden chopping board on existing stove at x66–77%, y38–46%. Do NOT add other tech items: no external monitor, no headphones, no router or keyboard. Critically maintain exact alignment with the input so that small purchased object regions can be layered over the starter apartment without obvious shifts. No UI, no text, no people. Output full furnished room in same landscape framing.
+
+## Integration
+
+Preserve the frame aspect ratio when replacing the artwork. Tech items use CSS shapes. Furniture, tech, parcels and evening actions use campaign state and existing engine actions. Night lighting uses CSS; reduced-motion preferences disable idle and installation animations. A furniture atlas experiment was discarded because its perspective did not match the room.
