@@ -1,5 +1,5 @@
 .office-world-plane{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
-.office-resident{position:absolute;transform:translate(-50%,-100%);width:4.7%;pointer-events:none}
+.office-resident{position:absolute;transform:translate(-50%,-100%);width:7.4%;pointer-events:none}
 .resident-target{position:relative;display:block;width:100%;padding:0;border:0;background:none;box-shadow:none;pointer-events:auto;color:#253e32;cursor:pointer;transform:scale(var(--person-scale));transform-origin:center bottom}
 .office-person{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 2px 1px #192e2520)}
 .resident-name{position:absolute;left:50%;top:102%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:7px;background:#fffdf0e8;box-shadow:0 2px 7px #20372b20;font-size:9px;white-space:nowrap;line-height:1.3}
@@ -7,15 +7,11 @@
 .resident-target:hover .resident-name,.resident-target:focus-visible .resident-name{background:#e0edbc;outline:2px solid #799954}
 .resident-target:focus-visible{outline:none}.office-agent-label{pointer-events:none}
 .living-office .office-activity{z-index:110;pointer-events:none}.living-office .office-experience{z-index:110;pointer-events:none}
-.person-leg,.person-arm{transform-box:fill-box;transform-origin:center top}
-.is-walking .person-leg.left,.is-walking .person-arm.right{animation:office-stride .48s ease-in-out infinite alternate}
-.is-walking .person-leg.right,.is-walking .person-arm.left{animation:office-stride .48s ease-in-out infinite alternate-reverse}
-.is-walking .person-head{animation:office-bob .48s ease-in-out infinite alternate}
-@keyframes office-stride{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
-@keyframes office-bob{from{transform:translateY(0)}to{transform:translateY(-1px)}}
-@media(max-width:760px){.office-resident{width:5.2%}.resident-name{font-size:8px;padding:2px 5px}.living-office .office-activity{font-size:8px;top:48px}.living-office .office-experience{display:none}}
-@media(prefers-reduced-motion:reduce){.is-walking .person-leg,.is-walking .person-arm,.is-walking .person-head{animation:none}}
+@media(max-width:760px){.office-resident{width:7.8%}.resident-name{font-size:8px;padding:2px 5px}.living-office .office-activity{font-size:8px;top:48px}.living-office .office-experience{display:none}}
 
 .resident-target::after{content:"";position:absolute;inset:0 -10px;min-height:44px;min-width:44px}
-.is-seated .person-head{animation:office-bob 3s ease-in-out infinite alternate}
-@media(prefers-reduced-motion:reduce){.is-seated .person-head{animation:none}}
+
+.office-sprite{aspect-ratio:2/3;background-image:url("/art/office-people.webp");background-size:400% 300%;background-repeat:no-repeat;filter:drop-shadow(0 2px 1px #172f2526)}
+.is-walking .office-sprite{animation:office-sprite-step .42s ease-in-out infinite alternate}
+@keyframes office-sprite-step{from{transform:translateY(0) rotate(-.6deg)}to{transform:translateY(-1.5px) rotate(.6deg)}}
+@media(prefers-reduced-motion:reduce){.is-walking .office-sprite{animation:none}}

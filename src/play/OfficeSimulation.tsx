@@ -22,7 +22,7 @@ function Colleague({id,avatarId,name,index,activity,beat,introducing,unread,onTa
   onAnimationStart={()=>setWalking(moving)} onAnimationComplete={()=>setWalking(false)}
   style={{zIndex:Math.round(destination[1]),'--person-scale':.85+destination[1]/350} as React.CSSProperties}>
   <Tag className={'resident-target'+(introducing?' office-agent-label':'')} onClick={introducing?undefined:()=>onTalk(id)} aria-label={introducing?undefined:t('ui.talkWith',{name})}>
-   <OfficePerson avatarId={avatarId} seated={!walking&&activity==='work'&&!(beat%4===1&&index===Math.floor(beat/4)%5)}/><span className="resident-name">{name}{unread&&!introducing&&<i className="resident-unread"/>}</span>
+   <OfficePerson avatarId={avatarId} walking={walking} seated={!walking&&activity==='work'&&!(beat%4===1&&index===Math.floor(beat/4)%5)}/><span className="resident-name">{name}{unread&&!introducing&&<i className="resident-unread"/>}</span>
   </Tag>
  </motion.div>;
 }
