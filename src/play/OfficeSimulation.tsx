@@ -1,9 +1,46 @@
-import { useEffect,useState } from 'react';
-import { useWorld } from '../world/store';
-import { activeCharacter,activeTask } from '../world/simulation';
-import { careerRank } from '../world/life';
-import { hasNewTopic } from '../content/contextDialogue';
-import { CharacterAvatar } from '../components/CharacterAvatar';
-import { useI18n } from '../content/localization';
-import { characterName } from './shared';
-export function OfficeSimulation({onTalk}:{onTalk:(id:string)=>void}){const w=useWorld(),{t}=useI18n(),[beat,setBeat]=useState(0),[mode,setMode]=useState<'full'|'reduced'|'hero'>('hero');useEffect(()=>{const update=()=>setMode(innerWidth>=1200?'full':innerWidth>=768?'reduced':'hero');update();addEventListener('resize',update);return()=>removeEventListener('resize',update)},[]);useEffect(()=>{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const timer=setInterval(()=>setBeat(b=>b+1),mode==='full'?7000:mode==='reduced'?14000:30000);return()=>clearInterval(timer)},[mode]);const first=activeCharacter(w).firstDay,introducing=!!first&&!['work','farewell','done'].includes(first.currentOnboardingStep),AgentTag=introducing?'span':'button';const task=activeTask(w),incident=w.schedule.some(e=>e.type==='incident'&&e.status==='pending'),review=task?.status==='review',qa=task?.status==='qa',phase=beat%6,dispute=!incident&&!review&&phase===3;useEffect(()=>{if(dispute&&w.phase==='office'&&w.life?.officeEncounterDay!==w.company?.currentDay)w.dispatch({type:'office-encounter'});},[dispute,w.phase,w.life?.officeEncounterDay,w.company?.currentDay]);const activity=incident?'officeIncident':review?'officeReview':qa?'officeQa':w.time>=1080?'officeEvening':w.time>=780&&w.time<=840?'officeLunch':dispute?'officeDispute':phase===4?'officeMeeting':'officeWork';const people=w.characters.filter(c=>c.employed&&c.id!==w.activeCharacterId).sort((a,b)=>['anya','ilya','sergey','max','oleg'].indexOf(a.id)-['anya','ilya','sergey','max','oleg'].indexOf(b.id)).slice(0,mode==='hero'?2:mode==='reduced'?3:5);const positions=[[31,30],[70,38],[24,62],[62,65],[48,23]];return <div className={'office-simulation mode-'+mode}><div className="office-activity" role="status">{t('life.'+activity)}</div>{people.map((c,i)=>{let [x,y]=positions[i];if(mode==='full'){if(incident||review||qa){x=20+i*14;y=46+(i%2)*11;}else if(phase===1&&i===2){x=82;y=71;}else if(dispute&&(i===1||i===4)){x=57+i*3;y=27;}else if(phase===4){x=28+i*8;y=30;}}return <AgentTag key={c.id} className={'office-agent'+(introducing?' office-agent-label':'')} style={{left:x+'%',top:y+'%',opacity:activity==='officeEvening'&&i>2?.2:1}} onClick={introducing?undefined:()=>onTalk(c.id)} aria-label={introducing?undefined:t('ui.talkWith',{name:characterName(c,t)})}><CharacterAvatar id={c.avatarId} size={28}/><span>{characterName(c,t)}{!introducing&&hasNewTopic(w,c)?' •':''}</span></AgentTag>})}<div className="office-experience">{t('life.role'+(['Junior','Middle','Senior','Lead'][Math.min(3,careerRank(activeCharacter(w)))]))}</div>{careerRank(activeCharacter(w))>0&&<div className="desk-mementos" aria-hidden="true">{careerRank(activeCharacter(w))>=2?'DEV CONF · ✓':'TODO · ✓'}</div>}</div>}
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {motion,useReducedMotion} from 'framer-motion';
+import {useWorld} from '../world/store';
+import {activeCharacter,activeTask} from '../world/simulation';
+import {careerRank} from '../world/life';
+import {hasNewTopic} from '../content/contextDialogue';
+import {useI18n} from '../content/localization';
+import {characterName} from './shared';
+import {OfficePerson} from './OfficePerson';
+import {officeDestination,officeRoute,type OfficeActivity,type OfficePoint} from './officeMovement';
+import './officeMovement.css';
+
+function Colleague({id,avatarId,name,index,activity,beat,introducing,unread,onTalk}:{id:string;avatarId:string;name:string;index:number;activity:OfficeActivity;beat:number;introducing:boolean;unread:boolean;onTalk:(id:string)=>void}) {
+ const reduced=useReducedMotion(),destination=officeDestination(index,activity,beat);
+ const previous=useRef<OfficePoint>(destination),[walking,setWalking]=useState(false);
+ const route=useMemo(()=>officeRoute(previous.current,destination),[destination[0],destination[1]]),moving=route.length>1;
+ useEffect(()=>{previous.current=destination;},[destination[0],destination[1]]);
+ const {t}=useI18n(),Tag=introducing?'span':'button';
+ return <motion.div className={'office-resident'+(walking&&!reduced?' is-walking':'')} initial={false}
+  animate={{left:route.map(p=>p[0]+'%'),top:route.map(p=>p[1]+'%')}}
+  transition={{duration:reduced?0:moving?Math.min(12,Math.max(4,route.length*1.3)):0,ease:'linear'}}
+  onAnimationStart={()=>setWalking(moving)} onAnimationComplete={()=>setWalking(false)}
+  style={{zIndex:Math.round(destination[1]),'--person-scale':.82+destination[1]/180} as React.CSSProperties}>
+  <Tag className={'resident-target'+(introducing?' office-agent-label':'')} onClick={introducing?undefined:()=>onTalk(id)} aria-label={introducing?undefined:t('ui.talkWith',{name})}>
+   <OfficePerson avatarId={avatarId}/><span className="resident-name">{name}{unread&&!introducing&&<i className="resident-unread"/>}</span>
+  </Tag>
+ </motion.div>;
+}
+export function OfficeSimulation({onTalk,paused=false}:{onTalk:(id:string)=>void;paused?:boolean}) {
+ const w=useWorld(),{t}=useI18n(),reduced=useReducedMotion(),[beat,setBeat]=useState(0),host=useRef<HTMLDivElement>(null),[size,setSize]=useState({width:0,height:0});
+ useEffect(()=>{const node=host.current;if(!node)return;const observer=new ResizeObserver(([entry])=>setSize({width:entry.contentRect.width,height:entry.contentRect.height}));observer.observe(node);return()=>observer.disconnect();},[]);
+ useEffect(()=>{if(reduced||paused)return;const timer=setInterval(()=>{if(!document.hidden)setBeat(b=>b+1)},18000);return()=>clearInterval(timer)},[reduced,paused]);
+ const first=activeCharacter(w).firstDay,introducing=!!first&&!['work','farewell','done'].includes(first.currentOnboardingStep);
+ const task=activeTask(w),incident=w.schedule.some(e=>e.type==='incident'&&e.status==='pending'),review=task?.status==='review',qa=task?.status==='qa',dispute=!introducing&&!incident&&!review&&beat%6===3;
+ useEffect(()=>{if(dispute&&w.phase==='office'&&w.life?.officeEncounterDay!==w.company?.currentDay)w.dispatch({type:'office-encounter'});},[dispute,w.phase,w.life?.officeEncounterDay,w.company?.currentDay]);
+ const activity:OfficeActivity=incident?'incident':review||qa?'review':first?.currentOnboardingStep==='meeting'||dispute?'meeting':w.time>=1080?'evening':w.time>=780&&w.time<=840?'lunch':'work';
+ const status=incident?'officeIncident':review?'officeReview':qa?'officeQa':activity==='meeting'?(dispute?'officeDispute':'officeMeeting'):activity==='evening'?'officeEvening':activity==='lunch'?'officeLunch':'officeWork';
+ const people=w.characters.filter(c=>c.employed&&c.id!==w.activeCharacterId).slice(0,5);
+ // Match the background's object-fit:cover crop on every viewport.
+ const width=Math.max(size.width,size.height*4/3),height=width*3/4;
+ return <div ref={host} className="office-simulation living-office">
+  <div className="office-activity" role="status">{t('life.'+status)}</div>
+  <div className="office-world-plane" style={{width,height}}>{people.map((c,i)=><Colleague key={c.id} id={c.id} avatarId={c.avatarId} name={characterName(c,t)} index={i} activity={activity} beat={beat} introducing={introducing} unread={hasNewTopic(w,c)} onTalk={onTalk}/>)}</div>
+  <div className="office-experience">{t('life.role'+(['Junior','Middle','Senior','Lead'][Math.min(3,careerRank(activeCharacter(w)))]))}</div>
+ </div>;
+}
