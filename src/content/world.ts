@@ -49,5 +49,7 @@ export const glossary=[
  ['rollback','Rollback','Возврат предыдущей рабочей версии, чтобы остановить проблему.','Restore the previous working version to stop an incident.'],
  ['debt','Технический долг','Временные упрощения, за которые позже придётся заплатить временем и сложностью.','Shortcuts that will cost time and complexity later.'],
  ['api','API','Договор о том, как системы обращаются друг к другу и какие данные передают.','An agreement on how systems communicate and which data they exchange.'],
+ ['requestId','requestId','Номер одного обращения к серверу. Помогает связать отправку, ответ и запись в журнале.','A number identifying one server request, linking its send, response and log entry.'],
+ ['network','Network','Обмен данными: что экран отправил серверу и что получил в ответ.','Data exchange: what the screen sent to the server and what came back.'],
  ['metric','Метрика','Измеримый показатель, который помогает понять, что происходит с продуктом.','A measurable signal that helps explain what is happening in a product.'],
 ].map(([id,title,ru,en])=>({id,titleKey:text(`term.${id}.title`,title,id==='debt'?'Technical debt':id==='metric'?'Metric':title),explanationKey:text(`term.${id}.explanation`,ru,en)}));

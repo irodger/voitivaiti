@@ -1,8 +1,9 @@
+import {codeArtifact} from './workArtifacts';
 import {text} from './localization';
 import type {ActionFlow,TechnicalAction} from '../world/types';
 type Pair=[string,string];
 function flow(key:string,initial:string[],rows:{id:string;label:Pair;result:Pair;minutes?:number;next?:string[];completes?:boolean;code?:string}[]):ActionFlow{
- return {initial,actions:rows.map(({label,result,...row}):TechnicalAction=>({...row,minutes:row.minutes??3,labelKey:text(`action.${key}.${row.id}`, ...label),observationKey:text(`observation.${key}.${row.id}`, ...result)}))};
+ return {initial,actions:rows.map(({label,result,...row}):TechnicalAction=>({...row,artifact:row.code&&['home','hero','usage','inspect','trace','log'].includes(row.id)?codeArtifact(key+'.'+row.id,row.code):undefined,minutes:row.minutes??3,labelKey:text(`action.${key}.${row.id}`, ...label),observationKey:text(`observation.${key}.${row.id}`, ...result)}))};
 }
 export const technicalFlows:Record<string,ActionFlow>={
  'FE-1427.files':flow('heading.files',['home','styles','hero'],[

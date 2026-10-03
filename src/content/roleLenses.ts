@@ -1,3 +1,4 @@
+import {roleArtifact} from './workArtifacts';
 import {architectureLenses} from './architectureLenses';
 import {deliveryLenses} from './deliveryLenses';
 import {accessLenses} from './accessLenses';
@@ -63,7 +64,7 @@ function lensTemplate(lens:RoleLens,category:CaseId):TaskTemplate{
  const inspect=action('inspect',lens.inspect,['Случай удалось повторить. Теперь можно отделить симптом от причины и сопоставить данные.','The case reproduced. You can now separate the symptom from its cause and compare evidence.'],12,['trace']);
  if(lens.id==='support'||lens.id==='mobile'||lens.probe)inspect.next=['trace','contact'];
  const ask=action('premature',lens.ask,lens.missing,8,['inspect']);ask.effects=[{target:'stress',value:1}];
- const trace=action('trace',lens.trace,lens.facts[category],18,undefined,true);trace.effects=[{target:'debugging',value:1},{target:'xp',value:10}];
+ const trace=action('trace',lens.trace,lens.facts[category],18,undefined,true);trace.artifact=roleArtifact(lens.id,category,trace.observationKey);trace.effects=[{target:'debugging',value:1},{target:'xp',value:10}];
  const fast=action('limited',lens.fast,['Локальный путь изменён. Это быстрее, но соседние случаи не покрыты. Проверь ограниченный результат до передачи.','The local path changed. It is faster, but neighboring cases are not covered. Verify the limited result before handing it over.'],20,['verify-limited']);
  const care=action('shared',lens.care,['Общий подход изменён. Потребовалось больше времени; теперь проверь исходный и соседний случаи.','The shared approach changed. It took longer; now verify the original and neighboring cases.'],40,['verify-shared']);
  const verifyLimited=action('verify-limited',lens.check,['Исходный случай проходит. Соседний остаётся за границами обхода; запиши это ограничение для коллег.','The original case passes. A neighboring case remains outside the workaround; record that limitation for colleagues.'],12,undefined,true);verifyLimited.outcome=outcome('temporary');verifyLimited.effects=[{target:'craft',value:1},{target:'techDebt',value:2}];

@@ -72,8 +72,10 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
  const environment=action('environment','hypothesis.environment','hypothesis.environment.result',['crosscheck']);
  const metrics=action('metrics','hypothesis.metrics','hypothesis.metrics.result',['crosscheck']);
  const cross=action('crosscheck','crosscheck','crosscheck.result',['apply-shared','apply-limited']);
+
  if(family==='artifact'){
   const open=action('open-artifact','artifact.open','artifact.seen',['experiment']);
+  open.artifact={kind:'task',titleKey:'story.artifact.title',promptKey:'artifact.hint',rows:[{id:'saved',labelKey:'story.artifact.open',detailKey:'story.artifact.seen'},{id:'report',labelKey:'story.hypothesis.environment',detailKey:'story.environment'}]};
   const experiment=action('experiment','experiment','experiment.result',grade===0?['apply-shared']:['environment','metrics']);
   scene.steps=[makeStep('artifact','artifact.title',[open,experiment,environment,metrics,cross,applyShared,applyLimited,sharedResult,limitedResult],['open-artifact'],`saved version: ${problem.story?.version??1}\noriginal case: passed\nnew report: state changes between actions`),base.steps[2]];
  }else if(family==='recurrence'){
