@@ -237,3 +237,9 @@ button.focus-bar:hover{background:#e3ecd7}
 .world-game .office-stage:has(.living-office) .office-laptop{left:8%;top:56%;width:20%;height:17%}
 
 .personal-finance ul{padding-left:18px;margin:12px 0 0}.personal-finance li{font-size:12px;line-height:1.65;margin:8px 0}.personal-finance li strong{white-space:nowrap}
+
+@media(max-width:1023px){
+ .world-game .office-stage:has(.living-office){container-type:inline-size}
+ .world-game .office-scene:has(.living-office) .office-render{object-fit:contain}
+ .world-game .office-stage:has(.living-office) .office-laptop{top:calc(50% + 4.5cqw);height:12.75cqw}
+}

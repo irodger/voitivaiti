@@ -30,17 +30,18 @@ function Colleague({id,avatarId,name,role,index,activity,beat,introducing,unread
  </motion.div>;
 }
 export function OfficeSimulation({onTalk,paused=false}:{onTalk:(id:string)=>void;paused?:boolean}) {
- const w=useWorld(),{t}=useI18n(),reduced=useReducedMotion(),[beat,setBeat]=useState(0),host=useRef<HTMLDivElement>(null),[size,setSize]=useState({width:0,height:0});
+ const w=useWorld(),{t}=useI18n(),reduced=useReducedMotion(),[compact,setCompact]=useState(()=>window.matchMedia('(max-width:1023px)').matches),[beat,setBeat]=useState(0),host=useRef<HTMLDivElement>(null),[size,setSize]=useState({width:0,height:0});
  useEffect(()=>{const node=host.current;if(!node)return;const observer=new ResizeObserver(([entry])=>setSize({width:entry.contentRect.width,height:entry.contentRect.height}));observer.observe(node);return()=>observer.disconnect();},[]);
  useEffect(()=>{if(reduced||paused)return;const timer=setInterval(()=>{if(!document.hidden)setBeat(b=>b+1)},18000);return()=>clearInterval(timer)},[reduced,paused]);
+ useEffect(()=>{const query=window.matchMedia('(max-width:1023px)'),update=()=>setCompact(query.matches);query.addEventListener('change',update);return()=>query.removeEventListener('change',update);},[]);
  const first=activeCharacter(w).firstDay,introducing=!!first&&!['work','farewell','done'].includes(first.currentOnboardingStep);
  const task=activeTask(w),incident=w.schedule.some(e=>e.type==='incident'&&e.status==='pending'),review=task?.status==='review',qa=task?.status==='qa',dispute=!introducing&&!incident&&!review&&beat%6===3;
  useEffect(()=>{if(dispute&&w.phase==='office'&&w.life?.officeEncounterDay!==w.company?.currentDay)w.dispatch({type:'office-encounter'});},[dispute,w.phase,w.life?.officeEncounterDay,w.company?.currentDay]);
  const activity:OfficeActivity=incident?'incident':review||qa?'review':first?.currentOnboardingStep==='meeting'||w.schedule.some(e=>e.type==='sync'&&e.status==='pending')||dispute?'meeting':w.time>=1080?'evening':w.time>=780&&w.time<=840?'lunch':'work';
  const status=incident?'officeIncident':review?'officeReview':qa?'officeQa':activity==='meeting'?(dispute?'officeDispute':'officeMeeting'):activity==='evening'?'officeEvening':activity==='lunch'?'officeLunch':'officeWork';
  const people=w.characters.filter(c=>c.employed&&c.id!==w.activeCharacterId).slice(0,5);
- // Match the background's object-fit:cover crop on every viewport.
- const width=Math.max(size.width,size.height*4/3),height=width*3/4;
+ // Keep the actor plane aligned with the background, including mobile letterboxing.
+ const width=(compact?Math.min:Math.max)(size.width,size.height*4/3),height=width*3/4;
  const player=activeCharacter(w);
  const reviewerIndex=Math.max(0,people.findIndex(c=>qa?professionById[c.profession].family==='qa':c.profession===player.profession));
  const roleName=(c:typeof player)=>t(professionById[c.profession].careers.find(n=>n.id===c.careerNodeId)?.titleKey??professionById[c.profession].titleKey);

@@ -15,3 +15,7 @@
 @media(max-width:1023px){.walk-scene{height:390px}.walk-world{gap:18px}.walk-panel{min-height:360px}.walk-panel .office-content{overflow:visible}.walk-scene-header{top:12px;left:12px;right:12px}.walk-hotspot{padding:9px 10px;font-size:10px;gap:5px}.walk-hotspot small{display:none}.walk-summary{gap:8px}.walk-summary>div{padding:13px;font-size:11px}.walk-panel-top>span{font-size:9px}}
 @media(max-width:500px){.walk-scene{height:320px}.walk-hotspot{font-size:9px;padding:9px}.walk-hotspot svg{width:13px}.walk-hotspot.route-river{left:78%!important}.walk-scene-footer{font-size:9px;bottom:12px}.walk-routes>button{padding:15px;gap:9px}.world-game .walk-routes p{font-size:11px}.walk-scene-header{font-size:10px}.world-game .walk-panel .office-content{padding:23px}}
 @media(prefers-reduced-motion:reduce){.walk-evening-light,.walk-trail .trail-line{animation:none}.walk-art,.walk-hotspot{transition:none}}
+
+/* The entrance remains an explicit return target in the same scene as the walk. */
+.walk-home-hotspot{left:27%;top:47%;z-index:5;border-color:#b9cd92;background:#f4f9df;box-shadow:0 0 0 4px #e0edb536,0 5px 14px #29463635}
+@media(max-width:500px){.walk-home-hotspot{font-size:10px;padding:9px 10px}.walk-home-hotspot svg:last-child{display:none}}
