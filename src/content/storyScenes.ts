@@ -1,3 +1,4 @@
+import {historyArtifact,environmentArtifact,reviewArtifact} from './historyArtifacts';
 import {text} from './localization';
 import type {SceneFamily,TaskTemplate,Step,TechnicalAction,Problem} from '../world/types';
 
@@ -70,23 +71,26 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
  }
  const makeStep=(id:string,title:string,actions:TechnicalAction[],initial:string[],code?:string):Step=>({id,titleKey:'story.'+title,bodyKey:base.descriptionKey,type:'choice',app:id==='discussion'?'chat':base.steps[0].app,actionFlow:{actions,initial},code,minutes:0,wrongMinutes:0,effects:[],wrongEffects:[]});
  const environment=action('environment','hypothesis.environment','hypothesis.environment.result',['crosscheck']);
+ environment.artifact=structuredClone(environmentArtifact);
  const metrics=action('metrics','hypothesis.metrics','hypothesis.metrics.result',['crosscheck']);
  const cross=action('crosscheck','crosscheck','crosscheck.result',['apply-shared','apply-limited']);
 
  if(family==='artifact'){
   const open=action('open-artifact','artifact.open','artifact.seen',['experiment']);
   open.artifact={kind:'task',titleKey:'story.artifact.title',promptKey:'artifact.hint',rows:[{id:'saved',labelKey:'story.artifact.open',detailKey:'story.artifact.seen'},{id:'report',labelKey:'story.hypothesis.environment',detailKey:'story.environment'}]};
+  open.artifact=historyArtifact(problem)??open.artifact;
   const experiment=action('experiment','experiment','experiment.result',grade===0?['apply-shared']:['environment','metrics']);
   scene.steps=[makeStep('artifact','artifact.title',[open,experiment,environment,metrics,cross,applyShared,applyLimited,sharedResult,limitedResult],['open-artifact'],`saved version: ${problem.story?.version??1}\noriginal case: passed\nnew report: state changes between actions`),base.steps[2]];
  }else if(family==='recurrence'){
   const previous=action('previous','artifact.open','environment',grade===0?['environment']:['environment','metrics']);
+  previous.artifact=historyArtifact(problem);
   if(grade===0)cross.next=['apply-shared'];
   scene.steps=[makeStep('recurrence','recurrence.title',[previous,environment,metrics,cross,applyShared,applyLimited,sharedResult,limitedResult],['previous']),base.steps[2]];
  }else if(family==='dependency'||family==='delegation'){
   const request=action('request',family==='delegation'?'assign':'request','request.result',['local','bypass','reply']);request.dependency=true;request.delegates=family==='delegation';
   const local=action('local','local','local.result',['audit','reply','bypass']);
   const audit=action('audit','audit','audit.result',['reply','bypass']);audit.minutes=20;
-  const reply=action('reply',family==='delegation'?'result':'reply','crosscheck.result',['verified-result','bounded-result']);reply.requiresReply=true;reply.observationKey=fact.observationKey;
+  const reply=action('reply',family==='delegation'?'result':'reply','crosscheck.result',['verified-result','bounded-result']);reply.requiresReply=true;reply.observationKey=fact.observationKey;reply.artifact=structuredClone(fact.artifact);
   const bypass=action('bypass','bypass','bypass.result',['bounded-result']);
   scene.steps=[makeStep('discussion',family+'.title',[request,local,audit,reply,bypass,sharedResult,limitedResult],['request']),base.steps[2]];
  }else if(family==='incident'){
@@ -96,6 +100,7 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
   scene.steps=[makeStep('triage','incident.title',[triage,mitigate,environment,cross,applyShared,applyLimited,limitedResult,sharedResult],['triage']),base.steps[2]];
  }else if(family==='review'){
   const inspect=action('inspect-review','inspect-review','inspect-review.result',['comment','approve-bounds']);
+  inspect.artifact=structuredClone(reviewArtifact);
   const comment=action('comment','comment','comment.result',['experiment']);
   const experiment=action('experiment','experiment','experiment.result',['verified-result']);
   const accept=action('approve-bounds','approve-bounds','bypass.result',['bounded-result']);

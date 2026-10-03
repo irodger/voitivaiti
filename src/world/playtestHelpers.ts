@@ -21,7 +21,8 @@ export function finishPlaytestTask(c:Campaign,style='shared'){
    for(let n=0;n<20&&activeTask(c)!.progress[step.id].status!=='completed';n++){
     const actions=availableTechnicalActions(step,activeTask(c)!.progress[step.id]);
     const action=actions.find(a=>a.id===style)??actions.find(a=>a.id===(style==='limited'?'apply-limited':'apply-shared'))??actions.find(a=>a.id===(style==='limited'?'bounded-result':'verified-result'))??actions[0];if(!action)throw Error('No action at '+step.id);
-    c=perform(c,{type:'technical-action',id:action.id});
+    if(action.artifact){for(const row of action.artifact.rows.filter(row=>!row.optional))c=perform(c,{type:'artifact-inspect',actionId:action.id,rowId:row.id});c=perform(c,{type:'artifact-compare',id:action.id});}
+    else c=perform(c,{type:'technical-action',id:action.id});
    }
   }else{
    if(['terminal','review','console'].includes(step.type)){c=perform(c,{type:'run'});c=perform(c,{type:'finish-run',taskId:task.id,stepId:step.id});}
