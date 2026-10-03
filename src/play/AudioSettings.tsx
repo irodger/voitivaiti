@@ -1,0 +1,4 @@
+import {Volume2,VolumeX} from 'lucide-react';
+import {text,useI18n,usePreferences} from '../content/localization';
+text('audio.label','Фоновый звук','Ambient sound');text('audio.on','Включён','On');text('audio.off','Выключен','Off');text('audio.hint','В офисе — тихий шум помещения, дома и на прогулке — эмбиент. При уходе из приложения звук приостанавливается.','Quiet room ambience in the office; soft ambient tones at home and outdoors. Sound pauses when you leave the app.');
+export function AudioSettings(){const {t}=useI18n(),prefs=usePreferences(),Icon=prefs.soundEnabled?Volume2:VolumeX;return <><div className="setting-row"><span><Icon size={17}/> {t('audio.label')}</span><button className="world-secondary" role="switch" aria-checked={prefs.soundEnabled} aria-label={t('audio.label')} onClick={()=>prefs.setSoundEnabled(!prefs.soundEnabled)}>{t(prefs.soundEnabled?'audio.on':'audio.off')}</button></div><p className="fine-print">{t('audio.hint')}</p></>;}

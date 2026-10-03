@@ -4,7 +4,7 @@ import type { Campaign,Character } from './types';
 import type { WorkKind } from './lifeTypes';
 import { professionById } from '../content/professions';
 export function autonomy(ch:Character){const rank=professionById[ch.profession].careers.findIndex(n=>n.id===ch.careerNodeId);return rank>=3?4:rank===2?3:rank===1?2:ch.completedWork.length>=3?1:0;}
-export function availableWork(ch:Character):WorkKind[]{return autonomy(ch)===0?['bug']:autonomy(ch)===1?['bug','feature']:autonomy(ch)===2?['bug','feature','review','debt']:['bug','feature','review','debt','support'];}
+export function availableWork(ch:Character):WorkKind[]{return autonomy(ch)===0?(ch.completedWork.length>=2?['bug','feature']:['bug']):autonomy(ch)===1?['bug','feature']:autonomy(ch)===2?['bug','feature','review','debt']:['bug','feature','review','debt','support'];}
 export const dayPhase=(minutes:number)=>{const clock=((minutes%1440)+1440)%1440;return clock<6*60||clock>=22*60?'night':clock<12*60?'morning':clock<18*60?'day':'evening';};
 export function carryQueue(c:Campaign){resolveResponsibilities(c);for(const q of c.life!.queue){if(q.status==='done'){q.status='waiting';q.age=0;q.expectation=undefined;q.problemId=undefined;q.projectId=undefined;q.promisedDay=undefined;q.delegatedTo=undefined;q.urgency=1+((c.company!.seed+c.company!.currentDay+q.minutes)%4);}else{q.age=(q.age??0)+1;q.urgency=Math.min(5,q.urgency+(q.age%2===0?1:0));}}c.life!.routineSummary=undefined;ensureWorkExpectations(c);}
 export function finishOfficeHours(c:Campaign){const from=c.time,to=Math.max(from,1080+(c.company!.seed+c.company!.currentDay)%18);c.time=to;c.life!.routineSummary={from,to,unfinished:c.tasks.some(t=>t.id===c.activeTaskId&&!t.rewarded)};}

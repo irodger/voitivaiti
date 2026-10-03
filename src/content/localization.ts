@@ -4,8 +4,8 @@ import type { ContentMode,Locale } from '../world/types';
 export type Translation = {ru:string;en:string;adult?:{ru:string;en:string}};
 export const dictionary:Record<string,Translation>={};
 export function text(key:string,ru:string,en:string,adult?:{ru:string;en:string}){dictionary[key]={ru,en,...(adult?{adult}: {})};return key;}
-type Preferences={locale:Locale;contentMode:ContentMode;setLocale:(l:Locale)=>void;toggleMode:()=>void};
-export const usePreferences=create<Preferences>()(persist(set=>({locale:'ru',contentMode:'clean',setLocale:locale=>set({locale}),toggleMode:()=>set(s=>({contentMode:s.contentMode==='clean'?'adult':'clean'}))}),{name:'voiti-vaiti-preferences'}));
+type Preferences={soundEnabled:boolean;setSoundEnabled:(enabled:boolean)=>void;locale:Locale;contentMode:ContentMode;setLocale:(l:Locale)=>void;toggleMode:()=>void};
+export const usePreferences=create<Preferences>()(persist(set=>({soundEnabled:true,setSoundEnabled:soundEnabled=>set({soundEnabled}),locale:'ru',contentMode:'clean',setLocale:locale=>set({locale}),toggleMode:()=>set(s=>({contentMode:s.contentMode==='clean'?'adult':'clean'}))}),{name:'voiti-vaiti-preferences'}));
 export function translate(key:string,values:Record<string,string|number>={},locale=usePreferences.getState().locale,mode=usePreferences.getState().contentMode){const entry=dictionary[key];const value=(mode==='adult'?entry?.adult?.[locale]:undefined)??entry?.[locale]??key;return value.replace(/\{(\w+)\}/g,(_,k)=>String(values[k]??`{${k}}`));}
 export function useI18n(){const {locale,contentMode}=usePreferences();return {t:(key:string,values?:Record<string,string|number>)=>translate(key,values,locale,contentMode),locale,contentMode};}
 const ui:Record<string,[string,string]>={

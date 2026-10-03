@@ -1,3 +1,4 @@
+import {restoreColleagueAppearances} from './characterAppearance';
 import {resolveTaskTemplate} from '../content/scenarios';
 import {isOrderedPlan,planOrder} from './planOrder';
 import { rememberPlayerName } from './playerName';
@@ -17,7 +18,7 @@ export function snapshot(s:Campaign):Campaign{return Object.fromEntries(Object.k
 export function migrateLegacy(raw:unknown):Campaign{
  const old=raw as Record<string,unknown>;if(!old||typeof old!=='object')return emptyCampaign();
  if(old.schemaVersion===3&&!old.company)return {...emptyCampaign(),meta:(old.meta as MetaProgress)??readMeta(),phase:old.phase==='create'?'create':'start'};
- if(old.schemaVersion===3&&old.company){const c=old as unknown as Campaign;if(Array.isArray(c.characters)&&c.characters.some(ch=>ch.id===c.activeCharacterId&&professionById[ch.profession])&&Array.isArray(c.tasks)&&c.tasks.every(t=>templateById[t.templateId]))return restoreActionProgress(ensureLife({...emptyCampaign(),...c,meta:c.meta??readMeta()}));return emptyCampaign();}
+ if(old.schemaVersion===3&&old.company){const c=old as unknown as Campaign;if(Array.isArray(c.characters)&&c.characters.some(ch=>ch.id===c.activeCharacterId&&professionById[ch.profession])&&Array.isArray(c.tasks)&&c.tasks.every(t=>templateById[t.templateId]))return restoreColleagueAppearances(restoreActionProgress(ensureLife({...emptyCampaign(),...c,meta:c.meta??readMeta()})));return emptyCampaign();}
  const people=old.characters as {id:string;name:string;avatarId:string;profession:string}[]|undefined;
  const person=people?.find(p=>p.id===old.activeCharacterId);if(!person)return {...emptyCampaign(),phase:old.gamePhase==='creation'?'create':'start'};
  const c=emptyCampaign(),world=generateWorld(1427),ch=makeCharacter(person.id,person.name,person.avatarId,professionById[person.profession]?person.profession:'frontend');Object.assign(c,world);c.characters.push(ch);c.company!.employeeIds.push(ch.id);c.activeCharacterId=ch.id;ch.currentProjectIds=[c.company!.projects[0].id];Object.assign(ch.stats,old.playerStats??{});const skills=(old.skills??{}) as Record<string,number>;ch.skills={craft:(skills.htmlCss??1)+(skills.javascript??0),debugging:skills.debugging??0,communication:skills.communication??1,leadership:0};c.company!.currentDay=Number(old.currentDay??1);c.time=Number(old.time??540);c.dayStart={...ch.stats};c.schedule=makeSchedule(c);c.schedule.find(e=>e.type==='sync')!.status='completed';

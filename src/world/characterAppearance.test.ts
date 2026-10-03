@@ -1,0 +1,6 @@
+import {it,expect,vi} from 'vitest';
+vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
+import {generateWorld,makeCharacter,emptyCampaign} from './simulation';
+import {matchColleagueAppearance,restoreColleagueAppearances} from './characterAppearance';
+it('generated named rosters use matching appearance families across seeds',()=>{for(let seed=0;seed<100;seed++)for(const ch of generateWorld(seed).characters){const index=Number(ch.name.split('.').at(-1)),base=Number(ch.avatarId)%6;if(index<18)expect(base===1||base===5).toBe(index%2===0);}});
+it('repairs old colleagues idempotently while preserving a player-selected avatar and ambiguous names',()=>{const c=emptyCampaign();c.characters=[makeCharacter('roman','roster.name.3','13','designer'),makeCharacter('alice','roster.name.16','16','qa'),makeCharacter('player','Алиса','3','frontend'),makeCharacter('sasha','roster.name.19','1','backend')];restoreColleagueAppearances(c);expect(c.characters.map(ch=>ch.avatarId)).toEqual(['12','13','3','1']);const saved=JSON.stringify(c);restoreColleagueAppearances(c);expect(JSON.stringify(c)).toBe(saved);expect(matchColleagueAppearance(c.characters[2]).avatarId).toBe('3');});
