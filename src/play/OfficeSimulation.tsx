@@ -9,7 +9,7 @@ import {hasNewTopic} from '../content/contextDialogue';
 import {useI18n} from '../content/localization';
 import {characterName} from './shared';
 import {OfficePerson} from './OfficePerson';
-import {officeDestination,officeRoute,residentActivity,type OfficeActivity,type OfficePoint} from './officeMovement';
+import {officeDestination,officeRoute,residentActivity,officeSeatFacing,type OfficeActivity,type OfficePoint} from './officeMovement';
 import './officeMovement.css';
 
 function Colleague({id,avatarId,name,role,index,activity,beat,introducing,unread,onTalk}:{id:string;avatarId:string;name:string;role:string;index:number;activity:OfficeActivity;beat:number;introducing:boolean;unread:boolean;onTalk:(id:string)=>void}) {
@@ -25,7 +25,7 @@ function Colleague({id,avatarId,name,role,index,activity,beat,introducing,unread
   onAnimationStart={()=>setWalking(moving)} onAnimationComplete={()=>setWalking(false)}
   style={{zIndex:Math.round(destination[1]),'--person-scale':.85+destination[1]/350} as React.CSSProperties}>
   <Tag className={'resident-target'+(introducing?' office-agent-label':'')} onClick={introducing?undefined:()=>onTalk(id)} aria-label={introducing?undefined:t('ui.talkWith',{name})} title={introducing?undefined:t('ui.talkWith',{name})}>
-   <OfficePerson avatarId={avatarId} walking={walking} seated={!walking&&atDesk}/><span className="resident-name">{name}{unread&&!introducing&&<i className="resident-unread"/>}</span><span className="resident-detail"><b>{name}</b><small>{role}</small><small>{t('officePerson.'+(walking?'walking':activity))}</small>{!introducing&&<strong>{t(unread?'officePerson.new':'officePerson.talk')}</strong>}</span>
+   <OfficePerson avatarId={avatarId} walking={walking} seated={!walking&&atDesk} facing={officeSeatFacing(index)}/><span className="resident-name">{name}{unread&&!introducing&&<i className="resident-unread"/>}</span><span className="resident-detail"><b>{name}</b><small>{role}</small><small>{t('officePerson.'+(walking?'walking':activity))}</small>{!introducing&&<strong>{t(unread?'officePerson.new':'officePerson.talk')}</strong>}</span>
   </Tag>
  </motion.div>;
 }

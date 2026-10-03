@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {officeDestination,officeRoute,residentActivity} from './officeMovement';
+import {officeDestination,officeRoute,residentActivity,officeSeatFacing} from './officeMovement';
 describe('office movement',()=>{
  it('only the colleague taking a break leaves their station',()=>{
   for(let i=1;i<5;i++)expect(officeDestination(i,'work',1)).toEqual(officeDestination(i,'work',0));
@@ -36,3 +36,5 @@ it('a review brings only its reviewer and the player into the discussion',()=>{
   expect(new Set(points.map(p=>p.join(','))).size).toBe(6);
  }
 });
+
+it('seated residents face their own monitors, not a shared direction',()=>{expect([0,1,2,3,4,5].map(officeSeatFacing)).toEqual(['right','right','right','left','left','right']);});

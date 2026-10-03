@@ -26,3 +26,6 @@ export function officeRoute(from:OfficePoint,to:OfficePoint):OfficePoint[] {
 export function residentActivity(index:number,activity:OfficeActivity,reviewerIndex:number):OfficeActivity {
  return activity==='review'&&index!==5&&index!==reviewerIndex?'work':activity;
 }
+
+// Back-wall desks and the front laptop face up-right; window desks face up-left.
+export function officeSeatFacing(index:number):'left'|'right'{return index===3||index===4?'left':'right';}
