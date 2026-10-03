@@ -1,7 +1,17 @@
-import {TermText} from './TermText';
+import {Activity,Layers,Handshake,Star,History} from 'lucide-react';
+import '../content/companyPage';
 import {useWorld} from '../world/store';
-import {activeCharacter,activeTask} from '../world/simulation';
 import {useI18n} from '../content/localization';
-import {Button,characterName} from './shared';
-
-export function Company(){const w=useWorld(),co=w.company!,{t}=useI18n();return <section className="collection-view world-collection"><p className="eyebrow">{t('ui.seedValue',{seed:co.seed})}</p><h1>{t(co.nameKey)}</h1><p>{t(`culture.${co.culture}`)} · {t(`stage.${co.stage}`)}</p><div className="company-stats">{(['techDebt','stability','processMaturity','reputation'] as const).map(k=><div key={k}><small>{t(`ui.${k}`)}</small><b>{co[k]} / 100</b></div>)}</div><div className="project-grid">{co.projects.map(p=><article key={p.id} className="world-card"><p className="eyebrow">{p.stack.join(' · ')}</p><h2>{t(p.nameKey)}</h2><div className="project-values"><span>{t('ui.techDebt')}: {p.techDebt}</span><span>{t('ui.stability')}: {p.stability}</span><span>{t('ui.securityLevel')}: {p.securityLevel}</span></div><Button secondary disabled={activeCharacter(w).currentProjectIds.includes(p.id)||!!activeTask(w)&&!activeTask(w)!.rewarded} onClick={()=>w.dispatch({type:'assign-project',id:p.id})}>{t(activeCharacter(w).currentProjectIds.includes(p.id)?'ui.currentProject':'ui.joinProject')}</Button><h3>{t('ui.problems')}</h3>{p.problems.filter(x=>x.discovered).map(problem=><div className="company-problem" key={problem.id}><span className={problem.status==='resolved'?'resolved-dot':'event-dot'}/><div><b>{t(problem.titleKey)}</b><small>{t(problem.status==='resolved'?'ui.problemResolved':'ui.problemProgress')} · {problem.affectedSystems.join(' → ')}</small>{problem.latestOutcomeKey&&<p><TermText>{t(problem.latestOutcomeKey)}</TermText></p>}{problem.workaround&&<code>TODO: temporary fix</code>}{problem.causedBy&&<p>{t('ui.oldDecision',{name:characterName(w.characters.find(c=>c.id===problem.causedBy)!,t)})}</p>}</div></div>)}</article>)}</div><h2>{t('ui.history')}</h2><div className="company-history">{[...co.history].reverse().map(h=><div key={h.id}><small>{t('ui.day',{day:h.day})}</small><b>{t(h.key)}</b><span>{h.actorId?characterName(w.characters.find(c=>c.id===h.actorId)!,t):''}</span></div>)}</div></section>}
+import {characterName} from './shared';
+import {CompanyLogo} from './CompanyLogo';
+import {CompanyProject} from './CompanyProject';
+import './companyPage.css';
+const metrics=[{id:'techDebt',hint:'debt',Icon:Layers,lower:true},{id:'stability',hint:'stability',Icon:Activity},{id:'processMaturity',hint:'process',Icon:Handshake},{id:'reputation',hint:'reputation',Icon:Star}] as const;
+export function Company(){
+ const w=useWorld(),co=w.company!,{t}=useI18n(),events=[...co.history].reverse();
+ const eventRows=(rows:typeof events)=>rows.map(h=>{const actor=w.characters.find(c=>c.id===h.actorId);return <li key={h.id}><small>{t('ui.day',{day:h.day})}</small><div><b>{t(h.key)}</b>{actor&&<span>{characterName(actor,t)}</span>}</div></li>;});
+ return <section className="collection-view world-collection company-page"><header className="company-identity"><CompanyLogo company={co}/><div><p className="eyebrow">{t('companyPage.employer')}</p><h1>{t(co.nameKey)}</h1><div className="company-tags"><span>{t('culture.'+co.culture)}</span><span>{t('stage.'+co.stage)}</span></div></div></header>
+ <section className="company-overview"><h2>{t('companyPage.overview')}</h2><p className="fine-print">{t('companyPage.scope')}</p><div className="company-metric-grid">{metrics.map(m=>{const value=co[m.id],good=m.id==='techDebt'?100-value:value;return <article key={m.id} className={good<40?'needs-attention':''}><m.Icon size={21}/><small>{t('ui.'+m.id)}</small><b>{value}<span>/100</span></b><div className="company-meter" aria-hidden="true"><i style={{width:Math.max(0,Math.min(100,value))+'%'}}/></div><small>{t('companyPage.'+(m.id==='techDebt'?'lower':'higher'))}</small><p>{t('companyPage.'+m.hint)}</p></article>;})}</div></section>
+ <h2>{t('companyPage.projects')}</h2><div className="project-grid">{co.projects.map(p=><CompanyProject key={p.id} project={p}/>)}</div>
+ <section className="company-timeline"><h2><History size={21}/>{t('companyPage.history')}</h2>{events.length?<><ol>{eventRows(events.slice(0,10))}</ol>{events.length>10&&<details><summary>{t('companyPage.older')}</summary><ol>{eventRows(events.slice(10))}</ol></details>}</>:<p>{t('companyPage.none')}</p>}</section></section>;
+}

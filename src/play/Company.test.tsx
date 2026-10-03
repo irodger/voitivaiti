@@ -1,0 +1,11 @@
+import {it,expect,vi} from 'vitest';
+import {renderToStaticMarkup} from 'react-dom/server';
+vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
+vi.mock('../world/store',async importOriginal=>{const actual=await importOriginal<typeof import('../world/store')>();return {...actual,useWorld:Object.assign((selector?: (s:ReturnType<typeof actual.useWorld.getState>)=>unknown)=>selector?selector(actual.useWorld.getState()):actual.useWorld.getState(),actual.useWorld)};});
+import {useWorld} from '../world/store';
+import {beginPlaytest} from '../world/playtestHelpers';
+import {activeCharacter} from '../world/simulation';
+import {Company} from './Company';
+import {CompanyLogo} from './CompanyLogo';
+it('explains metric direction and represents the assigned project as status, not a disabled action',()=>{const c=beginPlaytest('frontend');useWorld.setState(c);const html=renderToStaticMarkup(<Company/>);expect(html).toContain('Меньше — лучше');expect(html).toContain('Больше — лучше');expect(html).toContain('company-current');expect(html).not.toContain('TODO: temporary fix');expect(html).not.toContain('disabled');});
+it('renders unknown legacy actors safely and keeps a stable company mark across renders',()=>{const c=beginPlaytest('frontend');c.company!.history.push({id:'old',kind:'task',key:'ui.project',day:1,actorId:'removed-actor'});c.company!.projects[0].problems[0].discovered=true;c.company!.projects[0].problems[0].causedBy='removed-actor';activeCharacter(c).currentProjectIds=[c.company!.projects[0].id];useWorld.setState(c);expect(()=>renderToStaticMarkup(<Company/>)).not.toThrow();expect(renderToStaticMarkup(<CompanyLogo company={c.company!}/>)).toBe(renderToStaticMarkup(<CompanyLogo company={structuredClone(c.company!)}/>));});
