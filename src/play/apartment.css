@@ -10,7 +10,7 @@
 .furniture-lamp{--furniture-mask:radial-gradient(ellipse 6% 13% at 36% 46%,#000 86%,transparent 100%);z-index:2}
 .furniture-kitchen{--furniture-mask:radial-gradient(ellipse 9% 7% at 69% 33%,#000 85%,transparent 100%);z-index:1}
 .furniture-chair{--furniture-mask:radial-gradient(ellipse 12% 14% at 86% 70%,#000 86%,transparent 100%);z-index:5}
-.furniture-bed{--furniture-mask:linear-gradient(#000,#000);clip-path:polygon(3% 41%,23% 41%,23% 47%,27% 51%,35% 56%,43% 62%,49% 71%,49% 84%,30% 88%,3% 68%);z-index:4}
+.furniture-bed{--furniture-mask:linear-gradient(#000,#000);clip-path:polygon(3% 40%,25% 40%,25% 49%,37% 55%,49% 64%,50% 85%,30% 90%,3% 70%);z-index:4}
 .furniture-library{--furniture-mask:radial-gradient(ellipse 4.5% 12% at 41.5% 32%,#000 88%,transparent 100%);z-index:2}
 @keyframes apartment-arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .home-room.apartment-scene .home-room-label{z-index:8;top:16px;left:18px;right:18px;background:#294636df;backdrop-filter:blur(12px);padding:10px 12px;border:1px solid #e4eacd25;border-radius:11px;color:#f4eed9;pointer-events:none}

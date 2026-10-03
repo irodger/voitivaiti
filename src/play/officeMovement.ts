@@ -31,3 +31,5 @@ export function residentActivity(index:number,activity:OfficeActivity,reviewerIn
 export function officeSeatFacing(index:number):'left'|'right'{return index===3||index===4?'left':'right';}
 
 export function officeMotionFacing(from:OfficePoint,to:OfficePoint,fallback:'left'|'right'='right'):'left'|'right'{const dx=to[0]-from[0];return Math.abs(dx)<.02?fallback:dx>0?'right':'left';}
+
+export function officeMotionRear(from:OfficePoint,to:OfficePoint,fallback=false):boolean{const dy=to[1]-from[1];return Math.abs(dy)<.02?fallback:dy<0;}
