@@ -17,4 +17,12 @@ describe('office movement',()=>{
   route.forEach(([x,y])=>{expect(x).toBeGreaterThan(0);expect(x).toBeLessThan(100);expect(y).toBeGreaterThan(0);expect(y).toBeLessThan(100)});
   expect(officeRoute(from,from)).toEqual([from]);
  });
+ it('six workstations and meeting places remain distinct and comfortably separated',()=>{
+  for(const activity of ['work','meeting','review','lunch'] as const){
+   const points=Array.from({length:6},(_,i)=>officeDestination(i,activity,0));
+   for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){
+    expect(Math.hypot(points[i][0]-points[j][0],points[i][1]-points[j][1])).toBeGreaterThan(10);
+   }
+  }
+ });
 });

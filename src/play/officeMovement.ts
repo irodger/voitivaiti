@@ -1,14 +1,14 @@
 export type OfficePoint = readonly [number, number];
 export type OfficeActivity = 'work' | 'meeting' | 'review' | 'incident' | 'lunch' | 'evening';
 // Feet coordinates on the background plate. Paths follow the open central aisle.
-const places: OfficePoint[] = [[29,53],[66,65],[18,67],[70,83],[47,46]];
-const aisle: OfficePoint[] = [[47,46],[30,54],[25,67],[30,79],[47,88],[66,83],[73,73],[66,64],[58,49]];
+const places: OfficePoint[] = [[41,35],[60,40],[79,46],[31,44],[21,58],[16,76]];
+const aisle: OfficePoint[] = [[41,45],[50,50],[68,53],[82,57],[83,72],[72,84],[57,81],[40,75],[32,62],[37,51]];
 export function officeDestination(index:number, activity:OfficeActivity, beat:number):OfficePoint {
- if(activity==='meeting'||activity==='review'||activity==='incident') return [42+(index%3)*7,46+Math.floor(index/3)*5];
- if(activity==='lunch') return [16+(index%3)*7,68+Math.floor(index/3)*6];
+ if(activity==='meeting'||activity==='review'||activity==='incident') return ([[58,65],[71,65],[83,68],[60,82],[73,84],[84,83]] as OfficePoint[])[index%6];
+ if(activity==='lunch') return ([[56,65],[70,64],[83,69],[60,81],[73,83],[84,83]] as OfficePoint[])[index%6];
  if(activity==='evening') return [65+index*4,85];
  // Only one colleague takes a short walk; the others stay at their own stations.
- return beat%4===1&&index===Math.floor(beat/4)%5 ? [70,83] : places[index%places.length];
+ return beat%4===1&&index===Math.floor(beat/4)%5 ? [78,76] : places[index%places.length];
 }
 export function officeRoute(from:OfficePoint,to:OfficePoint):OfficePoint[] {
  if(from[0]===to[0]&&from[1]===to[1]) return [from];

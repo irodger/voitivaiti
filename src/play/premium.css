@@ -232,3 +232,6 @@ button.focus-bar:hover{background:#e3ecd7}
 .first-day .team-intro-footer{flex-shrink:0;padding:14px 28px;border-top:1px solid var(--line);background:var(--paper)}.team-intro-footer>.primary-button{width:100%}.office-agent-label{box-shadow:none!important}@media(max-width:760px){.first-day .team-intro-footer{padding:16px 22px}}
 
 .world-game .first-day .team-intro-footer>.primary-button{margin:0}
+
+/* Six-seat office: the player laptop sits at the front-left desk. */
+.world-game .office-stage:has(.living-office) .office-laptop{left:8%;top:56%;width:20%;height:17%}
