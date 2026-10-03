@@ -15,7 +15,7 @@ export function perspectiveAction(c:Campaign,id:string){const ep=c.perspective,c
  ep.choice=returned?'return':'approve';ep.observations.push('mastery.'+(mentoring?(returned?'mentorLimited':'mentorResult'):returned?'returnResult':'approveResult'));ep.completed=true;if(mentoring)c.time+=10;
  if(!returned&&!problem.contributions.includes(ep.profession==='qa'?'validation':'repair'))problem.contributions.push(ep.profession==='qa'?'validation':'repair');
  if(returned){problem.discovered=true;problem.status='planned';}else if(problem.contributions.includes('repair')&&problem.contributions.includes('validation'))problem.status='resolved';
- rememberExperience(c,['cross-team',...(mentoring?['mentoring']:[])],'perspective:'+task.id,'mastery.episodeTitle',task);
+ rememberExperience(c,['cross-team',...(mentoring?['mentoring']:['review'])],'perspective:'+task.id,'mastery.episodeTitle',task);
  c.meta!.perspectives[ep.profession]=[...new Set([...(c.meta!.perspectives[ep.profession]??[]),problem.category])];
  const event={id:'perspective:'+task.id,day:c.company!.currentDay,kind:'perspective',key:ep.observations.at(-1)!,actorId:ch.id,problemId:problem.id,projectId:task.projectId};problem.history.push(event);c.company!.history.push(event);c.company!.projects.find(p=>p.id===task.projectId)!.history.push(event);return true;
 }

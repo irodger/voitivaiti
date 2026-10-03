@@ -1,3 +1,4 @@
+import {DelegationResults} from './DelegationResults';
 import {useState} from 'react';
 import {useWorld} from '../world/store';
 import {activeCharacter} from '../world/simulation';
@@ -9,7 +10,7 @@ import type {WorkKind} from '../world/lifeTypes';
 export function RemainderQueue(){
  const w=useWorld(),ch=activeCharacter(w),{t}=useI18n(),[chosen,setChosen]=useState<WorkKind|null>(null),level=autonomy(ch),queue=w.life!.queue;
  const selected=queue.find(q=>q.status==='selected'&&!q.delegatedTo);
- return <div className="remainder-queue">{queue.filter(q=>q.status!=='done').map(q=>{
+ return <><DelegationResults/><div className="remainder-queue">{queue.filter(q=>q.status!=='done').map(q=>{
   const npc=w.characters.find(n=>n.id===workOwner[q.id]),delegated=!!q.delegatedTo;
   const canTake=level>0&&availableWork(ch).includes(q.id)&&(!selected||selected.id===q.id);
   const takeReason=w.life!.reviewDue?'review':w.time>=1020?'late':null;
@@ -27,5 +28,5 @@ export function RemainderQueue(){
    {!delegated&&((canTake&&takeReason)||helpReason)&&<small className="queue-unavailable">{t('queue.reason.'+(canTake&&takeReason?takeReason:helpReason))}</small>}
    {chosen===q.id&&!selected&&canTake&&!takeReason&&<div className="queue-agreement"><p>{t('queue.agree')}</p><div className="remainder-actions"><button onClick={()=>choose(true)}>{t('life.explain')}</button><button onClick={()=>choose(false)}>{t('life.dismiss')}</button></div></div>}
   </article>;
- })}</div>;
+ })}</div></>;
 }

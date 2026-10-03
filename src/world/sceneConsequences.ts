@@ -5,7 +5,8 @@ export function commitSceneOutcome(c:Campaign,task:Task){
  const project=c.company!.projects.find(p=>p.id===task.projectId)!,problem=project.problems.find(p=>p.id===task.problemId)!;
  const outcome=task.outcome;
  problem.latestOutcomeKey=outcome.summaryKey;
- problem.workaround=outcome.kind==='temporary';
+ if(outcome.kind==='temporary')problem.workaround=true;
+ else if(outcome.systemChanged!==false)problem.workaround=false;
  problem.causedBy=task.characterId;
  if(outcome.kind==='temporary')problem.status='planned';
  const id=task.id+':outcome';
@@ -20,12 +21,12 @@ export function resolveSceneConsequences(c:Campaign){
   if(pending.resolved||pending.dueDay>c.life!.calendarDay)continue;
   pending.resolved=true;
   // A later durable contribution can supersede an earlier workaround.
-  const superseded=problem.consequences!.some(e=>e!==pending&&e.outcome.kind==='durable'&&problem.consequences!.indexOf(e)>problem.consequences!.indexOf(pending));
+  const superseded=problem.consequences!.some(e=>e!==pending&&e.outcome.kind==='durable'&&e.outcome.systemChanged!==false&&problem.consequences!.indexOf(e)>problem.consequences!.indexOf(pending));
   if(pending.outcome.kind==='temporary'&&superseded)continue;
   problem.latestOutcomeKey=pending.outcome.followupKey;
   if(pending.outcome.kind==='temporary'){
    problem.status='planned';problem.discovered=true;problem.workaround=true;problem.severity=Math.min(5,problem.severity+1);
-   project.stability=Math.max(0,project.stability-2);
+   if(pending.outcome.systemChanged!==false)project.stability=Math.max(0,project.stability-2);
    const item=c.life!.queue.find(q=>q.problemId===problem.id);
    if(item&&item.status==='done'){item.status='waiting';item.age=0;item.expectation=undefined;}
   }
