@@ -1,3 +1,4 @@
+import '../content/conferences';
 import '../content/personalFinance';
 import {useI18n} from '../content/localization';
 import type {Character} from '../world/types';

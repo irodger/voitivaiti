@@ -1,0 +1,12 @@
+import {text} from './localization';
+const entries:Record<string,[string,string]>={
+ title:['Профильная конференция','Professional conference'],invite:['Приглашение на конференцию','Conference invitation'],
+ intro:['Выбери одну секцию. Онлайн — 90 минут бесплатно; выезд — 180 минут и 4 000 ₽ за билет и дорогу. Текущая работа останется у тебя: продолжишь после секции.','Choose a session. Online: 90 minutes, free. In person: 180 minutes and ₽4,000 including travel. Your current work stays open; resume afterwards.'],
+ evidence:['Как проверять противоречивые наблюдения','Checking conflicting observations'],handoff:['Как передавать работу без потерянного контекста','Handing work over without losing context'],
+ evidenceNote:['На секции сравнили два отчёта: одинаковая ошибка возникала при разных условиях. Полезный приём: записать среду, время и шаги каждого наблюдения, потом искать общую причину. Заметка для следующего расследования; проект пока не изменился.','Two reports showed the same error under different conditions. Record the environment, time and steps before looking for a shared cause. A note for your next investigation; the project has not changed.'],
+ handoffNote:['В разобранном примере коллега повторил выполненную проверку: ему передали результат без условий и ограничений. В заметках: что проверено, при каких условиях, что ещё неизвестно и кто продолжит. Можно применять в следующей работе.','A colleague repeated a finished check because the handoff omitted conditions and limitations. Notes: what was checked, under which conditions, what remains unknown, and who continues. Useful for future handoffs.'],
+ online:['Подключиться онлайн · бесплатно','Join online · free'],visit:['Посетить · 4 000 ₽','Attend · ₽4,000'],skip:['Пропустить приглашение','Skip invitation'],notes:['Заметки с конференции','Conference notes'],
+ office:['Участие доступно в рабочее время из офиса.','Attend during office hours.'],sync:['Сначала закончи утреннюю встречу.','Finish the morning meeting first.'],incident:['Сначала разберитесь с текущим ЧП.','Handle the current incident first.'],time:['Сегодня времени не хватит. Приглашение останется на завтра.','Not enough time today. The invitation stays available tomorrow.'],money:['На выезд нужно 4 000 ₽. Онлайн-секция бесплатная.','In-person attendance costs ₽4,000. The online session is free.'],
+};
+Object.entries(entries).forEach(([id,[ru,en]])=>text('conference.'+id,ru,en));
+text('finance.conference','Билет на конференцию и дорога','Conference ticket and travel');

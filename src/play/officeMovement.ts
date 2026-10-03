@@ -8,7 +8,7 @@ export function officeDestination(index:number, activity:OfficeActivity, beat:nu
  if(activity==='lunch') return ([[56,65],[70,64],[83,69],[60,81],[73,83],[84,83]] as OfficePoint[])[index%6];
  if(activity==='evening') return [65+index*4,85];
  // Only one colleague takes a short walk; the others stay at their own stations.
- return beat%4===1&&index===Math.floor(beat/4)%5 ? [78,76] : places[index%places.length];
+ return beat%4===1&&index===Math.floor(beat/4)%5 ? ([[78,76],[55,67],[82,61],[47,72],[69,84]] as OfficePoint[])[index%5] : places[index%places.length];
 }
 export function officeRoute(from:OfficePoint,to:OfficePoint):OfficePoint[] {
  if(from[0]===to[0]&&from[1]===to[1]) return [from];
