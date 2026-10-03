@@ -25,7 +25,7 @@ export function resolveSceneConsequences(c:Campaign){
   if(pending.outcome.kind==='temporary'&&superseded)continue;
   problem.latestOutcomeKey=pending.outcome.followupKey;
   if(pending.outcome.kind==='temporary'){
-   problem.status='planned';problem.discovered=true;problem.workaround=true;problem.severity=Math.min(5,problem.severity+1);
+   if(problem.story)problem.story.change='environment';problem.status='planned';problem.discovered=true;problem.workaround=true;problem.severity=Math.min(5,problem.severity+1);
    if(pending.outcome.systemChanged!==false)project.stability=Math.max(0,project.stability-2);
    const item=c.life!.queue.find(q=>q.problemId===problem.id);
    if(item&&item.status==='done'){item.status='waiting';item.age=0;item.expectation=undefined;}

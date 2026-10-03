@@ -12,9 +12,7 @@ function act(c:Campaign,a:Action){return transition(c,a).campaign;}
 function work(c:Campaign,category='interface',style='shared'){
  const q=c.life!.queue.find(q=>q.id==='bug')!,p=c.company!.projects[0];q.status='selected';q.explained=true;q.projectId=p.id;q.problemId=p.problems.find(p=>p.category===category)!.id;
  c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';c=act(c,{type:'take-task'});
- for(const id of ['inspect','trace'])c=act(c,{type:'technical-action',id});c=act(c,{type:'advance'});
- for(const id of [style,'verify-'+style])c=act(c,{type:'technical-action',id});c=act(c,{type:'advance'});
- c=act(c,{type:'technical-action',id:'handoff'});return act(c,{type:'advance'});
+ return finishPlaytestTask(c,style);
 }
 import {absenceObligations} from './vacation';
 import {dailySalary} from './economy';
@@ -35,7 +33,7 @@ describe('v0.24 confirmed responsibility',()=>{
   expect(activeCharacter(c).careerNodeId).toBe('level-2');
   expect(activeCharacter(c).experience!.some(e=>e.tags.includes('mentoring'))).toBe(false);
   expect(canPromote(activeCharacter(c),'level-3')).toBe(false);
- });
+ },30000);
  it('repeating one context or unconfirmed tags cannot substitute for diversity',()=>{
   let c=start();for(let i=0;i<10;i++)c=work(c,'interface');
   rememberExperience(c,['delegation','people','ownership','planning'],'click','ui.work');

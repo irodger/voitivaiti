@@ -1,0 +1,10 @@
+import {it,expect,vi} from 'vitest';
+import {renderToStaticMarkup} from 'react-dom/server';
+vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
+vi.mock('../content/localization',async importOriginal=>{const actual=await importOriginal<typeof import('../content/localization')>();return {...actual,useI18n:()=>{const {locale,contentMode}=actual.usePreferences.getState();return {locale,contentMode,t:(key:string,values?:Record<string,string|number>)=>actual.translate(key,values,locale,contentMode)};}};});
+import {CareerReport} from './CareerReport';
+import {translate,usePreferences} from '../content/localization';
+import {buildCareerReport} from '../world/careerReport';
+import {transition} from '../world/engine';
+import {emptyCampaign} from '../world/simulation';
+it('renders an understandable report in both languages with optional statistics',()=>{const c=transition(emptyCampaign(),{type:'new',name:'Story',avatarId:'1',professionId:'frontend',seed:1427}).campaign;const report=buildCareerReport(c,'quit');for(const locale of ['ru','en'] as const){usePreferences.setState({locale});const html=renderToStaticMarkup(<CareerReport report={report} characterId={c.activeCharacterId}/>);expect(html).toContain(translate('report.timeline'));expect(html).toContain(translate('report.end.quit'));expect(html).toContain('<details>');expect(html).not.toContain('report.stat.');expect(html).not.toContain('report.pattern.');}usePreferences.setState({locale:'ru'});});

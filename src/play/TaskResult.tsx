@@ -1,8 +1,8 @@
+import {resolveTaskTemplate} from '../content/scenarios';
 import {PerspectivePanel} from './PerspectivePanel';
 import '../content/corrections';
 import {useWorld} from '../world/store';
 import {activeTask} from '../world/simulation';
-import {templateById} from '../content/scenarios';
 import {useI18n} from '../content/localization';
 import {decisionFeedback} from './decisionFeedback';
 import {TermText} from './TermText';
@@ -11,7 +11,7 @@ import {Button} from './shared';
 export function TaskResult({onClose}:{onClose:()=>void}){
  const w=useWorld(),task=activeTask(w),{t}=useI18n();
  if(!task)return null;
- const template=templateById[task.templateId];
+ const template=resolveTaskTemplate(task);
  const choiceStep=template.steps.find(step=>step.type!=='review'&&step.options?.some(option=>option.id===task.progress[step.id]?.choiceId));
  const choice=choiceStep?.options?.find(option=>option.id===task.progress[choiceStep.id].choiceId);
  const evidence=template.steps.find(step=>step.items&&step.resolution==='consequential');

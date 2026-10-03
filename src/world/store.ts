@@ -1,3 +1,4 @@
+import {resolveTaskTemplate} from '../content/scenarios';
 import {isOrderedPlan,planOrder} from './planOrder';
 import { rememberPlayerName } from './playerName';
 import { ensureLife,emptyMeta,archiveCareer } from './life';
@@ -36,10 +37,10 @@ export function saveBeforeUpdate(){try{const current=snapshot(useWorld.getState(
 
 function restoreActionProgress(c:Campaign){
  for(const task of c.tasks){
-  if(!task.rewarded){const steps=templateById[task.templateId].steps;const unsafe=steps.find(step=>{const p=task.progress[step.id],mapping=step.actionFlow?.legacyActions;if(!p||!mapping||p.actionHistory!==undefined)return false;const id=mapping[p.choiceId??'']??p.draft.map(id=>mapping[id]).find(Boolean);return id&& !step.actionFlow!.actions.find(a=>a.id===id)?.completes;});
+  if(!task.rewarded){const steps=resolveTaskTemplate(task).steps;const unsafe=steps.find(step=>{const p=task.progress[step.id],mapping=step.actionFlow?.legacyActions;if(!p||!mapping||p.actionHistory!==undefined)return false;const id=mapping[p.choiceId??'']??p.draft.map(id=>mapping[id]).find(Boolean);return id&& !step.actionFlow!.actions.find(a=>a.id===id)?.completes;});
    if(unsafe){const start=steps.indexOf(unsafe);task.currentStepId=unsafe.id;task.status='active';task.completedStepIds=task.completedStepIds.filter(id=>steps.findIndex(s=>s.id===id)<start);steps.slice(start).forEach((step,i)=>{const p=task.progress[step.id];p.status=i===0?'active':'locked';p.run='idle';p.responseKey=undefined;if(i>0){p.choiceId=undefined;p.draft=[];p.actionHistory=step.actionFlow?[]:undefined;}});}
   }
-  for(const step of templateById[task.templateId].steps){const p=task.progress[step.id];if(p&&p.status!=='completed'&&isOrderedPlan(step))p.draft=planOrder(step,p.draft);if(!step.actionFlow||!p||p.status!=='active'||p.actionHistory!==undefined)continue;
+  for(const step of resolveTaskTemplate(task).steps){const p=task.progress[step.id];if(p&&p.status!=='completed'&&isOrderedPlan(step))p.draft=planOrder(step,p.draft);if(!step.actionFlow||!p||p.status!=='active'||p.actionHistory!==undefined)continue;
   if(step.actionFlow.legacyActions){const mapping=step.actionFlow.legacyActions,id=mapping[p.choiceId??'']??p.draft.map(id=>mapping[id]).find(Boolean);p.actionHistory=id?[id]:[];p.responseKey=undefined;continue;}
   if(p.choiceId||task.attemptsByStep[step.id]){const previous=step.actionFlow.actions.find(a=>a.id===p.choiceId&&!a.completes);p.actionHistory=[previous?.id??'resume'];p.responseKey=undefined;}
  }}return c;

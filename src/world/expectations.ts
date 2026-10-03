@@ -25,7 +25,7 @@ export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|
  if(choice!=='defer'){e.extensionUsed=true;e.dueDay=Math.max(day,e.dueDay)+(choice==='blocker'?1:2);e.state='waiting';}
  e.reactionKey='expect.reply.'+choice;
  c.time+=choice==='defer'?2:10;
- const event={id:`expect-${q.id}-${day}-${choice}`,day,kind:'obligation',key:e.reactionKey,actorId:workOwner[q.id],projectId:q.projectId,problemId:q.problemId};
+ const event={id:`expect-${q.id}-${day}-${choice}`,day,kind:'obligation',key:e.reactionKey,actorId:workOwner[q.id],projectId:q.projectId,problemId:q.problemId,values:{characterId:c.activeCharacterId,work:q.id,choice}};
  c.company!.history.push(event);
  return true;
 }
@@ -41,7 +41,7 @@ export function expectationPressure(c:Campaign){
   e.reactionKey='expect.reaction.'+(escalated?'escalated':e.communication?'explained':'waiting');
   const npcId=workOwner[q.id];
   l.obligations.push({day:l.calendarDay,work:q.id,npcId,kind:e.communication||q.promisedDay!==undefined?'promise':'waiting'});
-  c.company!.history.push({id:`expect-${q.id}-${l.calendarDay}`,day:l.calendarDay,kind:'obligation',key:e.reactionKey,actorId:npcId,projectId:q.projectId,problemId:q.problemId});
+  c.company!.history.push({id:`expect-${q.id}-${l.calendarDay}`,day:l.calendarDay,kind:'obligation',key:e.reactionKey,actorId:npcId,projectId:q.projectId,problemId:q.problemId,values:{characterId:c.activeCharacterId,work:q.id,reaction:escalated?'escalated':'overdue',communication:e.communication??'none',dueDay:e.dueDay}});
   const r=ch.relationships.find(r=>r.characterId===npcId);
   if(r)r.trust=Math.max(0,r.trust-(e.communication?1:3));
   if(escalated&&!e.escalationRecorded){

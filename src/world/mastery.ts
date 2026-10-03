@@ -1,21 +1,21 @@
+import {resolveTaskTemplate} from '../content/scenarios';
 import {professionById} from '../content/professions';
-import {templateById} from '../content/scenarios';
 import type {Campaign,Character,Task,Experience} from './types';
 export const rankOf=(ch:Character)=>Math.max(0,professionById[ch.profession].careers.findIndex(n=>n.id===ch.careerNodeId));
 export function rememberExperience(c:Campaign,tags:string[],id:string,titleKey:string,task?:Task,proof?:Partial<Experience>){
  const ch=c.characters.find(ch=>ch.id===c.activeCharacterId)!;ch.experience??=[];if(ch.experience.some(e=>e.id===id))return;
- const tpl=task&&templateById[task.templateId];
+ const tpl=task&&resolveTaskTemplate(task);
  ch.experience.push({id,titleKey,tags,taskId:task?.id,problemId:task?.problemId,projectId:task?.projectId,profession:ch.profession,grade:rankOf(ch),day:c.life!.calendarDay,context:tpl?.category,resultKind:task?.outcome?.kind??'checked',confirmed:!!task?.rewarded,...proof});
 }
 export function recordWorkExperience(c:Campaign,task:Task){
- const tpl=templateById[task.templateId];if(!tpl||!task.rewarded)return;
+ const tpl=resolveTaskTemplate(task);if(!tpl||!task.rewarded)return;
  const ch=c.characters.find(n=>n.id===c.activeCharacterId)!,tags=['guided',tpl.category],lens=task.templateId.startsWith('lens.');
  if(lens||ch.completedWork.length>2)tags.push('autonomy');
  if(lens||tpl.steps.some(s=>['planning','estimate','resource-allocation','dependency-map','architecture-diagram'].includes(s.type)))tags.push('planning');
  if(lens||tpl.steps.some(s=>s.resolution==='consequential'))tags.push('tradeoff','ambiguity');
  if(tpl.steps.some(s=>s.app==='chat'||s.type==='review'))tags.push('communication','cross-team');
  // Ownership includes investigation, verification and handoff; it need not be a production code change.
- if(lens&&task.progress.investigate?.status==='completed'&&task.progress.resolve?.status==='completed'&&task.progress.handoff?.status==='completed')tags.push('ownership','review');
+ if(lens&&tpl.steps.every(s=>task.progress[s.id]?.status==='completed'))tags.push('ownership','review');
  else if(tpl.steps.some(s=>['review','release-check'].includes(s.type)))tags.push('review','ownership');
  if(tpl.category==='payment'||tpl.category==='performance'||tpl.steps.some(s=>s.type==='incident-response'))tags.push('production');
  if(task.workKind&&c.life!.queue.find(q=>q.id===task.workKind)?.explained)tags.push('prioritization');
@@ -56,7 +56,7 @@ export function restoreExperience(c:Campaign){
    if(restored){restored.grade=previous?.grade??0;restored.day=previous?.day??(Number(task.id.split('-')[1])||1);}
   }
   for(const e of old.filter(e=>e.id.startsWith('perspective:')&&e.taskId)){
-   const task=c.tasks.find(t=>t.id===e.taskId&&t.rewarded);if(task)ch.experience.push({...e,confirmed:true,context:templateById[task.templateId]?.category,resultKind:task.outcome?.kind??'checked'});
+   const task=c.tasks.find(t=>t.id===e.taskId&&t.rewarded);if(task)ch.experience.push({...e,confirmed:true,context:resolveTaskTemplate(task)?.category,resultKind:task.outcome?.kind??'checked'});
   }
   ch.experienceVersion=2;c.activeCharacterId=active;
  }

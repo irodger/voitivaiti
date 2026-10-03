@@ -23,7 +23,7 @@ export function arrangeAbsence(c:Campaign,returnDay:number,arrangements:Vacation
   }
   unagreed.push(q.id);summary.push('absence.waited.'+q.id);
   if(choice!=='ignore')summary.push('absence.notAgreed');
-  c.company!.history.push({id:`absence:${c.activeCharacterId}:${c.life!.calendarDay}:${q.id}`,day:c.life!.calendarDay,kind:'absence-unagreed',key:'absence.waited.'+q.id,actorId:c.activeCharacterId,projectId:q.projectId,problemId:q.problemId});
+  c.company!.history.push({id:`absence:${c.activeCharacterId}:${c.life!.calendarDay}:${q.id}`,day:c.life!.calendarDay,kind:'absence-unagreed',key:'absence.waited.'+q.id,actorId:c.activeCharacterId,projectId:q.projectId,problemId:q.problemId,values:{work:q.id,characterId:c.activeCharacterId}});
   const ch=c.characters.find(n=>n.id===c.activeCharacterId)!,r=ch.relationships.find(r=>r.characterId===workOwner[q.id]);if(r)r.trust=Math.max(0,r.trust-2);
  }
  if(unagreed.length){

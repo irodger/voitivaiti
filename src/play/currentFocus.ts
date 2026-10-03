@@ -1,13 +1,13 @@
+import {resolveTaskTemplate} from '../content/scenarios';
 import {currentDelivery} from '../world/delivery';
 import '../content/delivery';
 import {currentWalk} from '../world/walk';
 import '../content/walk';
 import {activeCharacter,activeTask} from '../world/simulation';
-import {templateById} from '../content/scenarios';
 import type {Campaign} from '../world/types';
 export type FocusTarget='task'|'work'|'home';
 export function currentFocus(w:Campaign){
- const ch=activeCharacter(w),task=activeTask(w),step=task&&templateById[task.templateId]?.steps.find(s=>s.id===task.currentStepId);
+ const ch=activeCharacter(w),task=activeTask(w),step=task&&resolveTaskTemplate(task)?.steps.find(s=>s.id===task.currentStepId);
  const result=(key:string,target?:FocusTarget)=>({key:'focus.'+key,target,taskId:task?.templateId,stepKey:step?.titleKey,count:w.life?.queue.filter(q=>q.status==='waiting').length??0});
  if(w.phase==='ended')return result('ended');
  if(w.phase==='home'){const delivery=currentDelivery(ch,w.life!.calendarDay);if(delivery)return {...result('home','home'),key:delivery.order.received?'delivery.focus.opened':'delivery.focus.sealed'};const walk=currentWalk(ch,w.company!.currentDay);return result(walk?(walk.status==='finished'?'walkDone':'walk'):'home','home');}

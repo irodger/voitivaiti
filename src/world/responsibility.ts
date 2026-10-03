@@ -32,7 +32,7 @@ export function assignResponsibility(c:Campaign,work:WorkKind,npcId:string){
 }
 export function resolveResponsibilities(c:Campaign){
  for(const d of c.company?.delegations??[]){
-  if(d.status!=='working'||d.dueDay>c.life!.calendarDay)continue;
+  if(d.status!=='working'||d.dueDay>c.life!.calendarDay||(d.dueDay===c.life!.calendarDay&&(d.dueMinute??0)>c.time))continue;
   d.status='returned';d.result=d.work==='review'||d.work==='support'?'verified':'bounded';
   const q=c.life!.queue.find(q=>q.id===d.work&&q.delegatedTo===d.npcId);
   if(q){q.status='done';if(q.expectation)q.expectation.state='resolved';}

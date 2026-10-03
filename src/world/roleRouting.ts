@@ -7,12 +7,12 @@ export function ordinaryProblem(c:Campaign,kind:WorkKind='bug'){
  const ch=c.characters.find(x=>x.id===c.activeCharacterId)!;
  const project=c.company!.projects.find(p=>ch.currentProjectIds.includes(p.id))??c.company!.projects[0];
  const item=c.life?.queue.find(q=>q.id===kind);
- const bound=c.company!.projects.find(p=>p.id===item?.projectId)?.problems.find(p=>p.id===item?.problemId&&p.status!=='resolved');
+ const bound=c.company!.projects.find(p=>p.id===item?.projectId)?.problems.find(p=>p.id===item?.problemId);
  if(bound&&supportedLensCategory(bound.category))return {project:c.company!.projects.find(p=>p.id===item!.projectId)!,problem:bound};
  const preference=kind==='feature'?'interface':kind==='debt'?'performance':kind==='support'?'payment':undefined;
  const candidates=project.problems.filter(p=>supportedLensCategory(p.category));
  candidates.sort((a,b)=>Number(b.status!=='resolved')-Number(a.status!=='resolved')||Number(b.category===preference)-Number(a.category===preference)||
-  (b.severity+(b.workaround?4:0)-3*(ch.scenarioCounts[`lens.${ch.profession}.${b.category}`]??0))-(a.severity+(a.workaround?4:0)-3*(ch.scenarioCounts[`lens.${ch.profession}.${a.category}`]??0))||a.id.localeCompare(b.id));
+  (b.severity+(b.workaround?4:0)-3*(b.story?.encounters.length??ch.scenarioCounts[`lens.${ch.profession}.${b.category}`]??0))-(a.severity+(a.workaround?4:0)-3*(a.story?.encounters.length??ch.scenarioCounts[`lens.${ch.profession}.${a.category}`]??0))||a.id.localeCompare(b.id));
  return {project,problem:candidates[0]};
 }
 export function ordinaryTemplateId(c:Campaign,kind:WorkKind){

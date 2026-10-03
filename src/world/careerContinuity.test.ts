@@ -1,3 +1,4 @@
+import {finishPlaytestTask} from './playtestHelpers';
 import {describe,it,expect,vi} from 'vitest';
 vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
 import {transition,type Action} from './engine';
@@ -11,9 +12,7 @@ function act(c:Campaign,a:Action){return transition(c,a).campaign;}
 function work(c:Campaign,category='interface',style='shared'){
  const q=c.life!.queue.find(q=>q.id==='bug')!,p=c.company!.projects[0];q.status='selected';q.explained=true;q.projectId=p.id;q.problemId=p.problems.find(p=>p.category===category)!.id;
  c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';c=act(c,{type:'take-task'});
- for(const id of ['inspect','trace'])c=act(c,{type:'technical-action',id});c=act(c,{type:'advance'});
- for(const id of [style,'verify-'+style])c=act(c,{type:'technical-action',id});c=act(c,{type:'advance'});
- c=act(c,{type:'technical-action',id:'handoff'});return act(c,{type:'advance'});
+ return finishPlaytestTask(c,style);
 }
 describe('v0.15 persistent company and lived career',()=>{
  it('migrates a v0.14 save and keeps a canonical company runtime after reload',()=>{const old=JSON.parse(JSON.stringify(start()));delete old.companyRuntime;old.life.worldEvents=[{id:'audit',day:1,until:20}];old.life.queue[0].expectation={state:'overdue',dueDay:1};let c=migrateLegacy(old);expect(c.companyRuntime!.worldEvents).toEqual(old.life.worldEvents);c.life!.calendarDay=8;expect(c.companyRuntime!.calendarDay).toBe(8);c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.life!.calendarDay).toBe(8);expect(c.life!.queue[0].expectation!.state).toBe('overdue');});

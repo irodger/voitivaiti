@@ -95,3 +95,5 @@ import {roleLensTemplates} from './roleLenses';
 export const templates:TaskTemplate[]=[...frontendTasks,...scenarios.map(c=>{const template=scenarioTemplate(c);if(c.id==='support-diagnosis')template.steps=supportActions(template.steps);return template;}),...priorityTasks,...roleLensTemplates];
 export const templateById=Object.fromEntries(templates.map(t=>[t.id,t]));
 
+
+export const resolveTaskTemplate=(task:import('../world/types').Task)=>task.scene??templateById[task.templateId];

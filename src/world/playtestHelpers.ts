@@ -1,6 +1,6 @@
+import {resolveTaskTemplate} from '../content/scenarios';
 import {transition,type Action} from './engine';
 import {activeCharacter,activeTask,emptyCampaign} from './simulation';
-import {templateById} from '../content/scenarios';
 import {availableTechnicalActions} from './technicalActions';
 import type {Campaign} from './types';
 
@@ -13,14 +13,14 @@ export function beginPlaytest(role:string){
  }
  return c;
 }
-export function finishPlaytestTask(c:Campaign){
+export function finishPlaytestTask(c:Campaign,style='shared'){
  for(let guard=0;guard<30;guard++){
   const task=activeTask(c);if(!task)throw Error('No task assigned');if(task.rewarded)return c;
-  const step=templateById[task.templateId].steps.find(s=>s.id===task.currentStepId)!;
+  const step=resolveTaskTemplate(task).steps.find(s=>s.id===task.currentStepId)!;
   if(step.actionFlow){
    for(let n=0;n<20&&activeTask(c)!.progress[step.id].status!=='completed';n++){
     const actions=availableTechnicalActions(step,activeTask(c)!.progress[step.id]);
-    const action=actions.find(a=>a.id==='shared')??actions[0];if(!action)throw Error('No action at '+step.id);
+    const action=actions.find(a=>a.id===style)??actions.find(a=>a.id===(style==='limited'?'apply-limited':'apply-shared'))??actions.find(a=>a.id===(style==='limited'?'bounded-result':'verified-result'))??actions[0];if(!action)throw Error('No action at '+step.id);
     c=perform(c,{type:'technical-action',id:action.id});
    }
   }else{
