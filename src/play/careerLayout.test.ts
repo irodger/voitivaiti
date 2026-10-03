@@ -1,0 +1,5 @@
+import {it,expect} from 'vitest';
+import {careerLayout} from './careerLayout';
+import {professionById,professions} from '../content/professions';
+it('shows the actual frontend fork without treating the sibling as a passed role',()=>{const layout=careerLayout(professionById.frontend.careers,'level-5');expect(layout.columns).toBe(5);expect(layout.points.find(p=>p.node.id==='level-4')).toMatchObject({depth:4,branched:true,state:'future'});expect(layout.points.find(p=>p.node.id==='level-5')).toMatchObject({depth:4,branched:true,state:'current'});expect(layout.points.find(p=>p.node.id==='level-3')!.state).toBe('passed');});
+it('places all existing roles and every edge in forward development order',()=>{for(const profession of professions){const layout=careerLayout(profession.careers,profession.startingNode);expect(layout.points).toHaveLength(profession.careers.length);for(const point of layout.points)for(const target of point.node.next)expect(layout.points.find(p=>p.node.id===target)!.depth).toBeGreaterThan(point.depth);}});
