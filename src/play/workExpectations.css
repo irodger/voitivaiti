@@ -1,0 +1,10 @@
+.work-expectations{display:grid;gap:12px;margin:0 0 24px;text-align:left}
+.work-expectations>h3{margin:0;font-size:14px;font-weight:700;color:#607253}
+.expectation-card{padding:16px;border:1px solid #dbe2ce;border-radius:14px;background:#f6f8ee;display:grid;gap:10px}
+.expectation-card h4{margin:0;font-size:16px;line-height:1.4;color:#253e32}
+.expectation-card p{margin:0;line-height:1.6}
+.expectation-card .expectation-meta{font-size:12px;color:#687960;line-height:1.5}
+.expectation-actions{display:flex;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px solid #dfe6d3}
+.expectation-actions button{min-height:40px;margin:0;font-size:12px;padding:9px 12px}
+.expectation-card .speech{margin:0}
+@media(max-width:540px){.expectation-card{padding:14px}.expectation-actions{display:grid;grid-template-columns:1fr}.expectation-actions button{width:100%;text-align:left}}

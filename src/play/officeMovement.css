@@ -12,9 +12,6 @@
 .resident-target::after{content:"";position:absolute;inset:0 -10px;min-height:44px;min-width:44px}
 
 .office-sprite{aspect-ratio:2/3;background-image:url("/art/office-people.webp");background-size:400% 300%;background-repeat:no-repeat;filter:drop-shadow(0 2px 1px #172f2526)}
-.is-walking .office-sprite{animation:office-sprite-step .42s ease-in-out infinite alternate}
-@keyframes office-sprite-step{from{transform:translateY(0) rotate(-.6deg)}to{transform:translateY(-1.5px) rotate(.6deg)}}
-@media(prefers-reduced-motion:reduce){.is-walking .office-sprite{animation:none}}
 /* Keep identification compact; show context only on the person being approached. */
 .office-resident::before{content:"";position:absolute;bottom:-2px;left:15%;width:70%;height:6px;border-radius:50%;background:#152d2530;filter:blur(2px)}
 .resident-detail{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:185px;max-width:44vw;padding:10px 12px;border:1px solid #d8dfc8;border-radius:12px;background:#fffef5f5;box-shadow:0 8px 24px #1c352733;text-align:left;pointer-events:none;font-size:11px;line-height:1.5}
@@ -23,3 +20,7 @@
 .office-resident:has(.resident-target:hover),.office-resident:has(.resident-target:focus-visible){z-index:120!important}
 .resident-target:active .office-person{filter:drop-shadow(0 0 4px #dfedb7)}
 @media(hover:none){.resident-target:hover .resident-detail{display:none}}
+
+.walk-cycle{background-image:url("/art/office-walk.webp");background-size:400% 400%;animation:office-walk-frames .72s steps(1,end) infinite}
+@keyframes office-walk-frames{0%,100%{background-position:var(--walk-x) 0%;translate:0 0}25%{background-position:var(--walk-x) 33.333333%;translate:0 -1px}50%{background-position:var(--walk-x) 66.666667%;translate:0 0}75%{background-position:var(--walk-x) 100%;translate:0 -1px}}
+@media(prefers-reduced-motion:reduce){.walk-cycle{animation:none;background-position:var(--walk-x) 0%}}
