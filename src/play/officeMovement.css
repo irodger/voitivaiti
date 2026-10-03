@@ -15,3 +15,11 @@
 .is-walking .office-sprite{animation:office-sprite-step .42s ease-in-out infinite alternate}
 @keyframes office-sprite-step{from{transform:translateY(0) rotate(-.6deg)}to{transform:translateY(-1.5px) rotate(.6deg)}}
 @media(prefers-reduced-motion:reduce){.is-walking .office-sprite{animation:none}}
+/* Keep identification compact; show context only on the person being approached. */
+.office-resident::before{content:"";position:absolute;bottom:-2px;left:15%;width:70%;height:6px;border-radius:50%;background:#152d2530;filter:blur(2px)}
+.resident-detail{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:185px;max-width:44vw;padding:10px 12px;border:1px solid #d8dfc8;border-radius:12px;background:#fffef5f5;box-shadow:0 8px 24px #1c352733;text-align:left;pointer-events:none;font-size:11px;line-height:1.5}
+.resident-detail b,.resident-detail small,.resident-detail strong{display:block}.resident-detail small{color:#6a7963}.resident-detail strong{margin-top:5px;font-size:10px;color:#45672c}
+.resident-target:hover .resident-detail,.resident-target:focus-visible .resident-detail{display:block}
+.office-resident:has(.resident-target:hover),.office-resident:has(.resident-target:focus-visible){z-index:120!important}
+.resident-target:active .office-person{filter:drop-shadow(0 0 4px #dfedb7)}
+@media(hover:none){.resident-target:hover .resident-detail{display:none}}

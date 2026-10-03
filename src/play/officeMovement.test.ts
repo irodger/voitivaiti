@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {officeDestination,officeRoute} from './officeMovement';
+import {officeDestination,officeRoute,residentActivity} from './officeMovement';
 describe('office movement',()=>{
  it('only the colleague taking a break leaves their station',()=>{
   for(let i=1;i<5;i++)expect(officeDestination(i,'work',1)).toEqual(officeDestination(i,'work',0));
@@ -9,7 +9,7 @@ describe('office movement',()=>{
  it('meeting and review gather actual people instead of moving labels separately',()=>{
   const positions=Array.from({length:5},(_,i)=>officeDestination(i,'meeting',0));
   expect(new Set(positions.map(p=>p.join(','))).size).toBe(5);
-  positions.forEach((p,i)=>expect(officeDestination(i,'review',0)).toEqual(p));
+  expect(officeDestination(5,'review',0)).not.toEqual(officeDestination(0,'review',0));
  });
  it('routes preserve endpoints and use intermediate aisle waypoints',()=>{
   const from=officeDestination(0,'work',0),to=officeDestination(3,'work',0),route=officeRoute(from,to);
@@ -18,11 +18,21 @@ describe('office movement',()=>{
   expect(officeRoute(from,from)).toEqual([from]);
  });
  it('six workstations and meeting places remain distinct and comfortably separated',()=>{
-  for(const activity of ['work','meeting','review','lunch'] as const){
+  for(const activity of ['work','meeting','lunch'] as const){
    const points=Array.from({length:6},(_,i)=>officeDestination(i,activity,0));
    for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){
     expect(Math.hypot(points[i][0]-points[j][0],points[i][1]-points[j][1])).toBeGreaterThan(10);
    }
   }
  });
+});
+
+it('a review brings only its reviewer and the player into the discussion',()=>{
+ for(let reviewer=0;reviewer<5;reviewer++){
+  const activities=Array.from({length:6},(_,i)=>residentActivity(i,'review',reviewer));
+  expect(activities.filter(a=>a==='review')).toHaveLength(2);
+  expect(activities[reviewer]).toBe('review');expect(activities[5]).toBe('review');
+  const points=activities.map((a,i)=>officeDestination(i,a,0));
+  expect(new Set(points.map(p=>p.join(','))).size).toBe(6);
+ }
 });
