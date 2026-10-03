@@ -26,5 +26,5 @@ export function historyArtifact(problem:Problem):WorkArtifact|undefined{
   ...previous.observations.slice(-2).map((detailKey,i)=>({id:'observation-'+i,optional:true,labelKey:'evidence.observations',detailKey}))
  ]};
 }
-export const environmentArtifact:WorkArtifact={kind:'environment',titleKey:'evidence.environments',promptKey:'artifact.hint',rows:[{id:'qa',labelKey:'evidence.qa',detailKey:'evidence.qa.data'},{id:'control',labelKey:'evidence.control',detailKey:'evidence.control.data'}]};
+export const environmentArtifact:WorkArtifact={experiment:true,kind:'environment',titleKey:'evidence.environments',promptKey:'artifact.experiment.prompt',rows:[{id:'qa',labelKey:'evidence.qa',detailKey:'evidence.qa.data'},{id:'control',labelKey:'evidence.control',detailKey:'evidence.control.data'}]};
 export const reviewArtifact:WorkArtifact={kind:'task',titleKey:'evidence.review',promptKey:'artifact.hint',rows:[{id:'original',labelKey:'evidence.original',detailKey:'evidence.original.data'},{id:'neighbor',labelKey:'evidence.neighbor',detailKey:'evidence.neighbor.data'}]};
