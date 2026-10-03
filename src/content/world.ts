@@ -40,7 +40,7 @@ export const glossary=[
  ['reconnect','reconnect','Восстановление связи после разрыва. Повторная отправка при этом может создать дубликат.','Reconnecting after a connection drops. Sending again can create a duplicate.'],
  ['frontend','Frontend','То, что пользователь видит и нажимает: экраны, кнопки и их поведение.','The screens, buttons and behavior a user sees and interacts with.'],
  ['bug','Bug','Программа делает не то, что от неё ожидают. Такую ошибку называют багом.','When software does not behave as expected, we call it a bug.'],
- ['daily','Daily','Короткая встреча команды: что сделали, что планируют и где нужна помощь.','A short team meeting: what happened, what comes next and who needs help.'],
+ ['daily','Дейли','Короткая регулярная встреча команды: что сделали, что планируют и где нужна помощь. Обычно проходит каждый рабочий день.','A short recurring team meeting: what happened, what comes next and who needs help. Usually held every workday.'],
  ['qa','QA','Проверка качества: работает ли продукт в реальных ситуациях, а не только в идеальном сценарии.','Quality assurance checks real situations, not just the happy path.'],
  ['review','Code Review','Коллега проверяет изменения до того, как они попадут пользователям.','A colleague checks changes before they reach users.'],
  ['mr','Merge Request','Запрос добавить твои изменения в общий проект. Здесь коллеги их обсуждают и одобряют.','A request to add your changes to the shared project, where colleagues discuss and approve them.'],
@@ -52,4 +52,4 @@ export const glossary=[
  ['requestId','requestId','Номер одного обращения к серверу. Помогает связать отправку, ответ и запись в журнале.','A number identifying one server request, linking its send, response and log entry.'],
  ['network','Network','Обмен данными: что экран отправил серверу и что получил в ответ.','Data exchange: what the screen sent to the server and what came back.'],
  ['metric','Метрика','Измеримый показатель, который помогает понять, что происходит с продуктом.','A measurable signal that helps explain what is happening in a product.'],
-].map(([id,title,ru,en])=>({id,titleKey:text(`term.${id}.title`,title,id==='debt'?'Technical debt':id==='metric'?'Metric':title),explanationKey:text(`term.${id}.explanation`,ru,en)}));
+].map(([id,title,ru,en])=>({id,titleKey:text(`term.${id}.title`,title,id==='debt'?'Technical debt':id==='metric'?'Metric':id==='daily'?'Daily':title),explanationKey:text(`term.${id}.explanation`,ru,en)}));

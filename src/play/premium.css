@@ -225,3 +225,10 @@ button.focus-bar:hover{background:#e3ecd7}
 @media(max-width:600px){.task-result{gap:14px}.task-result h2{font-size:23px}}
 
 .evening-completed{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);padding:8px 0}.evening-clock{font-size:12px}
+
+/* Team introductions are a compact list of speakers, not selectable cards. */
+.first-day .team-intro-list{display:grid;gap:12px}.world-game .first-day .team-intro-list .speech{margin:0;padding:15px;background:transparent;border:0;border-left:2px solid var(--line);border-radius:0;box-shadow:none}.world-game .first-day .team-intro-list .speech p{margin-top:5px;line-height:1.65}.world-game .first-day .team-intro-help{font-size:12px;margin:0}.office-agent-label{pointer-events:none;cursor:default}
+
+.first-day .team-intro-footer{flex-shrink:0;padding:14px 28px;border-top:1px solid var(--line);background:var(--paper)}.team-intro-footer>.primary-button{width:100%}.office-agent-label{box-shadow:none!important}@media(max-width:760px){.first-day .team-intro-footer{padding:16px 22px}}
+
+.world-game .first-day .team-intro-footer>.primary-button{margin:0}

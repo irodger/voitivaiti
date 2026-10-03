@@ -1,3 +1,4 @@
+import {measurementArtifact,crossSourceArtifact} from './measurementArtifacts';
 import {historyArtifact,environmentArtifact,reviewArtifact} from './historyArtifacts';
 import {text} from './localization';
 import type {SceneFamily,TaskTemplate,Step,TechnicalAction,Problem} from '../world/types';
@@ -23,7 +24,7 @@ const copy=[
  ['hypothesis.environment.result','В окружении QA сбой повторяется. В соседнем — нет. Общий всплеск метрик ещё не объясняет различие.','The QA environment reproduces the failure; a neighboring one does not. The overall metric spike does not yet explain the difference.'],
  ['hypothesis.metrics.result','Всплеск начался раньше обращения QA и затронул соседний поток. Это другой сигнал: один общий график не объясняет конкретный сбой.','The spike preceded QA’s report and affected a neighboring flow. It is a separate signal: one overall graph cannot explain the specific failure.'],
  ['crosscheck','Сопоставить оба источника на одном времени и версии','Cross-check both sources on one timestamp and version'],
- ['crosscheck.result','После выравнивания времени осталось различие версии и состояния. Два отчёта не опровергают друг друга: они измеряли разные случаи.','After aligning timestamps, version and state still differ. The reports do not contradict each other: they measured different cases.'],
+ ['crosscheck.result','График показывает соседний поток, а QA проверяет конкретное действие. Время и условия различаются: оба отчёта полезны, но общий всплеск не доказывает причину этого сбоя.','The chart measures a neighboring flow while QA tests a specific interaction. Timing and conditions differ: both reports help, but the overall spike does not prove this failure’s cause.'],
  ['request','Передать коллеге условия и запросить недостающие данные','Send reproduction conditions and request missing data'],
  ['request.result','Запрос ушёл с версией, временем и шагами. Коллега проверяет свою часть; пока можно исследовать локальные данные или заняться другой работой.','The request includes version, time and steps. The colleague is checking their part; investigate local evidence or do other work meanwhile.'],
  ['local','Пока коллега проверяет — собрать локальную последовательность','Collect the local sequence while the colleague checks'],
@@ -73,7 +74,9 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
  const environment=action('environment','hypothesis.environment','hypothesis.environment.result',['crosscheck']);
  environment.artifact=structuredClone(environmentArtifact);
  const metrics=action('metrics','hypothesis.metrics','hypothesis.metrics.result',['crosscheck']);
+ metrics.artifact=measurementArtifact();
  const cross=action('crosscheck','crosscheck','crosscheck.result',['apply-shared','apply-limited']);
+ cross.artifact=crossSourceArtifact(problem);
 
  if(family==='artifact'){
   const open=action('open-artifact','artifact.open','artifact.seen',['experiment']);
