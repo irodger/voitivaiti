@@ -1,0 +1,21 @@
+/* Current work first; the office remains interactive below on a narrow screen. */
+@media(max-width:1023px){.world-game .work-screen>.world-task-panel{order:-1}.world-game .work-screen>.world-office{order:0}}
+.world-game .laptop-menubar>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.world-game .laptop-bezel>button{min-width:44px;min-height:30px;display:grid;place-items:center}
+.world-game .laptop-steps-label{font-size:10px;letter-spacing:.04em;margin:0 0 8px;color:var(--muted)}
+.world-game .laptop-step-list>button{min-height:44px}
+.world-game .laptop-apps>button:focus-visible,.world-game .laptop-step-list>button:focus-visible,.world-game .artifact-records button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.world-game .observation-history>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:12px;color:var(--muted)}
+.world-game .observation-history>article{border-inline-start:2px solid var(--line);padding-inline-start:12px}
+.world-game .artifact-progress{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.world-game .artifact-progress progress{width:70px;max-width:30%;height:6px;accent-color:#799852}
+.world-game .artifact-footer{padding:14px 18px;border-top:1px solid var(--line);background:var(--paper)}
+.world-game .artifact-footer>p{margin:0 0 10px;font-size:12px;line-height:1.6;color:var(--muted)}
+.world-game .artifact-footer .artifact-compare{margin:0;width:100%;min-height:44px}
+.world-game .artifact-footer .artifact-compare:disabled{cursor:default;opacity:.5}
+.world-game.theme-violet .artifact-progress progress{accent-color:#7847b0}
+.world-game .problem-context{padding:12px 14px;border-radius:10px}
+.world-game.theme-violet .stat-money small{color:#fff0c1}
+.world-game.theme-violet .problem-context :is(small,b){color:#65437f}
+.world-game.theme-violet .progress-segments i.active{background:#7847b0}
+@media(max-width:600px){.world-game .laptop-backdrop{padding:8px 6px}.world-game .laptop-shell{max-height:none}.world-game .laptop-content{padding:18px 14px}.world-game .artifact-progress,.world-game .artifact-footer{padding:12px 14px}}

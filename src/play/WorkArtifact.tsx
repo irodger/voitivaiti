@@ -1,3 +1,4 @@
+import '../content/workspaceUx';
 import {ArtifactData} from './ArtifactData';
 import {useI18n} from '../content/localization';
 import {useWorld} from '../world/store';
@@ -6,11 +7,12 @@ import '../content/workArtifacts';
 import './workArtifact.css';
 export function WorkArtifact({action,progress,readOnly=false}:{action:TechnicalAction;progress:StepProgress;readOnly?:boolean}){
  const {t}=useI18n(),dispatch=useWorld(s=>s.dispatch),artifact=action.artifact!,seen=progress.artifactReadings?.[action.id]??[];
- const complete=artifact.rows.filter(row=>!row.optional).every(row=>seen.includes(row.id));
+ const required=artifact.rows.filter(row=>!row.optional),inspected=required.filter(row=>seen.includes(row.id)).length,complete=inspected===required.length;
  const conditions=artifact.rows.filter(row=>!row.optional),selected=progress.artifactConditions?.[action.id]??conditions[0]?.id;
  const current=conditions.find(row=>row.id===selected)??conditions[0];
  return <section className={'work-artifact artifact-'+artifact.kind} aria-label={t(artifact.titleKey)}>
  <header><small>{t('artifact.open')}</small><h3>{t(artifact.titleKey)}</h3><p>{t(artifact.promptKey)}</p></header>
+ {!readOnly&&<div className="artifact-progress" role="status"><progress value={inspected} max={Math.max(1,required.length)} aria-label={t('workspace.records',{done:inspected,total:required.length})}/><span>{t('workspace.records',{done:inspected,total:required.length})}</span></div>}
  {artifact.experiment&&!readOnly&&<div className="artifact-experiment">
  <div className="experiment-conditions" role="group" aria-label={t(artifact.titleKey)}>{conditions.map(row=><button key={row.id} aria-pressed={current.id===row.id} onClick={()=>dispatch({type:'artifact-condition',actionId:action.id,rowId:row.id})}>{t(row.labelKey)}{seen.includes(row.id)&&' ✓'}</button>)}</div>
  <button className="experiment-run" onClick={()=>dispatch({type:'artifact-inspect',actionId:action.id,rowId:current.id})}>{t('artifact.experiment.run')}</button>
@@ -23,6 +25,6 @@ export function WorkArtifact({action,progress,readOnly=false}:{action:TechnicalA
  }
  {seen.includes(row.id)&&<div className="artifact-data"><ArtifactData row={row}/></div>}
  </article>)}</div>
- {!readOnly&&complete&&<button className="artifact-compare" onClick={()=>dispatch({type:'artifact-compare',id:action.id})}>{t('artifact.continue')} · {t('action.minutes',{minutes:action.minutes})} &rarr;</button>}
+ {!readOnly&&<footer className="artifact-footer"><p>{t(complete?'workspace.ready':'workspace.remaining',{count:required.length-inspected})}</p><button className="artifact-compare" disabled={!complete} onClick={()=>dispatch({type:'artifact-compare',id:action.id})}>{t('artifact.continue')} · {t('action.minutes',{minutes:action.minutes})} &rarr;</button></footer>}
  </section>;
 }

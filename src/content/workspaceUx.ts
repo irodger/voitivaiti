@@ -1,0 +1,12 @@
+import {text} from './localization';
+text('workspace.atWork','Рабочий день ещё продолжается','The workday is still in progress');
+text('workspace.homePreview','Ты можешь посмотреть квартиру и покупки. Прогулка, ужин и сон станут доступны после рабочего дня.','You can browse your apartment and purchases. Walks, dinner and sleep become available after the workday.');
+text('workspace.backToWork','Вернуться к работе','Return to work');
+text('workspace.steps','Этапы работы','Work steps');
+text('workspace.currentApp','Здесь выполняется текущий шаг','Current step happens here');
+text('workspace.referenceApp','Материалы и собранные наблюдения','Reference materials and collected observations');
+text('workspace.history','Ранее в этом шаге · {count}','Earlier in this step · {count}');
+text('workspace.records','Просмотрено записей: {done} из {total}','Records inspected: {done} of {total}');
+text('workspace.remaining','Осталось записей: {count}. Посмотри их, чтобы сделать вывод.','Inspect {count} more records before drawing a conclusion.');
+text('workspace.ready','Данные собраны. Теперь зафиксируй вывод.','Evidence gathered. Now record your conclusion.');
+text('workspace.roleFilter','Фильтр по профессии','Filter by profession');
