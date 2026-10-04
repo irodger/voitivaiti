@@ -76,3 +76,23 @@
 .world-game.theme-violet .home-room.apartment-scene{background:radial-gradient(ellipse at 35% 25%,#eee4f7,#c8b8da 80%)}
 .world-game.theme-violet .home-room.apartment-scene.phase-night{background:#544465}
 .world-game.theme-violet .apartment-art{clip-path:polygon(1% 19%,34% 0,39% 0,99% 18%,99% 72%,67.5% 97%,55% 88%,48.5% 95.5%,1% 69.5%)}
+
+/* Home details and commerce use the selected interface palette. */
+.world-game.theme-violet :is(.focus-bar>svg,.home-pay>svg){color:var(--green)}
+.world-game.theme-violet :is(.routine-panel p,.routine-panel small,.apartment-action small,.autosave,.marketplace .market-brand small,.market-delivery-note,.market-product-copy p,.market-price small,.market-shipping p,.shipping-track){color:var(--muted)}
+.world-game.theme-violet :is(.routine-panel,.home-pay,.market-catalog>article,.market-shipping,.market-shipping article){border-color:var(--line)}
+.world-game.theme-violet .marketplace .market-brand>svg{background:#eee4f7;color:var(--green)}
+.world-game.theme-violet .market-catalog>article{background:var(--paper);box-shadow:0 3px 8px #432c5b08}
+.world-game.theme-violet .market-product-art{background:radial-gradient(ellipse at 50% 70%,#e4d6f1,#f6f0fb 72%)}
+.world-game.theme-violet .market-product-art>.market-owned-badge{background:#fff3cde8;border-color:#e8cc78;color:#604074}
+.world-game.theme-violet .market-price b{color:var(--ink)}
+.world-game.theme-violet .market-buy{background:var(--green);border-color:#57348c;color:#fff8dc}
+.world-game.theme-violet .market-buy:hover{background:#57348c}
+.world-game.theme-violet :is(.market-buy,.market-receive):focus-visible{outline-color:#b88718}
+.world-game.theme-violet .market-shipping{background:#f1eafa}
+.world-game.theme-violet .shipping-track .reached{color:var(--green)}
+.world-game.theme-violet .market-receive{background:#fff1be;border-color:#e8cc78;color:#604074}
+.world-game.theme-violet .market-receive:hover{background:#f6dc72}
+.world-game.theme-violet :is(.delivery-stage-label,.delivery-stage-name,.delivery-panel-top button,.delivery-panel .delivery-story,.delivery-panel .delivery-paid){color:var(--muted)}
+.world-game.theme-violet .delivery-stage{background:radial-gradient(ellipse at 50% 70%,#e7d9f2,#f5eefb 60%,#d3c1e3);border-color:var(--line)}
+.world-game.theme-violet .delivery-panel .delivery-benefit{background:#f1eafa;border-color:var(--line);color:var(--ink)}

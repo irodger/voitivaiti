@@ -112,3 +112,8 @@
 - Сетевые записи используют компактное моноширинное оформление. Метрики наследуют акцент приложения.
 - Design/component: две колонки для сравнения на широкой области, одна на мобильном. Архивные записи сохраняют раскрываемый список.
 - Состояния изучения, обязательность записей, механики и данные не изменены.
+
+
+### v0.45.2 — Home palette consistency
+
+User screenshots exposed remaining fixed sage colors in marketplace cards, prices, delivery notes, routine descriptions, hotspot durations, salary icon and saved status. Scoped violet overrides now cover these surfaces and purchase/delivery states. Product artwork and room illustrations retain their original object colors. Production build verifies the CSS and release integration; this patch does not change game state or actions.
