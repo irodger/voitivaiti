@@ -30,3 +30,6 @@ text('appPurpose.ide','Структура, код и связи компонен
 text('appPurpose.browser','Поведение экрана и обмен данными','Screen behavior and exchanged data');
 text('appPurpose.console','Записи событий и признаки сбоя','Event records and signs of failure');
 text('appPurpose.chat','Вопросы, договорённости и проверка работы','Questions, agreements and work review');
+
+text('desk.syncHint','Команда собирается: коротко сверим планы перед работой.','The team is gathering: align the plan before starting work.');
+text('desk.joinSync','К команде','Join the team');

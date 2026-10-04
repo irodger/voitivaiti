@@ -142,3 +142,12 @@ Added a compact application header with purpose, actual completed-stage count, c
 ### v0.46.4 — Reference laptop shell
 
 Moved app navigation into a dark command bar with existing game identity and actual day/time. Sidebar now holds work stages only. Dashboard content expands to 1100px; narrower screens use a compact two-row command bar. Existing keyboard focus trap covers the new navigation. No new game controls or fabricated status. Visual browser verification remains outstanding.
+
+
+### v0.47.0 — Cohesive illustrated dashboard
+
+Day and task list share the main column; illustrated character rail starts beside the day, not below it. Character identity remains the saved avatar/name, with a shared workspace illustration rather than assigning every player one invented face. Agreements use collapsed details on the desk while other call sites retain their expanded view. Pending morning sync gives an explicit return to office meeting. Task actions align beside the description on wide screens. Rewarded tasks no longer select Chat while displaying the desk. Desktop browser inspection confirmed the asset loads and the character name is white over a dark backing. Eight relevant UI tests pass. Physical mobile viewport has not been verified.
+
+Generated asset: public/art/laptop-workspace.webp (built-in imagegen, converted to WebP). Prompt: premium illustrated cozy IT workspace, empty ergonomic chair, dual monitors with abstract code, amber lamp, coffee and plants, city sunset, navy/indigo/honey palette; no people or readable UI text.
+
+Final verification: all 317 tests across 48 files passed. Desktop screenshot showed both available task cards with their actions on the first screen; image loaded, no horizontal overflow, agreements closed by default and Tasks correctly selected.
