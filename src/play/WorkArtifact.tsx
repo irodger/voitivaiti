@@ -1,3 +1,4 @@
+import {ActionDock} from './ActionDock';
 import '../content/workspaceUx';
 import {ArtifactData} from './ArtifactData';
 import {useI18n} from '../content/localization';
@@ -25,6 +26,6 @@ export function WorkArtifact({action,progress,readOnly=false}:{action:TechnicalA
  }
  {seen.includes(row.id)&&<div className="artifact-data"><ArtifactData row={row}/></div>}
  </article>)}</div>}
- {!readOnly&&<footer className="artifact-footer"><p>{t(complete?'workspace.ready':'workspace.remaining',{count:required.length-inspected})}</p><button className="artifact-compare" disabled={!complete} onClick={()=>dispatch({type:'artifact-compare',id:action.id})}>{t('artifact.continue')} · {t('action.minutes',{minutes:action.minutes})} &rarr;</button></footer>}
+ {!readOnly&&<ActionDock active={complete}><footer className="artifact-footer"><p>{t(complete?'workspace.ready':'workspace.remaining',{count:required.length-inspected})}</p><button className="artifact-compare" disabled={!complete} onClick={()=>dispatch({type:'artifact-compare',id:action.id})}>{t('artifact.continue')} · {t('action.minutes',{minutes:action.minutes})} &rarr;</button></footer></ActionDock>}
  </section>;
 }
