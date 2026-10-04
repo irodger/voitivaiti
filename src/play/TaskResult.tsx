@@ -1,3 +1,4 @@
+import {ActionDock} from './ActionDock';
 import {resolveTaskTemplate} from '../content/scenarios';
 import {PerspectivePanel} from './PerspectivePanel';
 import '../content/corrections';
@@ -24,6 +25,6 @@ export function TaskResult({onClose}:{onClose:()=>void}){
   <div className="time-comparison"><div><small>{t('ui.estimate')}</small><b>{t('ui.min',{value:template.estimate})}</b></div><div><small>{t('ui.timeActual')}</small><b>{t('ui.min',{value:task.taskElapsedMinutes})}</b></div></div>
   <p>{t(delta>0?'result.over':delta<0?'result.under':'result.onTime',{minutes:Math.abs(delta)})}</p>
   <PerspectivePanel/>
-  <Button onClick={()=>{if(w.perspective)w.dispatch({type:'perspective-action',id:'close'});onClose();}}>{t('result.close')}</Button>
+  <ActionDock><Button onClick={()=>{if(w.perspective)w.dispatch({type:'perspective-action',id:'close'});onClose();}}>{t('result.close')}</Button></ActionDock>
  </section>;
 }

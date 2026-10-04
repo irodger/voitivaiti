@@ -9,3 +9,14 @@
 .panel-action-dock .artifact-footer>p{font-size:11px;margin:0 0 8px}
 @media(max-width:1023px){.panel-action-slot{padding:12px 14px}.laptop-workspace{width:100%}}
 @media(max-height:600px){.panel-action-slot{padding:8px 12px}.panel-action-dock .event-choices{gap:5px}.panel-action-dock button{min-height:40px!important;padding:10px 14px}}
+
+.panel-action-slot{max-height:40%;overflow-y:auto;overscroll-behavior:contain}
+.panel-action-dock .technical-actions{margin:0;padding:0;border:0;display:grid;gap:8px}
+.panel-action-dock .technical-actions>small,.dock-choice-context{font-size:11px;font-weight:600;color:var(--muted);margin:0}
+.panel-action-dock .technical-actions>button{min-height:44px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:10px;text-align:left;font-size:12px}
+.panel-action-dock .technical-actions>button>small{white-space:nowrap;color:var(--muted);font-size:11px}
+.panel-action-dock .technical-actions>button:hover{background:#eef2e6}
+.world-game.theme-violet .panel-action-dock .technical-actions>button:hover{background:#fff1be}
+.panel-action-dock .technical-actions>button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+
+.panel-action-dock .choices{margin:0;gap:8px}

@@ -1,3 +1,4 @@
+import {ActionPanel,ActionDock} from './ActionDock';
 import {useEffect,useRef} from 'react';
 import {ArrowLeft,Check,Package} from 'lucide-react';
 import '../content/delivery';
@@ -24,15 +25,15 @@ export function Delivery({onBack}:{onBack:(view:'market'|'evening')=>void}){
    </div>
    <div className="delivery-stage-name">{t(item.titleKey)}</div>
   </section>
-  <section className="world-task-panel delivery-panel">
+  <ActionPanel desktopOnly className="world-task-panel delivery-panel">
    <div className="delivery-panel-top"><button onClick={()=>close('market')}><ArrowLeft size={15}/>{t('delivery.back')}</button></div>
    <div className="office-content">
     <h1 tabIndex={-1} ref={heading}>{t(opened?'delivery.opened':'delivery.title')}</h1>
     <h2>{t(item.titleKey)}</h2>
     <p className="delivery-story" role={opened?'status':undefined}>{t(opened?'delivery.'+item.id+'.result':'delivery.sealed')}</p>
     {opened?<p className="delivery-benefit"><Check size={17}/>{t(item.descriptionKey)}</p>:<p className="delivery-paid">{t('delivery.paid',{price:item.price.toLocaleString(locale)})}</p>}
-    <Button onClick={()=>opened?close('evening'):w.dispatch({type:'unpack',itemId:item.id})}>{t(opened?'delivery.home':'delivery.open')}</Button>
+    <ActionDock><Button onClick={()=>opened?close('evening'):w.dispatch({type:'unpack',itemId:item.id})}>{t(opened?'delivery.home':'delivery.open')}</Button></ActionDock>
    </div>
-  </section>
+  </ActionPanel>
  </div>;
 }
