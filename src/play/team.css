@@ -4,3 +4,17 @@
 .team-banner{min-height:240px}
 @media(max-width:540px){.team-banner{min-height:0}}
 .team-tools{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.team-search{display:flex;align-items:center;gap:10px;padding:0 14px;flex:1;min-width:180px;background:var(--paper);border:1px solid var(--line);border-radius:12px;color:var(--muted)}.team-search input{border:0;background:transparent;color:var(--ink);width:100%;padding:14px 0;outline-offset:0;font-size:12px}.team-tools select{font-size:12px;min-height:46px}.team-tools button[aria-pressed=true]{background:var(--lime);border-color:var(--green)}.team-empty{padding:25px;border:1px dashed var(--line);border-radius:18px;display:grid;gap:15px}.team-empty button{justify-self:start}.team-topic-preview{display:grid;gap:7px;margin:0 0 16px}.team-topic-preview>small{font-size:10px;color:var(--muted)}.team-topic-preview button{display:flex;gap:8px;align-items:center;justify-content:space-between;background:#f4f6eb;border:1px solid #e2e8d5;padding:10px 12px;border-radius:10px;text-align:left;font-size:11px;min-height:40px}.team-topic-preview button:hover{background:#e9efdc}.world-game.theme-violet .team-topic-preview button{background:#f3eafa;border-color:#e0cfee;color:#66427f}.world-game.theme-violet .team-topic-preview button:hover{background:#ffe9a4}@media(max-width:540px){.team-tools>*{width:100%}.team-tools select{max-width:none}.team-search{flex-basis:100%}}
+
+@media(max-width:540px){
+ .team-view{gap:16px}
+ .team-banner{padding:16px 18px}
+ .team-banner h1{font-size:26px;margin:4px 0 8px}
+ .team-banner h2{display:none}
+ .team-banner-copy>p:last-of-type{font-size:12px;line-height:1.5;margin:0}
+ .team-banner-stats{margin-top:12px;gap:8px}
+ .team-banner-stats span{font-size:10px}
+ .team-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+ .team-tools>.team-search{grid-column:1/-1;min-width:0}
+ .team-tools>select{min-width:0;width:100%;padding:8px;font-size:11px}
+ .team-tools>button{width:auto;font-size:11px;padding:8px;min-height:44px;white-space:nowrap}
+}

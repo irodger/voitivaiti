@@ -10,3 +10,5 @@ text('workspace.records','Просмотрено записей: {done} из {to
 text('workspace.remaining','Осталось записей: {count}. Посмотри их, чтобы сделать вывод.','Inspect {count} more records before drawing a conclusion.');
 text('workspace.ready','Данные собраны. Теперь зафиксируй вывод.','Evidence gathered. Now record your conclusion.');
 text('workspace.roleFilter','Фильтр по профессии','Filter by profession');
+text('workspace.currentStep','Сейчас','Current');
+text('workspace.resumeStep','К текущему шагу','Resume current step');

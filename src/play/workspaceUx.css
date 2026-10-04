@@ -19,3 +19,14 @@
 .world-game.theme-violet .problem-context :is(small,b){color:#65437f}
 .world-game.theme-violet .progress-segments i.active{background:#7847b0}
 @media(max-width:600px){.world-game .laptop-backdrop{padding:8px 6px}.world-game .laptop-shell{max-height:none}.world-game .laptop-content{padding:18px 14px}.world-game .artifact-progress,.world-game .artifact-footer{padding:12px 14px}}
+
+.laptop-mobile-steps{display:none}
+.laptop-history-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.laptop-history-notice .read-only-notice{margin:0}
+.laptop-history-notice button{min-height:44px}
+@media(max-width:1023px){
+ .laptop-mobile-steps{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--paper);flex:none}
+ .laptop-mobile-steps>span{font-size:11px;color:var(--muted);flex:none}
+ .laptop-mobile-steps select{min-width:0;width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:inherit;padding:8px;font:inherit;font-size:12px}
+ .laptop-mobile-steps select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+}
