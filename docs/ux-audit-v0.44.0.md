@@ -156,3 +156,10 @@ Final verification: all 317 tests across 48 files passed. Desktop screenshot sho
 ### v0.47.1 — Apps with distinct content
 
 Fixed rewarded-task navigation: app tabs no longer all render WorkDesk. AppContext scopes observations to the app and inspected artifact rows to source/network/metrics/task families. Completed legacy step code and selected evidence remain available. IDE has a structure/source viewer; Console a dark journal; Browser a light screen/data surface; Chat completed discussion bubbles. Future review text and unread artifact rows are withheld. Three data-isolation regression tests and five existing desk/workspace checks passed; production build passed. Desktop browser verified IDE/Console switching after completed work and no horizontal overflow in Console. Mobile and every profession have not been manually played.
+
+
+## v0.47.2 — Working surfaces
+
+Decision cards, file choices and source line numbers improve the existing working steps without changing rewards or task actions. Completed-step navigation now takes precedence over the rewarded-task app summary.
+
+Validation: 320 tests passed before the navigation correction; final production build passed. Desktop browser inspection exposed the archive routing defect. After reload the saved run had no active task, so the corrected archive and mobile layout were not manually verified.
