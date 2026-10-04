@@ -1,0 +1,178 @@
+[
+  {
+    "role": "frontend",
+    "style": "shared",
+    "completed": 29,
+    "grade": "level-2",
+    "money": 243041,
+    "maxStress": 100,
+    "phase": "ended",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "review",
+      "dependency",
+      "incident",
+      "coordination",
+      "recurrence",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 29
+  },
+  {
+    "role": "frontend",
+    "style": "limited",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 277023,
+    "maxStress": 88,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "recurrence",
+      "review",
+      "dependency",
+      "coordination",
+      "incident",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  },
+  {
+    "role": "qa",
+    "style": "shared",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 210982,
+    "maxStress": 89,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "dependency",
+      "incident",
+      "coordination",
+      "recurrence",
+      "review",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  },
+  {
+    "role": "qa",
+    "style": "limited",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 209636,
+    "maxStress": 89,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "recurrence",
+      "dependency",
+      "coordination",
+      "review",
+      "incident",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  },
+  {
+    "role": "designer",
+    "style": "shared",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 248133,
+    "maxStress": 92,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "review",
+      "dependency",
+      "incident",
+      "coordination",
+      "recurrence",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  },
+  {
+    "role": "designer",
+    "style": "limited",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 245596,
+    "maxStress": 89,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "recurrence",
+      "dependency",
+      "coordination",
+      "review",
+      "incident",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  },
+  {
+    "role": "product",
+    "style": "shared",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 295410,
+    "maxStress": 92,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "review",
+      "dependency",
+      "incident",
+      "coordination",
+      "recurrence",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  },
+  {
+    "role": "product",
+    "style": "limited",
+    "completed": 40,
+    "grade": "level-1",
+    "money": 292864,
+    "maxStress": 89,
+    "phase": "office",
+    "error": "",
+    "families": [
+      "starter",
+      "investigation",
+      "recurrence",
+      "dependency",
+      "review",
+      "coordination",
+      "incident",
+      "artifact"
+    ],
+    "templates": 5,
+    "encounters": 40
+  }
+]

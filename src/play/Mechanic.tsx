@@ -1,3 +1,4 @@
+import {ProblemHistory} from './ProblemHistory';
 import {TaskBrief} from './TaskBrief';
 import {ActionDock} from './ActionDock';
 import {resolveTaskTemplate} from '../content/scenarios';
@@ -27,6 +28,7 @@ export function StepRenderer({step,readOnly=false,viewProgress}:{step:Step;readO
  return <section className={`mechanic mechanic-${step.type}`}><TaskBrief task={task}/><div className="step-label">{t('ui.step',{step:resolveTaskTemplate(task).steps.indexOf(step)+1,total:resolveTaskTemplate(task).steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div><h2>{t(step.titleKey)}</h2>{step.type==='search'?<div className="search-input"><Search size={18}/><TermText>{t(step.bodyKey)}</TermText></div>:<p className="mechanic-brief"><TermText>{t(step.type==='review'?'fix.ready':step.bodyKey)}</TermText></p>}
  {task.encounter&&resolveTaskTemplate(task).steps[0].id===step.id&&[...new Set(task.encounter.contextKeys)].map(key=><p className="mechanic-brief" key={key}><TermText>{t(key)}</TermText></p>)}
  {!task.encounter&&priorOutcome&&<p className="mechanic-brief"><TermText>{t(priorOutcome)}</TermText></p>}
+ {resolveTaskTemplate(task).steps[0].id===step.id&&<ProblemHistory task={task}/>}
  {consequential&&!disabled&&p.run!=='running'&&step.type!=='review'&&((step.options?.length??0)>1||(step.items?.length??0)>1)&&<DecisionHelp/>}
  {step.type==='file-browser'&&<div className="file-path">src / pages / Home</div>}
  {step.preview&&<VisualPreview kind={step.preview} done={done}/>}

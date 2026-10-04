@@ -1,3 +1,4 @@
+import {WorkItemContext} from './WorkItemContext';
 import {WorkKindIcon} from './WorkKindIcon';
 import {DelegationResults} from './DelegationResults';
 import {useState} from 'react';
@@ -20,7 +21,7 @@ export function RemainderQueue(){
   return <article className="remainder-card" data-kind={q.id} key={q.id}>
    <h2><WorkKindIcon kind={q.id}/>{t('life.work.'+q.id)}</h2>
    <small>{npc?characterName(npc,t):t('ui.team')} · {t('loop.age',{days:q.age??0})} · ~{t('ui.min',{value:q.minutes})}</small>
-   <p>{t('life.work.'+q.id+'.body')}</p>
+   <WorkItemContext item={q}/><p>{t('life.work.'+q.id+'.body')}</p>
    {delegated?<small>{t('queue.delegated')}</small>:<div className="remainder-actions">
     {canTake&&!takeReason&&<button onClick={()=>selected?w.dispatch({type:'take-task'}):setChosen(chosen===q.id?null:q.id)}>{t(selected?'queue.start':'queue.choose')}</button>}
     {q.status==='waiting'&&availableWork(ch).includes(q.id)&&!helpReason&&<button onClick={()=>w.dispatch({type:'help-work',id:q.id})}>{t('queue.action.'+q.id)}</button>}

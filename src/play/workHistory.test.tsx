@@ -1,0 +1,11 @@
+import {it,expect,vi} from 'vitest';
+import {renderToStaticMarkup} from 'react-dom/server';
+vi.mock('../content/localization',async original=>({...await original<typeof import('../content/localization')>(),useI18n:()=>({t:(key:string)=>key,locale:'ru'})}));
+const fixture=vi.hoisted(()=>({characters:[{id:'max',name:'QA colleague'}],tasks:[{id:'prior',outcome:{summaryKey:'actual-temporary-result'}}],company:{projects:[{id:'project',problems:[{id:'problem',titleKey:'payment-problem',rootCause:'hidden-root-cause',workaround:true,story:{encounters:[{taskId:'prior',actorId:'max',day:2,observations:['inspected-record']}],limitations:['unresolved-case']}}]}]}}));
+vi.mock('../world/store',()=>({useWorld:(select?: (w:typeof fixture)=>unknown)=>select?select(fixture):fixture}));
+import {WorkItemContext} from './WorkItemContext';
+import {ProblemHistory} from './ProblemHistory';
+import type {Task} from '../world/types';
+it('queue context shows its bound problem and owner without exposing its hidden cause',()=>{const html=renderToStaticMarkup(<WorkItemContext item={{id:'bug',projectId:'project',problemId:'problem',status:'waiting',minutes:120,urgency:2,expectation:{state:'waiting',dueDay:4}}}/>);expect(html).toContain('payment-problem');expect(html).toContain('QA colleague');expect(html).toContain('workHistory.temporary');expect(html).not.toContain('hidden-root-cause');});
+it('history uses recorded outcomes and observations rather than inferring a repair',()=>{const html=renderToStaticMarkup(<ProblemHistory task={{projectId:'project',problemId:'problem'} as Task}/>);expect(html).toContain('actual-temporary-result');expect(html).toContain('inspected-record');expect(html).toContain('unresolved-case');expect(html).not.toContain('hidden-root-cause');});
+it('unbound queue entries and unseen problems remain usable without invented history',()=>{expect(renderToStaticMarkup(<WorkItemContext item={{id:'bug',status:'waiting',minutes:120,urgency:2}}/>)).not.toContain('payment-problem');expect(renderToStaticMarkup(<ProblemHistory task={{projectId:'missing',problemId:'missing'} as Task}/>)).toBe('');});
