@@ -30,3 +30,13 @@
  .laptop-mobile-steps select{min-width:0;width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:inherit;padding:8px;font:inherit;font-size:12px}
  .laptop-mobile-steps select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 }
+
+.world-game .artifact-archive>details{border-bottom:1px solid var(--line)}
+.world-game .artifact-archive summary{cursor:pointer;min-height:44px;padding:12px 16px;font-size:12px;font-weight:600}
+.world-game .artifact-archive summary>span{float:right;margin-left:12px}
+.world-game :is(.artifact-archive,.observation-history,.latest-observation,.artifact-action-option) summary:focus-visible{outline:2px solid currentColor;outline-offset:-2px}
+.world-game.theme-green{--muted:#596858}
+.world-game.theme-green :is(.office-content>p,.world-card p,.world-card small,.fine-print,.eyebrow,.speaker span,.project-strip small,.current-step-card small,.problem-context small,.time-comparison small,.day-results small,.hud-stat small){color:var(--muted)}
+.world-game.theme-green :is(.team-member-role,.team-member-purpose,.team-trust small,.team-topic-preview>small,.team-banner-copy>p:last-of-type){color:var(--muted)}
+.world-game.theme-green .stat-money small{color:#e4edda}
+.world-game.theme-green .progress-segments i.active{background:#536e3d}

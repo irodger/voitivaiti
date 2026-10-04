@@ -59,3 +59,20 @@
 .world-game.theme-violet :is(input,textarea,[contenteditable=true]){cursor:text}
 .world-game.theme-violet button:disabled{cursor:not-allowed}
 }
+
+/* Theme surfaces share one palette, including lazily loaded Home styles. */
+.world-game.theme-violet :is(.home-tabs,.release-item,.version-update){border-color:var(--line)}
+.world-game.theme-violet .home-tabs button{color:var(--muted)}
+.world-game.theme-violet .home-tabs button.active{background:#f6dc72;color:#49315f}
+.world-game.theme-violet .home-tabs button:hover:not(.active){background:#eee4f7;color:#583879}
+.world-game.theme-violet :is(.home-shop article,.home-shop article.installed,.home-pay-note,.market-orders){background:#f1eafa;border-color:#dfd1eb}
+.world-game.theme-violet :is(.home-shop article>svg,.home-shop p,.home-pay small,.home-pay>span,.home-market,.home-market a,.home-pay-note,.home-pay-note b){color:#6e587c}
+.world-game.theme-violet .home-shop button{background:#fff1be;color:#604074}
+.world-game.theme-violet .home-shop button:disabled{background:#e8dff0;color:#6e587c}
+.world-game.theme-violet .avatar-backdrop{fill:#e3d3f1}
+.world-game.theme-violet .avatar-backdrop[data-tone="1"],.world-game.theme-violet .avatar-backdrop[data-tone="3"],.world-game.theme-violet .avatar-backdrop[data-tone="5"]{fill:#f9e8ac}
+.world-game.theme-violet .office-scene:has(.living-office){background:radial-gradient(ellipse at 35% 25%,#eee4f7,#c8b8da 80%);border-color:#d9cce5}
+.world-game.theme-violet .office-scene:has(.living-office) .office-render{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1448 1086'%3E%3Cpath fill='white' d='M11 250L377 0H670L1438 120V628L1237 1081L830 961L775 1039L11 796Z'/%3E%3C/svg%3E");mask-size:contain;mask-position:center;mask-repeat:no-repeat}
+.world-game.theme-violet .home-room.apartment-scene{background:radial-gradient(ellipse at 35% 25%,#eee4f7,#c8b8da 80%)}
+.world-game.theme-violet .home-room.apartment-scene.phase-night{background:#544465}
+.world-game.theme-violet .apartment-art{clip-path:polygon(1% 19%,34% 0,39% 0,99% 18%,99% 72%,67.5% 97%,55% 88%,48.5% 95.5%,1% 69.5%)}

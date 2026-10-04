@@ -19,12 +19,12 @@ export function WorkArtifact({action,progress,readOnly=false}:{action:TechnicalA
  <div className="experiment-output" role="status">{seen.includes(current.id)?<ArtifactData row={current}/>:t('artifact.experiment.empty')}</div>
  </div>}
  {artifact.experiment&&conditions.some(row=>seen.includes(row.id)&&(readOnly||row.id!==current.id))&&<h4 className="experiment-results-label">{t('artifact.experiment.results')}</h4>}
- <div className="artifact-records">{artifact.rows.filter(row=>!artifact.experiment||row.optional||(seen.includes(row.id)&&(readOnly||row.id!==current.id))).map(row=><article key={row.id}>
+ {readOnly?<div className="artifact-records artifact-archive">{artifact.rows.filter(row=>seen.includes(row.id)).map(row=><details key={row.id}><summary>{t(row.labelKey)}<span aria-hidden="true">✓</span></summary><div className="artifact-data"><ArtifactData row={row}/></div></details>)}</div>:<div className="artifact-records">{artifact.rows.filter(row=>!artifact.experiment||row.optional||(seen.includes(row.id)&&(readOnly||row.id!==current.id))).map(row=><article key={row.id}>
  {artifact.experiment&&!row.optional?<h4 className="experiment-record-title">{t(row.labelKey)}</h4>:
  <button type="button" aria-expanded={seen.includes(row.id)} disabled={readOnly} onClick={()=>dispatch({type:'artifact-inspect',actionId:action.id,rowId:row.id})}><span>{t(row.labelKey)}</span><span>{seen.includes(row.id)?'\u2713':t('artifact.read')}</span></button>
  }
  {seen.includes(row.id)&&<div className="artifact-data"><ArtifactData row={row}/></div>}
- </article>)}</div>
+ </article>)}</div>}
  {!readOnly&&<footer className="artifact-footer"><p>{t(complete?'workspace.ready':'workspace.remaining',{count:required.length-inspected})}</p><button className="artifact-compare" disabled={!complete} onClick={()=>dispatch({type:'artifact-compare',id:action.id})}>{t('artifact.continue')} · {t('action.minutes',{minutes:action.minutes})} &rarr;</button></footer>}
  </section>;
 }

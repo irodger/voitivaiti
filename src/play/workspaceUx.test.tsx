@@ -16,7 +16,7 @@ it('explains the missing evidence and does not require optional notes',()=>{
 });
 it('previous evidence has no submit button or unfinished-task instructions',()=>{
  const html=renderToStaticMarkup(<WorkArtifact action={action} progress={{...progress,artifactReadings:{trace:['first']}}} readOnly/>);
- expect(html).not.toContain('artifact-compare');expect(html).not.toContain('artifact-progress');expect(html).not.toContain('workspace.remaining');
+ expect(html).not.toContain('artifact-compare');expect(html).not.toContain('artifact-progress');expect(html).not.toContain('workspace.remaining');expect(html).toContain('artifact-archive');expect(html).toContain('<details><summary>');expect(html).not.toContain('disabled');
 });
 it('keeps earlier observations available while the latest result and next action remain visible',()=>{
  const first={...action,id:'first',artifact:undefined},latest={...action,id:'latest',artifact:undefined,next:['next']},next={...action,id:'next',artifact:undefined};
