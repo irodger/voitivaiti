@@ -37,3 +37,19 @@
 .world-game .laptop-display[data-app] :is(.term-link,.observation-history>summary,.artifact-action-option>summary,.technical-actions>small){color:var(--app-accent)}
 .world-game .laptop-display[data-app] .technical-actions>button{background:var(--app-tint);border-color:var(--app-line);color:var(--ink)}
 .world-game .laptop-display[data-app] .technical-actions>button small{color:var(--muted)}
+
+.world-game .laptop-display[data-app] .work-artifact>header{display:flex;align-items:flex-start;gap:14px}
+.artifact-emblem{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;flex:none;background:var(--app-paper,#fffdf7);color:var(--app-accent,#395a40);border:1px solid var(--app-line,#dce1d4)}
+.work-artifact>header>div{min-width:0;flex:1}
+.world-game .laptop-display[data-app] .artifact-records article>button{min-height:52px;align-items:center;font-size:13px}
+.world-game .laptop-display[data-app] .artifact-records article>button span:last-child{padding:4px 7px;border-radius:6px;background:var(--app-tint);font-size:10px}
+.world-game .laptop-display[data-app] .artifact-source{margin:12px 0 0;padding:16px;border-radius:9px;background:var(--app-code);color:var(--app-code-ink);font:12px/1.8 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid var(--app-accent)}
+.world-game .laptop-display[data-app] .artifact-source .term-link{color:var(--app-code-ink)}
+.world-game .laptop-display[data-app] .artifact-network .artifact-data{font:12px/1.8 Consolas,monospace;padding-top:12px;background:var(--app-tint);border-left:3px solid var(--app-accent);margin:0 14px 14px;border-radius:6px}
+.world-game .laptop-display[data-app] .artifact-trend i{background:var(--app-accent)}
+.world-game .laptop-display[data-app] .artifact-trend li{padding:8px 0;border-bottom:1px solid var(--app-line)}
+.world-game .laptop-display[data-app] :is(.artifact-design,.artifact-component) .artifact-records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.world-game .laptop-display[data-app] :is(.artifact-design,.artifact-component) .artifact-records>article{border:1px solid var(--app-line);margin:8px;border-radius:10px;overflow:hidden}
+.world-game .laptop-display[data-app] :is(.artifact-design,.artifact-component) .artifact-archive{display:block}
+.world-game .laptop-display[data-app] .artifact-task .artifact-data{border-left:3px solid var(--app-line);margin-left:18px}
+@media(max-width:600px){.world-game .laptop-display[data-app] .work-artifact>header{gap:10px}.artifact-emblem{width:34px;height:34px;border-radius:9px}.world-game .laptop-display[data-app] :is(.artifact-design,.artifact-component) .artifact-records{grid-template-columns:1fr}.world-game .laptop-display[data-app] .work-artifact h3{font-size:17px}}
