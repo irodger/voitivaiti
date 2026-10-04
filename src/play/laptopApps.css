@@ -53,3 +53,5 @@
 .world-game .laptop-display[data-app] :is(.artifact-design,.artifact-component) .artifact-archive{display:block}
 .world-game .laptop-display[data-app] .artifact-task .artifact-data{border-left:3px solid var(--app-line);margin-left:18px}
 @media(max-width:600px){.world-game .laptop-display[data-app] .work-artifact>header{gap:10px}.artifact-emblem{width:34px;height:34px;border-radius:9px}.world-game .laptop-display[data-app] :is(.artifact-design,.artifact-component) .artifact-records{grid-template-columns:1fr}.world-game .laptop-display[data-app] .work-artifact h3{font-size:17px}}
+
+.world-game .work-desk{display:grid;gap:20px}.world-game .desk-current{display:grid;gap:14px;padding:18px;background:var(--app-tint);border:1px solid var(--app-line);border-radius:14px}.world-game .work-desk>p,.world-game .desk-current small{color:var(--muted)}

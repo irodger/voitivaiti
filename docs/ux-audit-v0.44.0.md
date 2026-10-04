@@ -117,3 +117,8 @@
 ### v0.45.2 — Home palette consistency
 
 User screenshots exposed remaining fixed sage colors in marketplace cards, prices, delivery notes, routine descriptions, hotspot durations, salary icon and saved status. Scoped violet overrides now cover these surfaces and purchase/delivery states. Product artwork and room illustrations retain their original object colors. Production build verifies the CSS and release integration; this patch does not change game state or actions.
+
+
+### v0.46.0 — Laptop work desk
+
+Moved task acquisition, subsequent queue work, paused dependencies and colleague expectations into the laptop Tasks tab. Office task panels now link to the laptop rather than duplicating digital actions. Task results return to the desk via reward-close without dismissing the laptop. Existing morning meetings, personal conversations and end-of-day actions remain physical office interactions. First-day introductions remain unchanged. Two rendering regressions check acquisition placement and unfinished-task preservation; all 308 existing tests passed before the final queue deduplication. Browser walkthrough remains outstanding.

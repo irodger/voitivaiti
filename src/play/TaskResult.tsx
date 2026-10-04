@@ -9,7 +9,7 @@ import {decisionFeedback} from './decisionFeedback';
 import {TermText} from './TermText';
 import {Button} from './shared';
 
-export function TaskResult({onClose}:{onClose:()=>void}){
+export function TaskResult({onClose,closeLabel='result.close'}:{onClose:()=>void;closeLabel?:string}){
  const w=useWorld(),task=activeTask(w),{t}=useI18n();
  if(!task)return null;
  const template=resolveTaskTemplate(task);
@@ -25,6 +25,6 @@ export function TaskResult({onClose}:{onClose:()=>void}){
   <div className="time-comparison"><div><small>{t('ui.estimate')}</small><b>{t('ui.min',{value:template.estimate})}</b></div><div><small>{t('ui.timeActual')}</small><b>{t('ui.min',{value:task.taskElapsedMinutes})}</b></div></div>
   <p>{t(delta>0?'result.over':delta<0?'result.under':'result.onTime',{minutes:Math.abs(delta)})}</p>
   <PerspectivePanel/>
-  <ActionDock><Button onClick={()=>{if(w.perspective)w.dispatch({type:'perspective-action',id:'close'});onClose();}}>{t('result.close')}</Button></ActionDock>
+  <ActionDock><Button onClick={()=>{if(w.perspective)w.dispatch({type:'perspective-action',id:'close'});onClose();}}>{t(closeLabel)}</Button></ActionDock>
  </section>;
 }

@@ -12,3 +12,12 @@ text('workspace.ready','Данные собраны. Теперь зафикси
 text('workspace.roleFilter','Фильтр по профессии','Filter by profession');
 text('workspace.currentStep','Сейчас','Current');
 text('workspace.resumeStep','К текущему шагу','Resume current step');
+
+text('desk.tasks','Задачи','Tasks');
+text('desk.digital','Рабочий ноутбук','Work laptop');
+text('desk.officeTitle','Люди рядом. Работа — в ноутбуке.','People nearby. Work in your laptop.');
+text('desk.officeBody','Очередь задач, материалы, сообщения и результаты доступны на рабочем столе ноутбука. Здесь можно поговорить с командой или закончить день.','Tasks, evidence, messages and results live on your laptop. Here you can talk to the team or finish your day.');
+text('desk.open','Открыть рабочий стол','Open work desk');
+text('desk.resume','Продолжить в ноутбуке','Continue in laptop');
+text('desk.back','К задачам','Back to tasks');
+text('desk.intro','Выбери следующую работу или продолжи текущую. Ожидание ответа не мешает посмотреть другие задачи.','Choose your next work or continue the current task. While waiting for a reply, you can explore other tasks.');
