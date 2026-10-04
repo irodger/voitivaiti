@@ -1,3 +1,4 @@
+import {TaskBrief} from './TaskBrief';
 import {ActionDock} from './ActionDock';
 import {resolveTaskTemplate} from '../content/scenarios';
 import {isOrderedPlan,planOrder} from '../world/planOrder';
@@ -23,7 +24,7 @@ export function StepRenderer({step,readOnly=false,viewProgress}:{step:Step;readO
  const ordered=isOrderedPlan(step),allocation=step.type==='resource-allocation';
  const displayOrder=ordered&& !done?planOrder(step,p.draft):p.draft;
  const items=ordered&&displayOrder.length?[...displayOrder.map(id=>step.items!.find(i=>i.id===id)!),...step.items!.filter(i=>!displayOrder.includes(i.id))]:step.items;
- return <section className={`mechanic mechanic-${step.type}`}><div className="step-label">{t('ui.step',{step:resolveTaskTemplate(task).steps.indexOf(step)+1,total:resolveTaskTemplate(task).steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div><h2>{t(step.titleKey)}</h2>{step.type==='search'?<div className="search-input"><Search size={18}/><TermText>{t(step.bodyKey)}</TermText></div>:<p className="mechanic-brief"><TermText>{t(step.type==='review'?'fix.ready':step.bodyKey)}</TermText></p>}
+ return <section className={`mechanic mechanic-${step.type}`}><TaskBrief task={task}/><div className="step-label">{t('ui.step',{step:resolveTaskTemplate(task).steps.indexOf(step)+1,total:resolveTaskTemplate(task).steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div><h2>{t(step.titleKey)}</h2>{step.type==='search'?<div className="search-input"><Search size={18}/><TermText>{t(step.bodyKey)}</TermText></div>:<p className="mechanic-brief"><TermText>{t(step.type==='review'?'fix.ready':step.bodyKey)}</TermText></p>}
  {task.encounter&&resolveTaskTemplate(task).steps[0].id===step.id&&[...new Set(task.encounter.contextKeys)].map(key=><p className="mechanic-brief" key={key}><TermText>{t(key)}</TermText></p>)}
  {!task.encounter&&priorOutcome&&<p className="mechanic-brief"><TermText>{t(priorOutcome)}</TermText></p>}
  {consequential&&!disabled&&p.run!=='running'&&step.type!=='review'&&((step.options?.length??0)>1||(step.items?.length??0)>1)&&<DecisionHelp/>}

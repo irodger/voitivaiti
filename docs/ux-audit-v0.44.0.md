@@ -163,3 +163,10 @@ Fixed rewarded-task navigation: app tabs no longer all render WorkDesk. AppConte
 Decision cards, file choices and source line numbers improve the existing working steps without changing rewards or task actions. Completed-step navigation now takes precedence over the rewarded-task app summary.
 
 Validation: 320 tests passed before the navigation correction; final production build passed. Desktop browser inspection exposed the archive routing defect. After reload the saved run had no active task, so the corrected archive and mobile layout were not manually verified.
+
+
+## v0.47.3 — Task presentation
+
+Added a task situation brief based on the actual template, author and recurrence link. Technical actions use icons and readable time labels; observations have a distinct result panel. Three starter scenario briefs now explain the customer or colleague impact while preserving evidence and choices.
+
+Validation: all 320 tests passed. Production build passed. A real Backend scene was opened in the desktop browser at 1280x720. Inspection showed excessive header height, so working scenes now use a compact app header and action cards. Mobile not manually verified. No rewards, professional outcomes or available-action rules changed.
