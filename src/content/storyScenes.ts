@@ -51,6 +51,20 @@ const copy=[
  ['result','Разобрать результат коллеги и оставшийся риск','Review the colleague’s result and remaining risk'],
  ['accept','Принять результат с границами и сообщить следующего владельца','Accept with boundaries and name the next owner'],
  ['revise','Вернуть конкретный случай на уточнение','Return a specific case for clarification'],
+ ['review.wait','Пока коллега проверяет — уточнить исходные условия','Clarify original conditions while the colleague checks'],
+ ['review.wait.result','Условия исходного случая сохранены. Это полезный контекст, но результата соседней проверки ещё нет.','Original conditions are recorded. This is useful context, but the neighboring test result is still pending.'],
+ ['review.boundary','Сверить обещанный объём с соседним случаем','Compare promised scope with the neighboring case'],
+ ['review.boundary.result','Соседний случай входит в обещанный объём. До ответа коллеги его нельзя считать проверенным.','The neighboring case belongs to the promised scope. It cannot be called verified before the colleague replies.'],
+ ['review.reply','Открыть ответ коллеги и повторить соседний случай','Open the colleague’s reply and repeat the neighboring case'],
+ ['review.reply.result','Коллега прислал версию и условия: исходный случай проходит, соседний воспроизводит сбой. Проверка дала конкретное замечание; рабочая система ещё не исправлена.','The colleague supplied version and conditions: the original case passes, the neighboring case reproduces a failure. The review produced a concrete finding; production is still unfixed.'],
+ ['review.handoff','Передать воспроизводимое замечание владельцу задачи','Send the reproducible finding to the task owner'],
+ ['review.handoff.result','Владелец получил условия сбоя и границу проверки. Следующая работа — исправить соседний случай, затем снова проверить оба пути.','The owner received failure conditions and verification boundaries. The next work is to fix the neighboring case, then retest both paths.'],
+ ['review.bounded.result','Принят только исходный проверенный случай. Результата соседней проверки нет; ограничение передано владельцу и осталось в истории.','Only the verified original case was accepted. The neighboring test has no result; the owner received the limitation and it remains in history.'],
+ ['review.bounded.followup','Соседний случай по-прежнему требует проверки. Ограниченное принятие не подтвердило его поведение.','The neighboring case still needs verification. Bounded acceptance did not confirm its behavior.'],
+ ['review.followup','Замечание сохранено в истории: исправление соседнего случая остаётся отдельной работой.','The finding remains in history: fixing the neighboring case is separate work.'],
+ ['review.reply.title','Ответ на замечание ревью','Reply to the review comment'],
+ ['review.original','Исходный случай на присланной версии проходит.','The original case passes on the supplied version.'],
+ ['review.neighbor','Соседний случай на той же версии воспроизводит сбой. Условия и порядок действий сохранены.','The neighboring case fails on the same version. Conditions and action order are recorded.'],
  ['pause','Пока ждём — заняться другой работой','Do other work while waiting'],
  ['resume','Продолжить эту работу','Resume this work'],
  ['waiting','Коллега ещё проверяет свою часть','The colleague is still checking their part'],
@@ -104,10 +118,16 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
  }else if(family==='review'){
   const inspect=action('inspect-review','inspect-review','inspect-review.result',['comment','approve-bounds']);
   inspect.artifact=structuredClone(reviewArtifact);
-  const comment=action('comment','comment','comment.result',['experiment']);
-  const experiment=action('experiment','experiment','experiment.result',['verified-result']);
+  const comment=action('comment','comment','comment.result',['review-context','experiment','approve-bounds']);comment.dependency=true;
+  const context=action('review-context','review.wait','review.wait.result',['review-boundary','experiment','approve-bounds']);context.minutes=15;
+  const boundary=action('review-boundary','review.boundary','review.boundary.result',['experiment','approve-bounds']);boundary.minutes=15;
+  const experiment=action('experiment','review.reply','review.reply.result',['verified-result']);experiment.requiresReply=true;experiment.requiresEvidence=true;
+  experiment.artifact={kind:'task',titleKey:'story.review.reply.title',promptKey:'artifact.hint',rows:[{id:'original',labelKey:'evidence.original',detailKey:'story.review.original'},{id:'neighbor',labelKey:'evidence.neighbor',detailKey:'story.review.neighbor'}]};
+  limitedResult.observationKey='story.review.bounded.result';limitedResult.outcome={...limitedResult.outcome!,summaryKey:'story.review.bounded.result',followupKey:'story.review.bounded.followup',systemChanged:false};
+  sharedResult.labelKey='story.review.handoff';sharedResult.observationKey='story.review.handoff.result';
+  sharedResult.outcome={...sharedResult.outcome!,summaryKey:'story.review.handoff.result',followupKey:'story.review.followup',systemChanged:false};
   const accept=action('approve-bounds','approve-bounds','bypass.result',['bounded-result']);
-  scene.steps=[makeStep('review-evidence','review.title',[inspect,comment,experiment,accept,sharedResult,limitedResult],['inspect-review']),base.steps[2]];
+  scene.steps=[makeStep('review-evidence','review.title',[inspect,comment,context,boundary,experiment,accept,sharedResult,limitedResult],['inspect-review']),base.steps[2]];
  }else{
   const negotiate=action('negotiate','negotiate','negotiate.result',['split','full']);
   const split=action('split','split','bypass.result',['bounded-result']);
