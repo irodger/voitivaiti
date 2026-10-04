@@ -1,137 +1,84 @@
-import {gameConfig} from '../config/game';
-import {applyEffects} from './effects';
-import {attendConference} from './conferences';
-import {recordEncounter} from './problemStories';
-import {handoffCandidate} from './responsibility';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {assignResponsibility,checkResponsibility} from './responsibility';
-import {personalLifeSnapshot} from './companyRuntime';
-import {startPerspective,perspectiveAction} from './perspective';
-import {recordWorkExperience,rankOf} from './mastery';
-import {communicateExpectation} from './expectations';
-import {commitSceneOutcome} from './sceneConsequences';
-import {deliveryFor,currentDelivery} from './delivery';
-import {availableWalkRoutes,canBeginWalk,currentWalk} from './walk';
+import { createActionServices } from './actions/services';
+import { attendConference } from './conferences';
+import { resolveTaskTemplate } from '../content/scenarios';
 import '../content/walk';
-import {eveningActivities,eveningDone,canSpendEvening} from './evening';
-import {isOrderedPlan,planOrder} from './planOrder';
-import {availableTechnicalActions} from './technicalActions';
-import {takeVacation} from './life';
-import { autonomy,availableWork,carryQueue,finishOfficeHours,workOwner } from './workLoop';
-import { startFirstDay,advanceFirstDay } from './firstDay';
+import { startFirstDay, advanceFirstDay } from './firstDay';
 import { glossary } from '../content/world';
-import { isConsequential,recordDecision } from './decisions';
-import { ensureLife,initLife,finishLife,selectPriority,closeWorkDay,reviewResponse,decision,archiveCareer,endCareer,advanceCalendar,montage,settleCalendarDay } from './life';
-import type { WorkKind } from './lifeTypes';
-import { availableTopics } from '../content/contextDialogue';
-import { marketItems } from '../content/marketplace';
-import { homeState,recovery } from './economy';
-import { homeUpgrades } from '../content/home';
-import type { Campaign,Effect,Feedback,Step,Task } from './types';
-import { activeCharacter,activeTask,canPromote,candidates,clamp,emptyCampaign,generateWorld,history,isLeader,makeCharacter,makeSchedule,makeTask } from './simulation';
+import { ensureLife, initLife, finishLife } from './life';
+import type { Campaign, Feedback } from './types';
+import { activeCharacter, activeTask, emptyCampaign, generateWorld, history, makeCharacter, makeSchedule } from './simulation';
 import { professionById } from '../content/professions';
-import { trackGameEvent } from './analytics';
-export type Action={type:"conference";mode:"online"|"visit"|"skip";topic:"evidence"|"handoff"}|{type:'artifact-condition';actionId:string;rowId:string}|{type:'artifact-compare';id:string}|{type:'artifact-inspect';actionId:string;rowId:string}|{type:'pause-task'}|{type:'resume-task';id:string}|{type:'delegation-result';id:string;response:'accept'|'clarify'}|{type:'perspective-start'}|{type:'perspective-action';id:string}|{type:'work-expectation';id:WorkKind;choice:'postpone'|'blocker'|'defer'}|{type:'inspect-delivery';itemId:string}|{type:'close-delivery'}|{type:'start-walk'}|{type:'walk-route';id:string}|{type:'end-walk'}|{type:'technical-action';id:string}|{type:'help-work';id:WorkKind}|{type:'delegate-work';id:WorkKind;npcId:string}|{type:'onboarding';choice?:string;name?:string}|{type:'discover-term';id:string;context:string}|{type:'office-encounter'}|{type:'priority';id:WorkKind;explained:boolean}|{type:'performance';accept:boolean}|{type:'montage'}|{type:'vacation';days?:3|7|14;arrangements?:import('./vacation').VacationArrangements}|{type:'montage-close'}|{type:'quit'}|{type:'next-career'}|{type:'rename';name:string}|{type:'conversation';npcId:string;topicId:string;choiceId:string}|{type:'order';itemId:string}|{type:'unpack';itemId:string}|{type:'buy-home';id:string}|{type:'evening';id:'walk'|'cook'|'read'|'games'}|{type:'new';name:string;avatarId:string;professionId:string;seed:number}|{type:'choose';id:string}|{type:'draft';id:string}|{type:'allocate';id:string;value:number}|{type:'submit'}|{type:'run'}|{type:'finish-run';taskId:string;stepId:string}|{type:'click'}|{type:'advance'}|{type:'take-task'}|{type:'event';id:string;choiceId:string}|{type:'promote';nodeId:string}|{type:'hire';id:string}|{type:'end-day'}|{type:'sleep'}|{type:'reward-close'}|{type:'survey-open'}|{type:'talk';id:string}|{type:'assign-project';id:string};
-export function transition(source:Campaign,action:Action):{campaign:Campaign;feedback:Feedback[]}{const c=ensureLife(structuredClone(source)),feedback:Feedback[]=[];const emit=(name:string,payload:Parameters<typeof trackGameEvent>[1]={})=>trackGameEvent(name,payload);
- const effects=(list:Effect[])=>applyEffects(c,list,feedback,action.type,activeTask(source)?.rewarded);
- const discover=(_ids:string[])=>{}; // Terms are learned only through an inline explanation.
 
- const tick=(minutes:number,task?:Task)=>{c.time+=minutes;if(task)task.taskElapsedMinutes+=minutes;if(minutes)feedback.push({id:Date.now()+feedback.length,key:'ui.min',value:minutes,good:true});};
- const completeStep=(task:Task,step:Step,extra:Effect[]=[],minutes=0)=>{const p=task.progress[step.id];if(p.status==='completed')return;if(!p.charged){effects(step.effects);tick(step.minutes,task);p.charged=true;}effects(extra);tick(minutes,task);p.status='completed';if(!task.completedStepIds.includes(step.id))task.completedStepIds.push(step.id);p.responseKey=p.responseKey??'ui.success';discover(step.terms??[]);};
- if(action.type==='new'){if(!professionById[action.professionId]||!['start','create'].includes(c.phase))return {campaign:source,feedback};const fresh=emptyCampaign(),world=generateWorld(action.seed>>>0),ch=makeCharacter(crypto.randomUUID(),action.name.trim().slice(0,24)||'Саша',action.avatarId,action.professionId);ch.currentProjectIds=[world.company.projects[0].id];const meta=c.meta;Object.assign(c,fresh,world,{activeCharacterId:ch.id,characters:[...world.characters,ch],phase:'office'});c.meta=meta;c.life=initLife(c);c.company!.employeeIds.push(ch.id);c.schedule=makeSchedule(c);ch.firstDay=startFirstDay(c);history(c,'created','ui.newCompany');emit('game_started');emit('character_created',{characterId:ch.id});emit('profession_selected',{professionId:ch.profession});emit('day_started',{day:1});finishLife(c);return {campaign:c,feedback};}
- if(!c.company||!c.characters.some(ch=>ch.id===c.activeCharacterId))return {campaign:source,feedback};
- const ch=activeCharacter(c),task=activeTask(c),template=task?resolveTaskTemplate(task):undefined,step=template?.steps.find(s=>s.id===task?.currentStepId),progress=step&&task?.progress[step.id];
- if(action.type==='discover-term'){const term=glossary.find(g=>g.id===action.id);if(term&&!ch.discoveredTerms.includes(term.id)){ch.discoveredTerms.push(term.id);ch.termMemories??={};ch.termMemories[term.id]={firstSeenContext:action.context.slice(0,500),discoveredAt:c.life!.calendarDay,profession:ch.profession,scenario:task?.templateId??('first-day:'+ch.firstDay?.currentOnboardingStep)};emit('term_discovered',{termId:term.id,characterId:ch.id});}return {campaign:c,feedback};}
- if(action.type==='onboarding'){advanceFirstDay(c,action);return {campaign:c,feedback};}
- if(ch.firstDay&&!ch.firstDay.onboardingCompleted&&!['work','farewell'].includes(ch.firstDay.currentOnboardingStep)&&!['rename','conversation',...(c.phase==='home'?['sleep']:[])].includes(action.type))return {campaign:source,feedback};
- if(ch.firstDay?.currentOnboardingStep==='farewell'&&action.type!=='end-day'&&!['rename','conversation'].includes(action.type))return {campaign:source,feedback};
- if(c.life!.montage&&!['montage-close','rename','quit','next-career'].includes(action.type))return {campaign:source,feedback};
- if(c.phase==='ended'&&action.type!=='next-career'&&!['rename','conversation'].includes(action.type))return {campaign:source,feedback};
- if(action.type==='next-career'){if(c.phase!=='ended')return {campaign:source,feedback};const fresh=emptyCampaign();return {campaign:{...fresh,meta:c.meta,phase:'create'},feedback};}
- if(action.type==='perspective-start'){startPerspective(c);}
- else if(action.type==='perspective-action'){perspectiveAction(c,action.id);}
-
- else if(action.type==='office-encounter'){if(c.phase==='office'&&!c.schedule.some(e=>e.type==='incident'&&e.status==='pending'))c.life!.officeEncounterDay=c.company.currentDay;}
- else if(action.type==='work-expectation'){communicateExpectation(c,action.id,action.choice);}
- else if(action.type==='priority'){selectPriority(c,action.id,action.explained);}
- else if(action.type==='performance'){reviewResponse(c,action.accept);}
- else if(action.type==='quit'){endCareer(c,'quit');}
-
- else if(action.type==='delegation-result'){checkResponsibility(c,action.id,action.response);}
- else if(action.type==='vacation'){takeVacation(c,action.days??7,action.arrangements);}
- else if(action.type==='montage'){montage(c);}
- else if(action.type==='montage-close'){if(c.phase!=='home'||!c.life!.montage)return {campaign:source,feedback};const stop=c.life!.montage.stop;c.life!.montage=null;if(stop==='recovery.return')advanceCalendar(c);c.company.currentDay++;c.life!.playedDay++;carryQueue(c);c.phase='office';if(!task||task.rewarded)c.activeTaskId=null;c.time=gameConfig.clock.workdayStart;c.dayStart={...ch.stats};c.dayWorkStart=ch.completedWork.length;c.schedule=makeSchedule(c);if(stop==='life.officeIncident'&&!c.schedule.some(e=>e.type==='incident'))c.schedule.push({id:'day-'+c.company.currentDay+'-incident',type:'incident',status:'pending',key:'ui.incident'});}
- else if(action.type==='rename'){const name=action.name.trim().slice(0,24);if(!name)return {campaign:source,feedback};ch.name=name;}
- else if(action.type==='pause-task'){if(!task||task.rewarded||!Object.values(task.progress).some(p=>p.dependency&&!p.dependency.ready))return {campaign:source,feedback};task.paused=true;c.activeTaskId=null;c.phase='office';const q=c.life!.queue.find(q=>q.id===task.workKind);if(q){q.status='waiting';q.delegatedTo=undefined;}const event=c.schedule.find(e=>e.type==='task');if(event)event.status='completed';}
- else if(action.type==='resume-task'){const pending=c.tasks.find(t=>t.id===action.id&&t.characterId===ch.id&&t.paused&&!t.rewarded);if(!pending||c.phase!=='office'||task&&!task.rewarded)return {campaign:source,feedback};pending.paused=false;c.activeTaskId=pending.id;const q=c.life!.queue.find(q=>q.id===pending.workKind);if(q){q.status='selected';q.projectId=pending.projectId;q.problemId=pending.problemId;}const event=c.schedule.find(e=>e.type==='task');if(event)event.status='pending';}
- else if(action.type==='take-task'){if(c.phase!=='office'||c.life!.reviewDue||c.time>=gameConfig.clock.lastTaskStart||c.schedule.some(e=>e.type==='sync'&&e.status==='pending')||task&&!task.rewarded)return {campaign:source,feedback};let selected=c.life!.queue.find(q=>q.status==='selected'&&!q.delegatedTo);if(!selected){if(autonomy(ch)>0&&ch.firstDay?.onboardingCompleted)return {campaign:source,feedback};selected=c.life!.queue.find(q=>q.status==='waiting'&&availableWork(ch).includes(q.id));if(!selected)return {campaign:source,feedback};selected.status='selected';selected.explained=true;}const paused=c.tasks.find(t=>t.paused&&!t.rewarded&&t.characterId===ch.id&&t.workKind===selected.id);if(paused){paused.paused=false;selected.projectId=paused.projectId;selected.problemId=paused.problemId;c.activeTaskId=paused.id;const event=c.schedule.find(e=>e.type==='task');if(event)event.status='pending';return {campaign:c,feedback};}const next=makeTask(c);c.tasks.push(next);c.activeTaskId=next.id;const event=c.schedule.find(e=>e.type==='task');if(event)event.status='pending';emit('task_started',{taskId:next.id,templateId:next.templateId,professionId:ch.profession,day:c.company.currentDay});}
- else if(action.type==='help-work'||action.type==='delegate-work'){if(c.tasks.some(t=>t.characterId===ch.id&&t.paused&&!t.rewarded&&t.workKind===action.id))return {campaign:source,feedback};const q=c.life!.queue.find(q=>q.id===action.id&&q.status==='waiting');if(c.phase!=='office'||!ch.firstDay?.onboardingCompleted||!q||task&&!task.rewarded||c.schedule.some(e=>e.type==='sync'&&e.status==='pending')||c.time+q.minutes>gameConfig.clock.workdayEnd)return {campaign:source,feedback};if(action.type==='delegate-work'){const npc=c.characters.find(n=>n.id===action.npcId&&n.id!==ch.id&&n.employed);if(rankOf(ch)<2||!npc||c.life!.queue.some(q=>q.delegatedTo===npc.id))return {campaign:source,feedback};if(!assignResponsibility(c,q.id,npc.id))return {campaign:source,feedback};tick(20);effects([{target:'stress',value:2}]);}else if(ch.completedWork.length>=2){if(!availableWork(ch).includes(q.id))return {campaign:source,feedback};q.status='selected';q.explained=true;const next=makeTask(c);c.tasks.push(next);c.activeTaskId=next.id;const event=c.schedule.find(e=>e.type==='task');if(event)event.status='pending';emit('task_started',{taskId:next.id,templateId:next.templateId,professionId:ch.profession,workKind:q.id});}else{q.status='done';tick(q.minutes);effects([{target:'stress',value:q.urgency>=4?4:2},{target:q.id==='debt'?'techDebt':'stability',value:q.id==='debt'?-4:2}]);const r=ch.relationships.find(r=>r.characterId===workOwner[q.id]);if(r)r.trust=Math.min(100,r.trust+4);}history(c,'work','life.work.'+q.id);}
-
- else if(action.type==='event'){const event=c.schedule.find(e=>e.id===action.id&&e.status==='pending');if(!event||event.type==='task')return {campaign:source,feedback};const valid:Record<string,string[]>={sync:['plan','clarify','help'],incident:['rollback','workaround'],company:['quality','rush'],career:['reflect'],survey:['yes','maybe','no','skip']};if(event.type==='survey'&&c.schedule.some(e=>e.type==='task'&&e.status==='pending'))return {campaign:source,feedback};if(!valid[event.type]?.includes(action.choiceId))return {campaign:source,feedback};event.choiceId=action.choiceId;event.status='completed';emit('event_choice',{eventId:event.id,choiceId:action.choiceId,day:c.company.currentDay});if(event.type==='sync'){effects([{target:'communication',value:1},{target:'reputation',value:1}]);tick(15);if(action.choiceId!=='plan'){effects([{target:'communication',value:1}]);history(c,'sync','loop.sync.'+action.choiceId);}discover(['daily']);}else if(event.type==='career'){effects([{target:'communication',value:1},{target:'reputation',value:2}]);tick(20);}else if(event.type==='survey'){c.survey=action.choiceId==='skip'?'skipped':'answered';c.surveyAnswer=action.choiceId;emit(action.choiceId==='skip'?'survey_skipped':'survey_answered',{answerId:action.choiceId});}else{const shortcut=['rush','workaround'].includes(action.choiceId);effects(shortcut?[{target:'techDebt',value:12},{target:'stability',value:-5},{target:'reputation',value:1}]:[{target:'techDebt',value:-6},{target:'stability',value:10},{target:'processMaturity',value:4}]);tick(shortcut?15:40);discover(['debt',...(event.type==='incident'?['rollback']:[])]);const project=c.company.projects.find(p=>p.id===task?.projectId)??c.company.projects[0];if(shortcut){decision(c,'riskyDeploys');const problem=project.problems.find(p=>p.status!=='resolved')??project.problems[0];problem.workaround=true;problem.causedBy=ch.id;problem.status='planned';const h=history(c,'workaround','ui.temporary',{projectId:project.id,problemId:problem.id});problem.history.push(h);project.history.push(h);}if(event.type==='incident'){effects([{target:'stress',value:14}]);c.company.incidents.push({id:event.id,day:c.company.currentDay,resolved:true,projectId:project.id});if(task?.status==='blocked')task.status='active';}}history(c,event.type,event.key);}
- else if(action.type==='assign-project'){if(c.company.projects.some(p=>p.id===action.id)&&(!task||task.rewarded)){ch.currentProjectIds=[action.id];history(c,'assignment','ui.project',{projectId:action.id});}}
- else if(action.type==='promote'){if(!canPromote(ch,action.nodeId)||task&&!task.rewarded)return {campaign:source,feedback};ch.careerNodeId=action.nodeId;c.life!.roleStartedDay=c.life!.calendarDay;ch.milestones=ch.milestones.filter(m=>m!=='performance');c.life!.performanceMilestones=0;const e=history(c,'promotion',professionById[ch.profession].careers.find(n=>n.id===action.nodeId)!.titleKey);ch.careerHistory.push(e);emit('promotion',{characterId:ch.id,careerNodeId:action.nodeId,professionId:ch.profession});}
- else if(action.type==='hire'){if(!isLeader(ch)||!['office','home'].includes(c.phase)||c.schedule.some(e=>e.status==='pending'))return {campaign:source,feedback};const candidate=candidates(c).find(p=>p.id===action.id);if(!candidate)return {campaign:source,feedback};archiveCareer(c,'hired_successor');ch.playable=false;candidate.playable=true;candidate.relationships.push({characterId:ch.id,trust:15});ch.relationships.push({characterId:candidate.id,trust:15});c.characters.push(candidate);c.company.employeeIds.push(candidate.id);const oldId=ch.id;c.activeCharacterId=candidate.id;const previousLife=c.life!,calendar=previousLife.calendarDay;ch.personalLife=personalLifeSnapshot(c);c.life=initLife(c);ensureLife(c);c.life.daysAtCompany=1;c.life.characterStartedDay=calendar;c.life.roleStartedDay=calendar;c.activeTaskId=null;c.candidateRound++;c.phase='home';candidate.firstDay=startFirstDay(c);history(c,'hired','ui.newEmployee');emit('character_hired',{characterId:candidate.id,professionId:candidate.profession});emit('active_character_changed',{characterId:candidate.id,oldCharacterId:oldId});}
- else if(action.type==='conversation'){const npc=c.characters.find(x=>x.id===action.npcId&&x.id!==ch.id&&x.employed),topic=npc&&availableTopics(c,npc).find(x=>x.id===action.topicId),choice=topic?.choices.find(x=>x.id===action.choiceId);const key=action.npcId+':'+action.topicId;if(!npc||!topic||!choice||ch.conversations?.[key])return {campaign:source,feedback};ch.conversations={...ch.conversations,[key]:choice.id};ch.dialogueHistory={...ch.dialogueHistory,[key]:{topic,choiceId:choice.id,day:c.life!.calendarDay}};if(topic.id==='context-review'){const q=c.life!.queue.find(q=>q.id==='review'&&q.status!=='done');if(q)q.promisedDay=c.life!.calendarDay+1;}if(ch.conversationRewardDay!==c.company.currentDay){ch.conversationRewardDay=c.company.currentDay;const r=ch.relationships.find(x=>x.characterId===npc.id);if(r)r.trust=Math.min(100,r.trust+5);else ch.relationships.push({characterId:npc.id,trust:25});effects([{target:'communication',value:1}]);}emit('conversation_choice',{characterId:npc.id,topicId:topic.id,choiceId:choice.id});}
- else if(action.type==='order'){const item=marketItems.find(i=>i.id===action.itemId);if(!item||!['office','home','reward'].includes(c.phase)||ch.stats.money<item.price||homeState(ch).owned.includes(item.id)||ch.orders?.some(o=>o.itemId===item.id))return {campaign:source,feedback};ch.orders=[...(ch.orders??[]),{itemId:item.id,orderedDay:c.company.currentDay,deliveryDay:c.life!.calendarDay+1,received:false}];effects([{target:'money',value:-item.price}]);emit('market_ordered',{itemId:item.id,amount:item.price,day:c.company.currentDay});}
- else if(action.type==='inspect-delivery'){const delivery=deliveryFor(ch,action.itemId,c.life!.calendarDay);if(c.phase!=='home'||currentWalk(ch,c.company.currentDay)||!delivery)return {campaign:source,feedback};ch.home={...homeState(ch),deliveryItemId:delivery.item.id};emit('delivery_opened',{itemId:delivery.item.id,received:delivery.order.received});}
- else if(action.type==='close-delivery'){if(c.phase!=='home'||!ch.home?.deliveryItemId)return {campaign:source,feedback};delete ch.home.deliveryItemId;}
- else if(action.type==='unpack'){const order=ch.orders?.find(o=>o.itemId===action.itemId),item=marketItems.find(i=>i.id===action.itemId);if(c.phase!=='home'||currentWalk(ch,c.company.currentDay)||!order||!item||order.received||order.deliveryDay>c.life!.calendarDay)return {campaign:source,feedback};order.received=true;const home=homeState(ch);ch.home={...home,deliveryItemId:item.id,owned:[...new Set([...home.owned,item.id])]};history(c,'delivery',item.titleKey);emit('market_received',{itemId:item.id,day:c.company.currentDay});}
- else if(action.type==='buy-home'){const item=homeUpgrades.find(u=>u.id===action.id);const home=homeState(ch);if(c.phase!=='home'||!item||home.owned.includes(item.id)||ch.stats.money<item.price)return {campaign:source,feedback};ch.home={...home,owned:[...home.owned,item.id]};effects([{target:'money',value:-item.price}]);history(c,'home-upgrade',item.titleKey);emit('home_upgrade_purchased',{upgradeId:item.id,characterId:ch.id});}
- else if(action.type==='start-walk'){if(c.phase!=='home'||currentDelivery(ch,c.life!.calendarDay)||!canBeginWalk(ch,c.company.currentDay,c.time))return {campaign:source,feedback};ch.home={...homeState(ch),walk:{day:c.company.currentDay,status:'choosing'}};emit('walk_opened',{day:c.company.currentDay});}
- else if(action.type==='walk-route'){const outing=currentWalk(ch,c.company.currentDay),route=availableWalkRoutes(ch,c.company.currentDay,c.time).find(r=>r.id===action.id);if(c.phase!=='home'||outing?.status!=='choosing'||!route)return {campaign:source,feedback};const before=ch.stats.stress,observationKey='walk.'+route.id+(before>=60?'.tired':'.result');effects([{target:'stress',value:-route.stress}]);tick(route.minutes);ch.home={...homeState(ch),eveningDay:c.company.currentDay,eveningActions:[...eveningDone(ch,c.company.currentDay),'walk'],walk:{day:c.company.currentDay,status:'finished',routeId:route.id,observationKey,minutes:route.minutes,stressBefore:before,stressAfter:ch.stats.stress}};history(c,'evening',observationKey,{values:{minutes:route.minutes,stress:before-ch.stats.stress}});emit('evening_choice',{choiceId:'walk',routeId:route.id,minutes:route.minutes,day:c.company.currentDay});}
- else if(action.type==='end-walk'){if(c.phase!=='home'||!currentWalk(ch,c.company.currentDay))return {campaign:source,feedback};const home=homeState(ch);delete home.walk;ch.home=home;}
- else if(action.type==='evening'){const home=homeState(ch);if(c.phase!=='home'||currentWalk(ch,c.company.currentDay)||currentDelivery(ch,c.life!.calendarDay)||!['walk','cook','read','games'].includes(action.id)||!canSpendEvening(ch,c.company.currentDay,c.time,action.id))return {campaign:source,feedback};ch.home={...home,eveningDay:c.company.currentDay,eveningActions:[...eveningDone(ch,c.company.currentDay),action.id]};effects(action.id==='games'?[{target:'stress',value:-5}]:action.id==='walk'?[{target:'stress',value:-7}]:action.id==='cook'?[{target:'energy',value:home.owned.includes('kitchen')?30:15}]:[{target:'craft',value:1+(home.owned.includes('library')?1:0)},{target:'energy',value:home.owned.includes('chair')?0:-5}]);c.time+=eveningActivities[action.id];history(c,'evening','evening.done.'+action.id);emit('evening_choice',{choiceId:action.id,day:c.company.currentDay});}
- else if(action.type==='end-day'){c.perspective=undefined;if(c.phase!=='office'||(ch.firstDay&&!ch.firstDay.onboardingCompleted?c.schedule.some(e=>e.status==='pending'):c.schedule.some(e=>e.type==='sync'&&e.status==='pending')))return {campaign:source,feedback};finishOfficeHours(c);if(ch.firstDay?.currentOnboardingStep==='farewell'){ch.firstDay.onboardingCompleted=true;ch.firstDay.currentOnboardingStep='done';}c.phase='home';const settled=settleCalendarDay(c),home=homeState(ch);if(home.paidDay!==c.company.currentDay){const pay=settled.salary;ch.home={...home,paidDay:c.company.currentDay,lastPay:pay};history(c,'salary','home.pay',{values:{amount:pay}});emit('salary_paid',{amount:pay,characterId:ch.id,day:c.company.currentDay});}closeWorkDay(c);history(c,'day','ui.rest');emit('day_completed',{day:c.company.currentDay});}
- else if(action.type==='sleep'){if(c.phase!=='home'||currentWalk(ch,c.company.currentDay)||ch.home?.deliveryItemId)return {campaign:source,feedback};const rest=recovery(ch);effects([{target:'energy',value:rest.energy},{target:'stress',value:-rest.stress}]);advanceCalendar(c);c.life!.playedDay++;c.company.currentDay++;carryQueue(c);c.phase='office';if(!task||task.rewarded)c.activeTaskId=null;c.time=gameConfig.clock.workdayStart;c.dayStart={...ch.stats};c.dayWorkStart=ch.completedWork.length;c.schedule=makeSchedule(c);const drift=c.company.culture==='fast'?2:1;c.company.techDebt=clamp(c.company.techDebt+drift);c.company.projects.forEach(p=>{p.techDebt=clamp(p.techDebt+drift);if(p.techDebt>65)p.stability=clamp(p.stability-2);});emit('day_started',{day:c.company.currentDay});}
- else if(action.type==='reward-close'){c.perspective=undefined;if(c.phase==='reward'){c.phase='office';if(ch.firstDay?.currentOnboardingStep==='work')ch.firstDay.currentOnboardingStep='farewell';}}
- else if(action.type==='survey-open'){if(c.survey==='unseen'&&c.schedule.some(e=>e.type==='survey')){c.survey='pending';emit('survey_shown');}}
- else if(action.type==='talk'){const npc=c.characters.find(x=>x.id===action.id&&x.id!==ch.id);if(npc&&!ch.relationships.some(r=>r.characterId===npc.id&&r.trust>=10)){const relation=ch.relationships.find(r=>r.characterId===npc.id);if(relation)relation.trust+=5;else ch.relationships.push({characterId:npc.id,trust:5});effects([{target:'communication',value:1}]);tick(5);}}
- else if(task&&step&&progress&&c.phase==='office'&&task.status!=='completed'&&task.status!=='blocked'){
-  const finished=progress.status==='completed';
-  if(action.type==='advance'){if(!finished)return {campaign:source,feedback};const next=template!.steps[template!.steps.indexOf(step)+1];if(next){task.currentStepId=next.id;task.progress[next.id].status='active';task.status=next.type==='review'?'review':next.type==='visual-compare'&&task.templateId==='FE-1427'?'qa':'active';discover(next.terms??[]);}else if(!task.rewarded&&template!.steps.every(s=>task.completedStepIds.includes(s.id))){effects(template!.rewards);task.rewarded=true;task.status='completed';const selected=c.life!.queue.find(q=>q.id===(task.workKind??c.life!.queue.find(q=>q.status==='selected'&&!q.delegatedTo)?.id));if(selected)selected.status='done';ch.completedWork.push(task.id);recordWorkExperience(c,task);ch.scenarioCounts[task.templateId]=(ch.scenarioCounts[task.templateId]??0)+1;if(!ch.milestones.includes('independent'))ch.milestones.push('independent');const project=c.company.projects.find(p=>p.id===task.projectId)!,problem=project.problems.find(p=>p.id===task.problemId)!;if(!problem.contributions.includes(template!.contribution))problem.contributions.push(template!.contribution);problem.status=problem.contributions.includes('repair')&&problem.contributions.includes('validation')?'resolved':'planned';effects(template!.completionEffects??[]);c.company.reputation=clamp(c.company.reputation+1);const h=history(c,'task',template!.titleKey,{projectId:project.id,problemId:problem.id});problem.history.push(h);project.history.push(h);if(problem.workaround&&problem.status==='resolved')problem.workaround=false;commitSceneOutcome(c,task);recordEncounter(c,task,problem);if(selected?.expectation)selected.expectation.state='resolved';c.schedule.find(e=>e.type==='task')!.status='completed';c.phase='reward';emit('task_completed',{taskId:task.id,templateId:task.templateId,minutes:task.taskElapsedMinutes,projectId:project.id,problemId:problem.id});}}
-  else if(finished)return {campaign:source,feedback};
-  else if(action.type==='artifact-compare'){
-   const candidate=availableTechnicalActions(step,progress).find(a=>a.id===action.id);
-   if(!candidate?.artifact||!candidate.artifact.rows.filter(row=>!row.optional).every(row=>progress.artifactReadings?.[candidate.id]?.includes(row.id)))return {campaign:source,feedback};
-   return transition(c,{type:'technical-action',id:candidate.id});
-  }
-  else if(action.type==='artifact-condition'){
-   const candidate=availableTechnicalActions(step,progress).find(a=>a.id===action.actionId);
-   if(!candidate?.artifact?.experiment||!candidate.artifact.rows.some(row=>row.id===action.rowId&&!row.optional))return {campaign:source,feedback};
-   progress.artifactConditions={...progress.artifactConditions,[candidate.id]:action.rowId};
-  }
-  else if(action.type==='artifact-inspect'){
-   const candidate=availableTechnicalActions(step,progress).find(a=>a.id===action.actionId);
-   if(!candidate?.artifact?.rows.some(row=>row.id===action.rowId))return {campaign:source,feedback};
-   const seen=progress.artifactReadings?.[candidate.id]??[];
-   if(seen.includes(action.rowId))return {campaign:source,feedback};
-   progress.artifactReadings={...progress.artifactReadings,[candidate.id]:[...seen,action.rowId]};
-   emit('artifact_inspected',{taskId:task.id,stepId:step.id,actionId:candidate.id,rowId:action.rowId});
-  }
-  else if(action.type==='technical-action'){
-   const next=availableTechnicalActions(step,progress).find(a=>a.id===action.id);if(!next)return {campaign:source,feedback};
-     if(next.requiresEvidence&&next.artifact&&!next.artifact.rows.filter(r=>!r.optional).every(r=>progress.artifactReadings?.[next.id]?.includes(r.id)))return {campaign:source,feedback};
-   progress.observations={...progress.observations,[next.id]:(task.outcome&&next.observationByOutcome?.[task.outcome.kind])??next.observationKey};effects(next.effects??[]);if(next.worldContribution){const problem=c.company.projects.find(p=>p.id===task.projectId)!.problems.find(p=>p.id===task.problemId)!;if(!problem.contributions.includes(next.worldContribution))problem.contributions.push(next.worldContribution);}if(next.outcome)task.outcome=structuredClone(next.outcome);progress.actionHistory=[...(progress.actionHistory??[]),next.id];progress.choiceId=next.id;progress.responseKey=undefined;
-   tick(next.minutes,task);
-   if(next.dependency){const q=c.life!.queue.find(q=>q.id===task.workKind),npc=q&&handoffCandidate(c,q);if(npc){progress.dependency={npcId:npc.id,dueDay:c.life!.calendarDay,dueMinute:c.time+30,ready:false};if(next.delegates&&q&&assignResponsibility(c,q.id,npc.id)){const job=c.company.delegations!.at(-1)!;job.dueDay=c.life!.calendarDay;job.dueMinute=c.time+30;progress.dependency.delegationId=job.id;}}else progress.dependency={npcId:template!.author,dueDay:c.life!.calendarDay,dueMinute:c.time+30,ready:false};}
-   if(next.completes&&progress.dependency?.delegationId)checkResponsibility(c,progress.dependency.delegationId,next.id==='bounded-result'?'clarify':'accept');
-   task.attemptsByStep[step.id]=(task.attemptsByStep[step.id]??0)+1;
-   emit('task_action',{taskId:task.id,stepId:step.id,actionId:next.id,observationKey:next.observationKey});
-   if(next.completes){if(!progress.charged){effects(step.effects);progress.charged=true;}completeStep(task,step);}
-  }
-  else if(action.type==='draft'){if(!step.items?.some(i=>i.id===action.id)||step.type==='resource-allocation')return {campaign:source,feedback};progress.draft=isOrderedPlan(step)?[action.id,...planOrder(step,progress.draft).filter(id=>id!==action.id)]:progress.draft.includes(action.id)?progress.draft.filter(id=>id!==action.id):[...progress.draft,action.id];}
-  else if(action.type==='allocate'){if(step.type!=='resource-allocation'||!step.items?.some(i=>i.id===action.id)||!Number.isInteger(action.value))return {campaign:source,feedback};progress.allocation[action.id]=Math.max(0,Math.min(step.budget??10,action.value));}
-  else if(action.type==='choose'||action.type==='submit'){
-   if(step.type==='review'&&progress.run!=='done')return {campaign:source,feedback};let correct=false;let extra:Effect[]=[];let minutes=0;
-   if(action.type==='choose'){const option=step.options?.find(o=>o.id===action.id);if(!option)return {campaign:source,feedback};correct=isConsequential(step)||option.correct!==false;progress.choiceId=option.id;progress.responseKey=option.responseKey;extra=option.effects??[];minutes=option.minutes??0;emit('task_choice',{taskId:task.id,templateId:task.templateId,stepId:step.id,choiceId:option.id,...(!isConsequential(step)?{correct}:{})});}
-   else {if(isOrderedPlan(step))progress.draft=planOrder(step,progress.draft);if(!step.solution)return {campaign:source,feedback};const ordered=['planning','incident-response'].includes(step.type);if(Array.isArray(step.solution)){correct=ordered?JSON.stringify(progress.draft)===JSON.stringify(step.solution):[...progress.draft].sort().join('|')===[...step.solution].sort().join('|');}else correct=Object.entries(step.solution).every(([id,value])=>(progress.allocation[id]??0)===value);if(isConsequential(step)){const total=Object.values(progress.allocation).reduce((a,b)=>a+b,0);if(step.type==='resource-allocation'?(total<=0||total>(step.budget??Infinity)):progress.draft.length===0)return {campaign:source,feedback};correct=true;progress.choiceId=JSON.stringify(step.type==='resource-allocation'?progress.allocation:progress.draft);}progress.responseKey=isConsequential(step)?'decision.committed':correct?'ui.correctPlan':(step.failureKey??'ui.wrongPlan');emit('task_choice',{taskId:task.id,stepId:step.id,choiceId:step.type+'-submit',...(!isConsequential(step)?{correct}:{})});}
-   task.attemptsByStep[step.id]=(task.attemptsByStep[step.id]??0)+1;if(correct){if(isConsequential(step))recordDecision(c,task,step,[...step.effects,...extra]);completeStep(task,step,extra,minutes);}else{decision(c,'technicalMistakes');if(task.attemptsByStep[step.id]>1)decision(c,'repeatedMistakes');effects(step.wrongEffects);tick(step.wrongMinutes,task);}
-  }else if(action.type==='run'){if(step.actionFlow)return {campaign:source,feedback};if(!['terminal','review','console'].includes(step.type)||progress.run!=='idle')return {campaign:source,feedback};if(!progress.charged){effects(step.effects);tick(step.minutes,task);progress.charged=true;}if(step.type==='console'){progress.run='done';completeStep(task,step);}else progress.run='running';}
-  else if(action.type==='finish-run'){if(action.taskId!==task.id||action.stepId!==step.id||progress.run!=='running')return {campaign:source,feedback};progress.run='done';if(!step.options)completeStep(task,step);}
-  else if(action.type==='click'){if(step.type!=='bug-reproduction'||progress.clicks>=2)return {campaign:source,feedback};progress.clicks++;tick(progress.clicks===1?Math.floor(step.minutes/2):Math.ceil(step.minutes/2),task);if(progress.clicks===2){effects(step.effects);progress.charged=true;completeStep(task,step);}}
- }
- if(action.type==='conference'&&attendConference(c,action.mode,action.topic))emit('conference_choice',{mode:action.mode,topic:action.topic});
- finishLife(c);return {campaign:c,feedback};
+export type { Action } from './actions/types';
+import type { Action } from './actions/types';
+import type { ActionContext } from './actions/context';
+import { actionHandlers } from './actions/registry';
+import { handleTask } from './actions/handleTask';
+export function transition(source: Campaign, action: Action): {
+    campaign: Campaign;
+    feedback: Feedback[];
+} {
+    const c = ensureLife(structuredClone(source)), feedback: Feedback[] = [];
+    const services = createActionServices(c, source, action, feedback);
+    const { emit } = services;
+    if (action.type === 'new') {
+        if (!professionById[action.professionId] || !['start', 'create'].includes(c.phase))
+            return { campaign: source, feedback };
+        const fresh = emptyCampaign(), world = generateWorld(action.seed >>> 0), ch = makeCharacter(crypto.randomUUID(), action.name.trim().slice(0, 24) || 'Саша', action.avatarId, action.professionId);
+        ch.currentProjectIds = [world.company.projects[0].id];
+        const meta = c.meta;
+        Object.assign(c, fresh, world, { activeCharacterId: ch.id, characters: [...world.characters, ch], phase: 'office' });
+        c.meta = meta;
+        c.life = initLife(c);
+        c.company!.employeeIds.push(ch.id);
+        c.schedule = makeSchedule(c);
+        ch.firstDay = startFirstDay(c);
+        history(c, 'created', 'ui.newCompany');
+        emit('game_started');
+        emit('character_created', { characterId: ch.id });
+        emit('profession_selected', { professionId: ch.profession });
+        emit('day_started', { day: 1 });
+        finishLife(c);
+        return { campaign: c, feedback };
+    }
+    if (!c.company || !c.characters.some(ch => ch.id === c.activeCharacterId))
+        return { campaign: source, feedback };
+    const ch = activeCharacter(c), task = activeTask(c), template = task ? resolveTaskTemplate(task) : undefined, step = template?.steps.find(s => s.id === task?.currentStepId), progress = step && task?.progress[step.id];
+    if (action.type === 'discover-term') {
+        const term = glossary.find(g => g.id === action.id);
+        if (term && !ch.discoveredTerms.includes(term.id)) {
+            ch.discoveredTerms.push(term.id);
+            ch.termMemories ??= {};
+            ch.termMemories[term.id] = { firstSeenContext: action.context.slice(0, 500), discoveredAt: c.life!.calendarDay, profession: ch.profession, scenario: task?.templateId ?? ('first-day:' + ch.firstDay?.currentOnboardingStep) };
+            emit('term_discovered', { termId: term.id, characterId: ch.id });
+        }
+        return { campaign: c, feedback };
+    }
+    if (action.type === 'onboarding') {
+        advanceFirstDay(c, action);
+        return { campaign: c, feedback };
+    }
+    if (ch.firstDay && !ch.firstDay.onboardingCompleted && !['work', 'farewell'].includes(ch.firstDay.currentOnboardingStep) && !['rename', 'conversation', ...(c.phase === 'home' ? ['sleep'] : [])].includes(action.type))
+        return { campaign: source, feedback };
+    if (ch.firstDay?.currentOnboardingStep === 'farewell' && action.type !== 'end-day' && !['rename', 'conversation'].includes(action.type))
+        return { campaign: source, feedback };
+    if (c.life!.montage && !['montage-close', 'rename', 'quit', 'next-career'].includes(action.type))
+        return { campaign: source, feedback };
+    if (c.phase === 'ended' && action.type !== 'next-career' && !['rename', 'conversation'].includes(action.type))
+        return { campaign: source, feedback };
+    if (action.type === 'next-career') {
+        if (c.phase !== 'ended')
+            return { campaign: source, feedback };
+        const fresh = emptyCampaign();
+        return { campaign: { ...fresh, meta: c.meta, phase: 'create' }, feedback };
+    }
+    const ctx: ActionContext = { c: c as ActionContext['c'], source, feedback, ch, task, template, step, progress, ...services, dispatch: transition };
+    const handler = actionHandlers[action.type];
+    const result = handler ? handler(ctx, action) : handleTask(ctx, action);
+    if (result)
+        return result;
+    if (action.type === 'conference' && attendConference(c, action.mode, action.topic))
+        emit('conference_choice', { mode: action.mode, topic: action.topic });
+    finishLife(c);
+    return { campaign: c, feedback };
 }
-
-
