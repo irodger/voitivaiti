@@ -21,3 +21,7 @@ text('desk.open','Открыть рабочий стол','Open work desk');
 text('desk.resume','Продолжить в ноутбуке','Continue in laptop');
 text('desk.back','К задачам','Back to tasks');
 text('desk.intro','Выбери следующую работу или продолжи текущую. Ожидание ответа не мешает посмотреть другие задачи.','Choose your next work or continue the current task. While waiting for a reply, you can explore other tasks.');
+
+text('desk.day','Рабочий день','Workday');
+text('desk.colleagues','Ответы и договорённости','Replies and agreements');
+text('desk.pending','Сегодня впереди','Still ahead today');

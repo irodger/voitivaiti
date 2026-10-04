@@ -122,3 +122,8 @@ User screenshots exposed remaining fixed sage colors in marketplace cards, price
 ### v0.46.0 — Laptop work desk
 
 Moved task acquisition, subsequent queue work, paused dependencies and colleague expectations into the laptop Tasks tab. Office task panels now link to the laptop rather than duplicating digital actions. Task results return to the desk via reward-close without dismissing the laptop. Existing morning meetings, personal conversations and end-of-day actions remain physical office interactions. First-day introductions remain unchanged. Two rendering regressions check acquisition placement and unfinished-task preservation; all 308 existing tests passed before the final queue deduplication. Browser walkthrough remains outstanding.
+
+
+### v0.46.1 — Dashboard composition
+
+User reference inspired dark laptop navigation, a day timeline, light task cards and a character rail. Timeline reads actual schedule completion; character status reads energy, stress and reputation, with no invented mood/productivity or countdown. The rail collapses on narrower screens. Task actions and application identities remain intact. WorkDesk regression tests and TypeScript pass; visual browser walkthrough remains outstanding.
