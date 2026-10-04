@@ -1,3 +1,4 @@
+import {WorkKindIcon} from './WorkKindIcon';
 import {DelegationResults} from './DelegationResults';
 import {useState} from 'react';
 import {useWorld} from '../world/store';
@@ -16,8 +17,8 @@ export function RemainderQueue(){
   const takeReason=w.life!.reviewDue?'review':w.time>=1020?'late':null;
   const helpReason=w.time+q.minutes>1080?'time':null;
   const choose=(explained:boolean)=>{w.dispatch({type:'priority',id:q.id,explained});setChosen(null);};
-  return <article className="remainder-card" key={q.id}>
-   <h2>{t('life.work.'+q.id)}</h2>
+  return <article className="remainder-card" data-kind={q.id} key={q.id}>
+   <h2><WorkKindIcon kind={q.id}/>{t('life.work.'+q.id)}</h2>
    <small>{npc?characterName(npc,t):t('ui.team')} · {t('loop.age',{days:q.age??0})} · ~{t('ui.min',{value:q.minutes})}</small>
    <p>{t('life.work.'+q.id+'.body')}</p>
    {delegated?<small>{t('queue.delegated')}</small>:<div className="remainder-actions">

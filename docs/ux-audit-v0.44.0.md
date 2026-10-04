@@ -127,3 +127,8 @@ Moved task acquisition, subsequent queue work, paused dependencies and colleague
 ### v0.46.1 — Dashboard composition
 
 User reference inspired dark laptop navigation, a day timeline, light task cards and a character rail. Timeline reads actual schedule completion; character status reads energy, stress and reputation, with no invented mood/productivity or countdown. The rail collapses on narrower screens. Task actions and application identities remain intact. WorkDesk regression tests and TypeScript pass; visual browser walkthrough remains outstanding.
+
+
+### v0.46.2 — Visual work identities
+
+Added a code-native desk illustration, five task-type colors with matching icons, and distinct character meter colors. Queue selection and actions are unchanged. Narrow screens reduce the header illustration and stack action labels. Three queue/desk rendering checks pass; browser visual walkthrough remains outstanding.
