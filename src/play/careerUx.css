@@ -1,0 +1,22 @@
+.career-view{display:flex;flex-direction:column;gap:22px}
+.career-view>*{flex-shrink:0}
+.career-view .career-next-grid{margin:0;align-items:start}
+.career-view .section-heading h1{margin-bottom:0}
+.career-view .promotion-card{border-top:4px solid var(--green)}
+.career-view .promotion-card h2{margin-top:6px}
+.career-view .promotion-progress{font-size:12px;color:var(--muted);margin:10px 0 16px}
+.career-view .promotion-remaining{margin-top:22px}
+.career-view .promotion-remaining h3{font-size:13px;color:var(--ink)}
+.career-view .promotion-confirmed{border-top:1px solid var(--line);margin-top:16px;padding-top:6px}
+.career-view .promotion-card summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:12px;color:var(--muted)}
+.career-view .promotion-card summary::before{content:'+';margin-right:8px;font-size:17px}
+.career-view .promotion-card details[open]>summary::before{content:'−'}
+.career-view .promotion-card summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:6px}
+.world-game.theme-violet .career-view .promotion-card{border-top-color:#8b60b7}
+@media(max-width:600px){.career-view{gap:16px}.career-view .promotion-card{padding:18px}}
+
+.career-view .promotion-card .requirements li{color:var(--muted);align-items:flex-start;line-height:1.5}
+.career-view .promotion-card .requirements li>span{flex:1;min-width:0}
+.career-view .promotion-card .requirements li>b{flex-shrink:0;white-space:nowrap;color:var(--ink)}
+.world-modal .requirements li{color:var(--muted)}
+.world-modal .requirements li>b{white-space:nowrap;flex-shrink:0}
