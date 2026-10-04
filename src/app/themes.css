@@ -30,3 +30,32 @@
 .world-game.theme-violet :is(.floating-feedback>div,.term-discovery,.progress-segments .completed){background:#f7e6a6;color:#664b23}
 .world-game.theme-violet :is(.requirements li.met,.company-current,.term-link){color:#764696}
 .world-game.theme-violet .cinematic-office .scene-top>span:last-child{color:#fff4dc}
+/* Interaction states belong to the selected palette too. */
+.world-game.theme-violet .nav-inner button:hover:not(.active){background:#eee3f8;color:#624081}
+.world-game.theme-violet :is(.settings-button,.icon-button):hover{background:#eee3f8;color:#624081}
+.world-game.theme-violet .office-shortcuts button:hover:enabled,.world-game.theme-violet .office-laptop:hover .desk-hotspot{background:#ffeaa1;color:#563472;border-color:#d6b24d}
+.world-game.theme-violet :is(.choice:not(:disabled):hover,.technical-actions>button:hover,.world-role-grid button:hover){background:#f2e9fb;color:#553171;border-color:#ba9ad6}
+.world-game.theme-violet button.focus-bar:hover{background:#f2e9fb}
+.world-game.theme-violet .primary-button:hover:enabled{box-shadow:0 6px 16px #66338b30,inset 0 1px #c6a3e577,inset 0 -2px #422367}
+.world-game.theme-violet .world-secondary:hover:enabled{background:#ffe59a;color:#53316e;border-color:#d7b447}
+.world-game.theme-violet :is(.office-scene,.cinematic-office,.home-room.apartment-scene){background:#c5b6d4;border-color:#d9cae7}
+.world-game.theme-violet .apartment-scene.phase-night{background:#766584}
+.world-game.theme-violet .apartment-action:hover{background:#ffe59a;color:#563472;box-shadow:0 0 0 4px #e9c85140,0 4px 14px #57337440}
+.world-game.theme-violet .resident-target:hover .resident-name,.world-game.theme-violet .resident-target:focus-visible .resident-name{background:#ffe9a1;color:#563472;outline-color:#ad80cf}
+.world-game.theme-violet .resident-detail{background:#fffaf0f5;border-color:#dbc8e9;color:#53336c}
+.world-game.theme-violet .resident-detail :is(small,strong){color:#796187}
+.world-game.theme-violet .resident-target:active .office-person{filter:drop-shadow(0 0 4px #eacd74)}
+.world-game.theme-violet .team-member:hover{border-color:#b798d0;box-shadow:0 8px 22px #62388d18}
+.world-game.theme-violet .start-button:hover{background:#ffe69b;color:#563472}
+.world-game.theme-violet .nav-inner button.active::after{background:#8854ad}
+.world-game.theme-violet,.world-game.theme-violet *{scrollbar-color:#9270b4 #eee6f5;scrollbar-width:thin}
+.world-game.theme-violet ::-webkit-scrollbar{width:9px;height:9px}
+.world-game.theme-violet ::-webkit-scrollbar-track{background:#eee6f5;border-radius:8px}
+.world-game.theme-violet ::-webkit-scrollbar-thumb{background:#9270b4;border:2px solid #eee6f5;border-radius:8px}
+.world-game.theme-violet ::-webkit-scrollbar-thumb:hover{background:#714b98}
+@media(hover:hover) and (pointer:fine){
+.world-game.theme-violet{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32' viewBox='0 0 28 32'%3E%3Cpath d='M3 2v23l6-6 5 10 5-3-5-9h9Z' fill='%236641a8' stroke='%23ffe28a' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2,auto}
+.world-game.theme-violet :is(button:not(:disabled),a,summary,select,[role=button]){cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 17V5q0-4 4-3q2 0 2 3v9q2-3 4 0q3-2 4 1q4-1 4 3v5q0 6-6 7h-7q-3-1-5-4l-6-7q-2-3 1-4q2-1 5 2Z' fill='%23f2cd53' stroke='%236641a8' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 13 3,pointer}
+.world-game.theme-violet :is(input,textarea,[contenteditable=true]){cursor:text}
+.world-game.theme-violet button:disabled{cursor:not-allowed}
+}
