@@ -1,0 +1,10 @@
+import {text} from './localization';
+text('spaces.office','Твой рабочий день','Your workday');
+text('spaces.current','В работе','In progress');
+text('spaces.queue','В очереди','Queued');
+text('spaces.people','Люди рядом','People nearby');
+text('spaces.home','Место, где можно выдохнуть','A place to recharge');
+text('spaces.energy','Энергия сейчас','Energy now');
+text('spaces.stress','Стресс сейчас','Stress now');
+text('spaces.sleep','Восстановление за сон','Recovery from sleep');
+text('spaces.recovery','До +{energy} энергии · −{stress} стресса','Up to +{energy} energy · −{stress} stress');

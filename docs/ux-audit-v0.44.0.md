@@ -170,3 +170,10 @@ Validation: 320 tests passed before the navigation correction; final production 
 Added a task situation brief based on the actual template, author and recurrence link. Technical actions use icons and readable time labels; observations have a distinct result panel. Three starter scenario briefs now explain the customer or colleague impact while preserving evidence and choices.
 
 Validation: all 320 tests passed. Production build passed. A real Backend scene was opened in the desktop browser at 1280x720. Inspection showed excessive header height, so working scenes now use a compact app header and action cards. Mobile not manually verified. No rewards, professional outcomes or available-action rules changed.
+
+
+## v0.48.0 — Office, home and team
+
+Office has a compact current-work card with a laptop shortcut and actual queue/team counts. Home shows current energy/stress and the existing sleep recovery values in its right panel, preserving apartment size. Team moves conversation topics above personality/trust details and uses a shorter banner and covers.
+
+Validation: 320 tests passed; final production build passed. Desktop browser inspected office, home and team at 1280x720 in violet theme. Inspection prompted moving HomeStatus out of the scene column and reducing office/banner height; final home/team compositions rechecked. Mobile and evening state were not manually tested.
