@@ -24,3 +24,6 @@ it('does not apply an older waiting worker while the new one is downloading',asy
  Object.assign(registration,{installing:Object.assign(new EventTarget(),{state:'installing'})});
  const pwa=await import('./pwa');await pwa.checkForUpdate();pwa.applyUpdate();expect(save).not.toHaveBeenCalled();
 });
+
+it('native installation is deferred until the install action, and honors userChoice',async()=>{const pwa=await import('./pwa');pwa.startPwa();const prompt=vi.fn(async()=>{}),event=Object.assign(new Event('beforeinstallprompt',{cancelable:true}),{prompt,userChoice:Promise.resolve({outcome:'accepted'})});window.dispatchEvent(event);expect(event.defaultPrevented).toBe(true);expect(prompt).not.toHaveBeenCalled();expect(await pwa.installApp()).toBe('accepted');expect(prompt).toHaveBeenCalledOnce();await pwa.installApp();expect(prompt).toHaveBeenCalledOnce();});
+it('appinstalled clears a deferred install event',async()=>{const pwa=await import('./pwa');pwa.startPwa();const prompt=vi.fn(async()=>({outcome:'accepted'}));window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'),{prompt}));window.dispatchEvent(new Event('appinstalled'));await pwa.installApp();expect(prompt).not.toHaveBeenCalled();});

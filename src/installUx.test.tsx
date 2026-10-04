@@ -1,0 +1,13 @@
+import {beforeEach,it,expect,vi} from 'vitest';
+import {renderToStaticMarkup} from 'react-dom/server';
+const pwa=vi.hoisted(()=>({installed:false,install:null as unknown,ready:false,update:null}));
+vi.mock('./pwa',()=>({usePwa:()=>pwa,installApp:vi.fn(),applyUpdate:vi.fn()}));
+import {InstallGame} from './play/InstallGame';
+import {PwaSettings} from './play/PwaSettings';
+import {canSuggestInstall,dismissInstall,readInstallMemory,rememberInstalled} from './installUx';
+beforeEach(()=>{const values=new Map<string,string>();vi.stubGlobal('localStorage',{getItem:(k:string)=>values.get(k)??null,setItem:(k:string,v:string)=>values.set(k,v)});vi.stubGlobal('navigator',{userAgent:'iPhone',platform:'iPhone',maxTouchPoints:1});Object.assign(pwa,{installed:false,install:null});});
+it('standalone and remembered installation suppress installation everywhere',()=>{pwa.installed=true;expect(renderToStaticMarkup(<InstallGame automatic eligible/>)).toBe('');expect(renderToStaticMarkup(<PwaSettings/>)).not.toContain('Как установить');pwa.installed=false;rememberInstalled();expect(renderToStaticMarkup(<InstallGame/>)).toBe('');});
+it('iPhone offers instructions and a permanent settings entry',()=>{const html=renderToStaticMarkup(<PwaSettings/>);expect(html).toContain('Как установить');expect(html).not.toContain('>Установить<');});
+it('native capability exposes install without automatically invoking it',()=>{pwa.install={};vi.stubGlobal('navigator',{userAgent:'Android',platform:'Linux',maxTouchPoints:1});expect(renderToStaticMarkup(<InstallGame automatic eligible/>)).toContain('>Установить<');});
+it('suggestion waits for eligibility and excludes desktop or unknown capability',()=>{expect(renderToStaticMarkup(<InstallGame automatic/>)).toBe('');vi.stubGlobal('navigator',{userAgent:'Desktop',platform:'Win32',maxTouchPoints:0});pwa.install={};expect(renderToStaticMarkup(<InstallGame automatic eligible/>)).toBe('');pwa.install=null;expect(renderToStaticMarkup(<InstallGame/>)).toBe('');});
+it('dismissal survives reload, allows a fourteen-day retry and stops after three refusals',()=>{const now=100000;dismissInstall(now);expect(canSuggestInstall(readInstallMemory(),now+1)).toBe(false);expect(canSuggestInstall(readInstallMemory(),now+14*86400000)).toBe(true);dismissInstall(now);dismissInstall(now);expect(canSuggestInstall(readInstallMemory(),now+30*86400000)).toBe(false);});

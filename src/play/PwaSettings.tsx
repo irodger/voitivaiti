@@ -1,4 +1,5 @@
-import { applyUpdate,installApp,usePwa } from '../pwa';
+import {InstallGame} from './InstallGame';
+import { applyUpdate,usePwa } from '../pwa';
 import { text,useI18n } from '../content/localization';
 text('pwa.title','Приложение на телефоне','App on your phone');
 text('pwa.install','Добавить приложение','Install app');
@@ -11,4 +12,4 @@ text('pwa.error','Не удалось подготовить офлайн-реж
 text('pwa.update','Обновить приложение','Update app');
 text('pwa.updateHint','Новая версия готова. Прогресс сохранён; обновление перезапустит игру.','A new version is ready. Your progress is saved; updating restarts the game.');
 text('pwa.local','Имя и прогресс хранятся локально. Установка не включает облачную синхронизацию между устройствами.','Your name and progress are stored locally. Installation does not enable cloud sync between devices.');
-export function PwaSettings(){const pwa=usePwa(),{t}=useI18n(),ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return <section className="pwa-settings"><h3>{t('pwa.title')}</h3>{pwa.installed?<p>{t('pwa.installed')}</p>:pwa.install?<button className="world-secondary" onClick={()=>void installApp()}>{t('pwa.install')}</button>:<p>{t(ios?'pwa.ios':'pwa.other')}</p>}<p role="status">{t(pwa.ready?'pwa.offline':pwa.error?'pwa.error':'pwa.preparing')}</p>{pwa.update&&<><p>{t('pwa.updateHint')}</p><button className="world-secondary" disabled={pwa.applying} onClick={applyUpdate}>{t('pwa.update')}</button>{pwa.saveFailed&&<p role="alert">{t('fix.saveFailed')}</p>}</>}<small>{t('pwa.local')}</small></section>}
+export function PwaSettings(){const pwa=usePwa(),{t}=useI18n();return <section className="pwa-settings"><h3>{t('pwa.title')}</h3>{pwa.installed?<p>{t('pwa.installed')}</p>:<InstallGame/>}<p role="status">{t(pwa.ready?'pwa.offline':pwa.error?'pwa.error':'pwa.preparing')}</p>{pwa.update&&<><p>{t('pwa.updateHint')}</p><button className="world-secondary" disabled={pwa.applying} onClick={applyUpdate}>{t('pwa.update')}</button>{pwa.saveFailed&&<p role="alert">{t('fix.saveFailed')}</p>}</>}<small>{t('pwa.local')}</small></section>}

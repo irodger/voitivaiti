@@ -1,14 +1,14 @@
 import {GAME_VERSION} from './content/releases';
 import {saveBeforeUpdate} from './world/store';
 import {useSyncExternalStore} from 'react';
-type InstallPrompt=Event&{prompt:()=>Promise<{outcome:string}>};
+type InstallPrompt=Event&{prompt:()=>Promise<{outcome:string}|void>;userChoice?:Promise<{outcome:string}>};
 type CheckStatus='idle'|'checking'|'downloading'|'available'|'current'|'failed'|'development';
 type State={install:InstallPrompt|null;update:ServiceWorker|null;ready:boolean;installed:boolean;error:boolean;availableVersion?:string;applying?:boolean;saveFailed?:boolean;checkStatus:CheckStatus};
 let state:State={install:null,update:null,ready:false,installed:false,error:false,checkStatus:'idle'};
 const listeners=new Set<()=>void>();
 const change=(next:Partial<State>)=>{state={...state,...next};listeners.forEach(fn=>fn());};
 export const usePwa=()=>useSyncExternalStore(fn=>{listeners.add(fn);return()=>listeners.delete(fn);},()=>state);
-export async function installApp(){const prompt=state.install;if(!prompt)return;change({install:null});try{await prompt.prompt();}catch{/* The browser may withdraw the prompt. */}}
+export async function installApp(){const prompt=state.install;if(!prompt)return;change({install:null});try{const result=await prompt.prompt();const choice=prompt.userChoice?await prompt.userChoice:result;if(choice?.outcome==='accepted')change({installed:true});return choice?.outcome;}catch{return 'unavailable';/* The browser may withdraw the prompt. */}}
 let registrationPromise:Promise<ServiceWorkerRegistration>|undefined;
 let checkPromise:Promise<void>|undefined;
 const watched=new WeakSet<ServiceWorker>();
