@@ -23,8 +23,10 @@ export function resolveSceneConsequences(c:Campaign){
   // A later durable contribution can supersede an earlier workaround.
   const superseded=problem.consequences!.some(e=>e!==pending&&e.outcome.kind==='durable'&&e.outcome.systemChanged!==false&&problem.consequences!.indexOf(e)>problem.consequences!.indexOf(pending));
   if(pending.outcome.kind==='temporary'&&superseded)continue;
+  if(problem.paymentChain?.stage==='verified'&&pending.outcome.summaryKey==='payment.chain.fixed')continue;
   problem.latestOutcomeKey=pending.outcome.followupKey;
   if(pending.outcome.kind==='temporary'){
+   if(problem.paymentChain?.stage==='workaround')problem.paymentChain.stage='returned';
    if(problem.story)problem.story.change='environment';problem.status='planned';problem.discovered=true;problem.workaround=true;problem.severity=Math.min(5,problem.severity+1);
    if(pending.outcome.systemChanged!==false)project.stability=Math.max(0,project.stability-2);
    const item=c.life!.queue.find(q=>q.problemId===problem.id);

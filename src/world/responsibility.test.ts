@@ -82,7 +82,7 @@ describe('vacation with continuing obligations',()=>{
   const c=start();activeCharacter(c).completedWork=['one'];c.phase='home';activeCharacter(c).stats.stress=82;
   const startDay=c.life!.calendarDay,due=c.life!.queue[0].expectation?.dueDay;
   expect(takeVacation(c,14)).toBe(true);let weekdays=0;for(let day=startDay+1;day<=c.life!.calendarDay;day++)if(isWorkday(day))weekdays++;
-  expect(weekdays).toBe(14);expect(c.life!.montage!.income).toBe(dailySalary(activeCharacter(c))*14);expect(activeCharacter(c).stats.stress).toBeLessThan(35);
+  expect(weekdays).toBe(14);expect(c.life!.montage!.income).toBe(dailySalary(activeCharacter(c))*14+(activeCharacter(c).home?.finances?.records.filter(r=>r.day>startDay&&r.day<=c.life!.calendarDay&&r.amount>0).reduce((sum,r)=>sum+r.amount,0)??0));expect(activeCharacter(c).stats.stress).toBeLessThan(35);
   expect(c.life!.queue[0].status).not.toBe('done');if(due)expect(c.life!.queue[0].expectation!.dueDay).toBe(due);
   expect(c.life!.queue[0].expectation!.state).toBe('escalated');expect(c.company!.history.some(e=>e.kind==='absence-unagreed')).toBe(true);
  });

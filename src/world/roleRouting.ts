@@ -6,6 +6,10 @@ import {hasRoleLens,supportedLensCategory} from '../content/roleLenses';
 export function ordinaryProblem(c:Campaign,kind:WorkKind='bug'){
  const ch=c.characters.find(x=>x.id===c.activeCharacterId)!;
  const project=c.company!.projects.find(p=>ch.currentProjectIds.includes(p.id))??c.company!.projects[0];
+ const inherited=project.problems.find(p=>p.paymentChain?.stage==='fixed'&&p.paymentChain.fixedBy!==ch.id);
+ if(inherited)return {project,problem:inherited};
+ const returned=project.problems.find(p=>p.paymentChain?.stage==='returned'&&ch.profession==='frontend');
+ if(returned&&(kind==='bug'||kind==='support'))return {project,problem:returned};
  const item=c.life?.queue.find(q=>q.id===kind);
  const bound=c.company!.projects.find(p=>p.id===item?.projectId)?.problems.find(p=>p.id===item?.problemId);
  if(bound&&supportedLensCategory(bound.category))return {project:c.company!.projects.find(p=>p.id===item!.projectId)!,problem:bound};

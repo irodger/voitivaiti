@@ -9,28 +9,50 @@ export function rememberExperience(c:Campaign,tags:string[],id:string,titleKey:s
 }
 export function recordWorkExperience(c:Campaign,task:Task){
  const tpl=resolveTaskTemplate(task);if(!tpl||!task.rewarded)return;
- const ch=c.characters.find(n=>n.id===c.activeCharacterId)!,tags=['guided',tpl.category],lens=task.templateId.startsWith('lens.');
- if(lens||ch.completedWork.length>2)tags.push('autonomy');
- if(lens||tpl.steps.some(s=>['planning','estimate','resource-allocation','dependency-map','architecture-diagram'].includes(s.type)))tags.push('planning');
- if(lens||tpl.steps.some(s=>s.resolution==='consequential'))tags.push('tradeoff','ambiguity');
- if(tpl.steps.some(s=>s.app==='chat'||s.type==='review'))tags.push('communication','cross-team');
- // Ownership includes investigation, verification and handoff; it need not be a production code change.
- if(lens&&tpl.steps.every(s=>task.progress[s.id]?.status==='completed'))tags.push('ownership','review');
- else if(tpl.steps.some(s=>['review','release-check'].includes(s.type)))tags.push('review','ownership');
- if(tpl.category==='payment'||tpl.category==='performance'||tpl.steps.some(s=>s.type==='incident-response'))tags.push('production');
- if(task.workKind&&c.life!.queue.find(q=>q.id===task.workKind)?.explained)tags.push('prioritization');
- if(task.legacyActorId||task.outcome?.kind==='temporary')tags.push('consequences');
- if(task.templateId==='lead-review')tags.push('mentoring');
- rememberExperience(c,tags,'work:'+task.id,tpl.titleKey,task,{outcome:task.outcome?.summaryKey??'ui.taskComplete'});
+ const tags=['guided',tpl.category];
+ const completed=tpl.steps.filter(s=>task.progress[s.id]?.status==='completed');
+ const performed=completed.flatMap(s=>(task.progress[s.id]?.actionHistory??[]).flatMap(id=>s.actionFlow?.actions.filter(a=>a.id===id)??[]));
+ const did=(ids:string[])=>performed.some(a=>ids.includes(a.id));
+ const add=(...values:string[])=>tags.push(...values);
+ for(const action of performed)add(...(action.experienceTags??[]));
+ if(did(['limited','shared','apply-limited','apply-shared','split','full','comment','approve-bounds']))add('autonomy','planning','tradeoff');
+ if(did(['trace','crosscheck','experiment','environment','metrics']))add('ambiguity');
+ if(did(['handoff','request','reply','contract']))add('communication','cross-team');
+ if(did(['verify-shared','verify-limited','verified-result','bounded-result'])&&did(['handoff']))add('ownership');
+ if(did(['inspect-review','comment','approve-bounds']))add('review');
+ if(task.outcome?.systemChanged===true&&did(['verify-shared','verified-result']))add('production');
+ if(performed.some(a=>a.delegates))add('delegation');
+ // Legacy mechanics have completion evidence even without an action log.
+ const mechanical=completed.filter(s=>!s.actionFlow);
+ if(mechanical.some(s=>['planning','estimate','resource-allocation','dependency-map','architecture-diagram'].includes(s.type)))add('planning');
+ if(mechanical.some(s=>s.resolution==='consequential'))add('tradeoff','ambiguity');
+ if(mechanical.some(s=>s.app==='chat'))add('communication','cross-team');
+ if(mechanical.some(s=>['review','release-check'].includes(s.type)))add('review','ownership');
+ if(mechanical.some(s=>s.type==='incident-response'))add('production');
+ if(mechanical.length&&completed.length===tpl.steps.length&&c.characters.find(n=>n.id===task.characterId)!.completedWork.length>2)add('autonomy');
+ if(task.workKind&&c.life!.queue.find(q=>q.id===task.workKind)?.explained)add('prioritization');
+ if(task.outcome?.kind==='temporary'||did(['previous','inspect-inherited']))add('consequences');
+ rememberExperience(c,[...new Set(tags)],'work:'+task.id,tpl.titleKey,task,{outcome:task.outcome?.summaryKey??'ui.taskComplete'});
 }
 // A single context contributes at most three stories per kind and grade.
 // Assignment clicks and XP never replace different completed responsibilities.
 function stories(ch:Character,rank:number){
- const groups=new Map<string,number>();
- return (ch.experience??[]).filter(e=>{
-  if(!e.confirmed||e.grade<rank-1||!e.context)return false;
+ const groups=new Map<string,Experience[]>();
+ for(const e of ch.experience??[]){
+  if(!e.confirmed||e.grade<rank-1||!e.context)continue;
   const key=[e.context,e.tags.includes('delegation')?'delegation':e.tags.includes('mentoring')?'mentoring':e.id.startsWith('perspective:')?'review':'work'].join(':');
-  const count=groups.get(key)??0;groups.set(key,count+1);return count<3;
+  groups.set(key,[...(groups.get(key)??[]),e]);
+ }
+ // Keep the same cap, but retain diverse demonstrated responsibilities rather
+ // than letting the first three assignments hide all later evidence.
+ return [...groups.values()].flatMap(entries=>{
+  const selected:Experience[]=[],covered=new Set<string>();
+  while(entries.length&&selected.length<3){
+   const score=(e:Experience)=>e.tags.reduce((n,t)=>n+(covered.has(t)?1:4),0);
+   entries.sort((a,b)=>score(b)-score(a)||b.day-a.day);
+   const e=entries.shift()!;selected.push(e);e.tags.forEach(t=>covered.add(t));
+  }
+  return selected;
  });
 }
 export function promotionChecks(ch:Character,nodeId:string){
@@ -49,7 +71,7 @@ export function promotionChecks(ch:Character,nodeId:string){
 }
 export function restoreExperience(c:Campaign){
  for(const ch of c.characters){
-  if(ch.experienceVersion===2)continue;
+  if(ch.experienceVersion===3)continue;
   const old=ch.experience??[];ch.experience=[];const active=c.activeCharacterId;c.activeCharacterId=ch.id;
   for(const task of c.tasks.filter(t=>t.characterId===ch.id&&t.rewarded)){
    recordWorkExperience(c,task);const restored=ch.experience.at(-1),previous=old.find(e=>e.id==='work:'+task.id);
@@ -58,6 +80,6 @@ export function restoreExperience(c:Campaign){
   for(const e of old.filter(e=>e.id.startsWith('perspective:')&&e.taskId)){
    const task=c.tasks.find(t=>t.id===e.taskId&&t.rewarded);if(task)ch.experience.push({...e,confirmed:true,context:resolveTaskTemplate(task)?.category,resultKind:task.outcome?.kind??'checked'});
   }
-  ch.experienceVersion=2;c.activeCharacterId=active;
+  ch.experienceVersion=3;c.activeCharacterId=active;
  }
 }
