@@ -21,8 +21,8 @@
 .resident-target:active .office-person{filter:drop-shadow(0 0 4px #dfedb7)}
 @media(hover:none){.resident-target:hover .resident-detail{display:none}}
 
-.walk-cycle{background-image:url("/art/office-walk.webp");background-size:400% 400%;animation:office-walk-frames .72s steps(1,end) infinite}
-@keyframes office-walk-frames{0%,100%{background-position:var(--walk-x) 0%;translate:0 0}25%{background-position:var(--walk-x) 33.333333%;translate:0 -1px}50%{background-position:var(--walk-x) 66.666667%;translate:0 0}75%{background-position:var(--walk-x) 100%;translate:0 -1px}}
+.walk-cycle{background-image:url("/art/office-walk.webp");background-size:400% 400%;--walk-trim-2:8%;--walk-trim-3:8%;--walk-trim-4:3%;animation:office-walk-frames .72s steps(1,end) infinite}
+@keyframes office-walk-frames{0%,100%{background-position:var(--walk-x) 0%;translate:0 0;clip-path:inset(0)}25%{background-position:var(--walk-x) 33.333333%;translate:0 -1px;clip-path:inset(var(--walk-trim-2) 0 0)}50%{background-position:var(--walk-x) 66.666667%;translate:0 0;clip-path:inset(var(--walk-trim-3) 0 0)}75%{background-position:var(--walk-x) 100%;translate:0 -1px;clip-path:inset(var(--walk-trim-4) 0 0)}}
 @media(prefers-reduced-motion:reduce){.walk-cycle{animation:none;background-position:var(--walk-x) 0%}}
 
-.walk-cycle.walk-rear{background-image:url("/art/office-walk-rear.webp")}
+.walk-cycle.walk-rear{background-image:url("/art/office-walk-rear.webp");--walk-trim-2:4%;--walk-trim-3:3%;--walk-trim-4:2%}

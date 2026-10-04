@@ -4,3 +4,6 @@ const copy:Record<string,[string,string]>={
 Object.entries(copy).forEach(([id,pair])=>text('loop.'+id,...pair));
 text('home.recovery','После сна стресс −{stress}.','Sleep reduces stress by {stress}.');
 text('home.cook','Приготовить ужин','Cook dinner');text('home.readCost','Можно провести вечер без рабочих задач.','You can spend the evening away from work.');
+
+text("loop.dailyTitle","Утренняя встреча команды","Daily team meeting");
+text("loop.dailyIntro","Каждый рабочий день коротко сверяемся: что продолжаем сегодня и где нужна помощь.","Each workday we check what we are continuing and where help is needed.");
