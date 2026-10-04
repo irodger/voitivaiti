@@ -137,3 +137,8 @@ Added a code-native desk illustration, five task-type colors with matching icons
 ### v0.46.3 — Application orientation
 
 Added a compact application header with purpose, actual completed-stage count, current/reference/history context and a Tasks navigation button. Header uses the existing per-app palettes. The mobile layout keeps navigation and purpose while dropping the redundant numeric count. No scenario or reward changes. Browser visual walkthrough remains outstanding.
+
+
+### v0.46.4 — Reference laptop shell
+
+Moved app navigation into a dark command bar with existing game identity and actual day/time. Sidebar now holds work stages only. Dashboard content expands to 1100px; narrower screens use a compact two-row command bar. Existing keyboard focus trap covers the new navigation. No new game controls or fabricated status. Visual browser verification remains outstanding.
