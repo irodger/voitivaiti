@@ -132,3 +132,8 @@ User reference inspired dark laptop navigation, a day timeline, light task cards
 ### v0.46.2 — Visual work identities
 
 Added a code-native desk illustration, five task-type colors with matching icons, and distinct character meter colors. Queue selection and actions are unchanged. Narrow screens reduce the header illustration and stack action labels. Three queue/desk rendering checks pass; browser visual walkthrough remains outstanding.
+
+
+### v0.46.3 — Application orientation
+
+Added a compact application header with purpose, actual completed-stage count, current/reference/history context and a Tasks navigation button. Header uses the existing per-app palettes. The mobile layout keeps navigation and purpose while dropping the redundant numeric count. No scenario or reward changes. Browser visual walkthrough remains outstanding.

@@ -25,3 +25,8 @@ text('desk.intro','Выбери следующую работу или прод�
 text('desk.day','Рабочий день','Workday');
 text('desk.colleagues','Ответы и договорённости','Replies and agreements');
 text('desk.pending','Сегодня впереди','Still ahead today');
+
+text('appPurpose.ide','Структура, код и связи компонентов','Structure, code and component relationships');
+text('appPurpose.browser','Поведение экрана и обмен данными','Screen behavior and exchanged data');
+text('appPurpose.console','Записи событий и признаки сбоя','Event records and signs of failure');
+text('appPurpose.chat','Вопросы, договорённости и проверка работы','Questions, agreements and work review');
