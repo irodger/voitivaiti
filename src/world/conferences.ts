@@ -1,3 +1,4 @@
+import {gameConfig} from '../config/game';
 import type {Campaign} from './types';
 import {activeCharacter} from './simulation';
 import {professionById} from '../content/professions';
@@ -14,7 +15,7 @@ export function conferenceBlock(c:Campaign,mode:'online'|'visit'){
  if(c.phase!=='office')return 'office';
  if(c.schedule.some(e=>e.type==='sync'&&e.status==='pending'))return 'sync';
  if(c.schedule.some(e=>e.type==='incident'&&e.status==='pending'))return 'incident';
- if(c.time+(mode==='visit'?180:90)>1080)return 'time';
+ if(c.time+(mode==='visit'?180:90)>gameConfig.clock.workdayEnd)return 'time';
  if(mode==='visit'&&activeCharacter(c).stats.money<4000)return 'money';
  return null;
 }

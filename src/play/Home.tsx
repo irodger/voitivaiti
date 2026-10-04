@@ -1,25 +1,33 @@
-import {HomeStatus} from './SpaceStatus';
-import {ActionPanel,ActionDock} from './ActionDock';
+import { formatNumber } from '../utils/format';
+import { SectionTabs } from '../components/SectionTabs';
+import { gameConfig } from '../config/game';
+import { HomeShop } from './HomeShop';
+import { HomeEvening } from './HomeEvening';
+import { useScrollReset } from '../hooks/useScrollReset';
+import { HomeStatus } from './SpaceStatus';
+import { ActionPanel, ActionDock } from './ActionDock';
 import '../content/workspaceUx';
-import {PersonalFinance} from './PersonalFinance';
-import {Delivery} from './Delivery';
-import {currentDelivery} from '../world/delivery';
-import {Walk} from './Walk';
-import {currentWalk,canBeginWalk} from '../world/walk';
+import { Delivery } from './Delivery';
+import { currentDelivery } from '../world/delivery';
+import { Walk } from './Walk';
+import { currentWalk } from '../world/walk';
 import '../content/evening';
-import {eveningActivities,eveningDone,canSpendEvening} from '../world/evening';
-import { dayPhase } from '../world/workLoop';
 import '../content/workLoop';
-import { RoutinePanel } from './RoutinePanel';
 import { Marketplace } from './Marketplace';
 import { ApartmentScene } from './ApartmentScene';
-import { useEffect,useRef,useState } from 'react';
-import { Moon, Check, Armchair, Sprout, Lamp, BedDouble, BookOpen, CookingPot, Wallet } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Wallet } from 'lucide-react';
 import { useWorld } from '../world/store';
 import { activeCharacter } from '../world/simulation';
-import { monthlySalary,dailySalary,homeState,recovery } from '../world/economy';
-import { homeUpgrades } from '../content/home';
+import { monthlySalary, dailySalary } from '../world/economy';
 import { useI18n } from '../content/localization';
-import { Button,formatTime } from './shared';
-const icons=[Sprout,Lamp,CookingPot,Armchair,BedDouble,BookOpen];
-export function Home({onWork}:{onWork?:()=>void}={}){const w=useWorld(),ch=activeCharacter(w),home=homeState(ch),rest=recovery(ch),{t,locale}=useI18n(),[view,setView]=useState<'evening'|'shop'|'market'>('evening');const panelRef=useRef<HTMLDivElement>(null);useEffect(()=>{panelRef.current?.scrollTo({top:0});},[view]);const money=(n:number)=>n.toLocaleString(locale);const openView=(next:'shop'|'market')=>{setView(next);if(window.matchMedia('(max-width:1023px)').matches)requestAnimationFrame(()=>document.querySelector('.home-panel')?.scrollIntoView({block:'start',behavior:'smooth'}));};if(w.phase==='home'&&currentDelivery(ch,w.life!.calendarDay))return <Delivery onBack={setView}/>;if(w.phase==='home'&&currentWalk(ch,w.company!.currentDay))return <Walk/>;return <div className="world-work home-world"><section className="home-left"><ApartmentScene onShop={()=>openView('shop')} onMarket={()=>{const parcel=ch.orders?.find(o=>!o.received&&o.deliveryDay<=w.life!.calendarDay);if(w.phase==='home'&&parcel)w.dispatch({type:'inspect-delivery',itemId:parcel.itemId});else openView('market');}}/><div className="home-pay"><Wallet size={23}/><div><small>{t('home.salary')}</small><strong>{money(monthlySalary(ch))} ₽</strong></div><span>{t('home.daily',{price:money(dailySalary(ch))})}</span></div><p className="home-market">{t('home.market')} <a href="https://habr.com/ru/specials/1060148/" target="_blank" rel="noreferrer">Хабр Карьера ↗</a></p></section><ActionPanel desktopOnly className="world-task-panel home-panel"><div className="home-tabs"><button className={view==='evening'?'active':''} onClick={()=>setView('evening')}>{t('home.evening')}</button><button className={view==='shop'?'active':''} onClick={()=>setView('shop')}>{t('home.shop')}</button><button className={view==='market'?'active':''} onClick={()=>setView('market')}>{t('market.tab')}</button></div><div className="office-content" ref={panelRef}>{view==='market'?<Marketplace/>:view==='shop'?<><h1>{t('home.shop')}</h1><div className="home-shop">{homeUpgrades.map((u,i)=>{const Icon=icons[i],owned=home.owned.includes(u.id),short=ch.stats.money<u.price;return <article className={owned?'installed':''} key={u.id}><Icon size={23}/><div><h3>{t(u.titleKey)}</h3><p>{t(u.descriptionKey)}</p></div><button disabled={owned||short||w.phase!=='home'} onClick={()=>w.dispatch({type:'buy-home',id:u.id})}>{owned?<><Check size={14}/>{t('home.owned')}</>:t(short?'home.short':'home.buy',{price:money(short?u.price-ch.stats.money:u.price)})}</button></article>})}</div>{w.phase!=='home'&&<p>{t('ui.homeLocked')}</p>}</>:w.phase!=='home'?<><HomeStatus/><h1>{t('workspace.atWork')}</h1><p>{t('workspace.homePreview')}</p>{onWork&&<ActionDock><Button onClick={onWork}>{t('workspace.backToWork')}</Button></ActionDock>}</>:<><p className="eyebrow">{t('ui.day',{day:w.company!.currentDay})}</p><h1>{t('loop.'+dayPhase(w.time))}</h1><HomeStatus/>{w.phase==='home'&&w.life?.routineSummary&&<><p>{t('loop.routine',{time:formatTime(w.life.routineSummary.to)})}</p>{w.life.routineSummary.unfinished&&<p>{t('loop.carried')}</p>}</>}<p>{t('loop.rest',rest)}</p>{w.phase==='home'&&<p className="evening-clock">{t('evening.time',{time:formatTime(w.time)})}</p>}<div className="home-activities">{(Object.keys(eveningActivities) as (keyof typeof eveningActivities)[]).map(id=>eveningDone(ch,w.company!.currentDay).includes(id)?<div className="evening-completed" key={id}><Check size={16}/>{t('evening.done.'+id)}</div>:(id==='walk'?canBeginWalk(ch,w.company!.currentDay,w.time):canSpendEvening(ch,w.company!.currentDay,w.time,id))?<Button key={id} secondary disabled={w.phase!=='home'} onClick={()=>w.dispatch(id==='walk'?{type:'start-walk'}:{type:'evening',id})}>{t(id==='walk'?'walk.range':(id==='games'?'life.':'home.')+id,{value:id==='cook'?(home.owned.includes('kitchen')?30:15):(1+(home.owned.includes('library')?1:0))})}{id!=='walk'&&<> · {t('ui.min',{value:eveningActivities[id]})}</>}</Button>:null)}{w.phase==='home'&&!Object.keys(eveningActivities).some(id=>id==='walk'?canBeginWalk(ch,w.company!.currentDay,w.time):canSpendEvening(ch,w.company!.currentDay,w.time,id as keyof typeof eveningActivities))&&<p>{t('evening.finished')}</p>}</div><PersonalFinance character={ch} daily={Math.max(0,(w.life?.livingCost??1200)-600)}/><div className="home-pay-note">{home.lastPay>0&&<b>{t('home.paid',{price:money(home.lastPay)})}</b>}<p>{t('home.payNote')}</p></div><ActionDock><Button disabled={w.phase!=='home'} onClick={()=>w.dispatch({type:'sleep'})}><Moon size={16}/>{t('ui.sleep')}</Button></ActionDock>{w.phase!=='home'&&<p>{t('ui.homeLocked')}</p>}<RoutinePanel/></>}</div></ActionPanel></div>}
+import { Button } from './shared';
+export function Home({ onWork }: {
+    onWork?: () => void;
+} = {}) { const w = useWorld(), ch = activeCharacter(w), { t, locale } = useI18n(), [view, setView] = useState<'evening' | 'shop' | 'market'>('evening'); const panelRef = useRef<HTMLDivElement>(null); useScrollReset(panelRef, view); const money = (n: number) => formatNumber(n, locale); const openView = (next: 'shop' | 'market') => { setView(next); if (window.matchMedia(gameConfig.ui.compactQuery).matches)
+    requestAnimationFrame(() => document.querySelector('.home-panel')?.scrollIntoView({ block: 'start', behavior: 'smooth' })); }; if (w.phase === 'home' && currentDelivery(ch, w.life!.calendarDay))
+    return <Delivery onBack={setView}/>; if (w.phase === 'home' && currentWalk(ch, w.company!.currentDay))
+    return <Walk />; return <div className="world-work home-world"><section className="home-left"><ApartmentScene onShop={() => openView('shop')} onMarket={() => { const parcel = ch.orders?.find(o => !o.received && o.deliveryDay <= w.life!.calendarDay); if (w.phase === 'home' && parcel)
+    w.dispatch({ type: 'inspect-delivery', itemId: parcel.itemId });
+else
+    openView('market'); }}/><div className="home-pay"><Wallet size={23}/><div><small>{t('home.salary')}</small><strong>{money(monthlySalary(ch))} ₽</strong></div><span>{t('home.daily', { price: money(dailySalary(ch)) })}</span></div><p className="home-market">{t('home.market')} <a href="https://habr.com/ru/specials/1060148/" target="_blank" rel="noreferrer">Хабр Карьера ↗</a></p></section><ActionPanel desktopOnly className="world-task-panel home-panel"><SectionTabs value={view} onChange={setView} items={[{ id: 'evening', label: t('home.evening') }, { id: 'shop', label: t('home.shop') }, { id: 'market', label: t('market.tab') }]}/><div className="office-content" ref={panelRef}>{view === 'market' ? <Marketplace /> : view === 'shop' ? <HomeShop /> : w.phase !== 'home' ? <><HomeStatus /><h1>{t('workspace.atWork')}</h1><p>{t('workspace.homePreview')}</p>{onWork && <ActionDock><Button onClick={onWork}>{t('workspace.backToWork')}</Button></ActionDock>}</> : <HomeEvening />}</div></ActionPanel></div>; }

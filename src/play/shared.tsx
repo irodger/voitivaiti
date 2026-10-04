@@ -12,5 +12,5 @@ export function Modal({title,children,onClose}:{title:string;children:ReactNode;
 export function characterName(ch:Character,t:(key:string)=>string){return ch.name.startsWith('roster.')||ch.name.startsWith('npc.')?t(ch.name):ch.name;}
 export function Speech({speaker='sergey',children}:{speaker?:string;children:ReactNode}){const {t}=useI18n(),ch=useWorld(s=>s.characters.find(c=>c.id===speaker));return <div className="speech"><CharacterAvatar id={ch?.avatarId??'3'} size={44}/><div><div className="speaker">{ch?characterName(ch,t):t('ui.npcName')}<span>{ch?t(professionById[ch.profession].careers.find(n=>n.id===ch.careerNodeId)!.titleKey):''}</span></div><p>{typeof children==='string'?<TermText>{children}</TermText>:children}</p></div></div>}
 export function Code({text,error=false}:{text:string;error?:boolean}){return <div className={`code-mock ${error?'error-code':''}`}><div className="code-top"><span className="window-dots" aria-hidden="true">● ● ●</span><span>{error?'Console':'source'}</span></div><div className="source-view"><div className="source-gutter" aria-hidden="true">{text.split("\n").map((_,index)=><span key={index}>{index+1}</span>)}</div><pre><code>{text}</code></pre></div></div>}
-export const formatTime=(n:number)=>`${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
+export {formatTime} from '../utils/format';
 

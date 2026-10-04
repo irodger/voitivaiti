@@ -1,3 +1,4 @@
+import {changeStress} from './stress';
 import type {Campaign} from './types';
 import type {WorkKind} from './lifeTypes';
 import {ordinaryProblem} from './roleRouting';
@@ -48,7 +49,7 @@ export function expectationPressure(c:Campaign){
    e.escalationRecorded=true;
    const kind=e.communication?'deadlineFailures':'communicationFailures';
    l.decisions[kind]++;l.decisionHistory.push({day:l.calendarDay,kind});
-   ch.stats.stress=Math.min(100,ch.stats.stress+(e.communication?1:3));
+   changeStress(ch,e.communication?1:3);
   }
  }
 }

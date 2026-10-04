@@ -1,12 +1,11 @@
+import {useEveningActivities} from '../hooks/useEveningActivities';
 import {TechArt} from './TechArt';
 import './marketplace.css';
-import {canBeginWalk} from '../world/walk';
 import {BookOpen, Check, CookingPot, DoorOpen, Gamepad2, Moon, Package, ShoppingBag, Sun} from 'lucide-react';
 import {homeUpgrades} from '../content/home';
 import {marketItems} from '../content/marketplace';
 import {useI18n} from '../content/localization';
 import {homeState} from '../world/economy';
-import {canSpendEvening, eveningActivities, eveningDone, type EveningActivity} from '../world/evening';
 import {activeCharacter} from '../world/simulation';
 import {useWorld} from '../world/store';
 import {dayPhase} from '../world/workLoop';
@@ -19,12 +18,10 @@ const activities = [
 
 export function ApartmentScene({onShop,onMarket}:{onShop:()=>void;onMarket:()=>void}) {
   const w=useWorld(), ch=activeCharacter(w), {t}=useI18n(), owned=homeState(ch).owned;
-  const phase=dayPhase(w.time), atHome=w.phase==='home', day=w.company!.currentDay;
-  const done=eveningDone(ch,day);
-  const available=(id:EveningActivity)=>id==='walk'?canBeginWalk(ch,day,w.time):canSpendEvening(ch,day,w.time,id);
-  const hasActivity=activities.some(({id})=>available(id));
+  const phase=dayPhase(w.time), atHome=w.phase==='home';
+  const {done,available,act,hasActivity,minutes:eveningActivities}=useEveningActivities();
   const parcels=(ch.orders??[]).filter(o=>!o.received && o.deliveryDay<=w.life!.calendarDay);
-  const act=(id:EveningActivity)=>w.dispatch(id==='walk'?{type:'start-walk'}:{type:'evening',id});
+
   return <div className={`home-room apartment-scene phase-${phase}`}>
     <div className="apartment-frame">
       <img className="apartment-art" src={`${import.meta.env.BASE_URL}art/apartment-premium.webp`} alt={t('home.roomAlt')}/>

@@ -1,3 +1,4 @@
+import {gameConfig} from '../config/game';
 import {WorkItemContext} from './WorkItemContext';
 import {WorkKindIcon} from './WorkKindIcon';
 import {DelegationResults} from './DelegationResults';
@@ -15,8 +16,8 @@ export function RemainderQueue(){
  return <><DelegationResults/><div className="remainder-queue">{queue.filter(q=>q.status!=='done'&&(!!q.delegatedTo||availableWork(ch).includes(q.id))).map(q=>{
   const npc=w.characters.find(n=>n.id===workOwner[q.id]),delegated=!!q.delegatedTo;
   const canTake=availableWork(ch).includes(q.id)&&(!selected||selected.id===q.id);
-  const takeReason=w.life!.reviewDue?'review':w.time>=1020?'late':null;
-  const helpReason=w.time+q.minutes>1080?'time':null;
+  const takeReason=w.life!.reviewDue?'review':w.time>=gameConfig.clock.lastTaskStart?'late':null;
+  const helpReason=w.time+q.minutes>gameConfig.clock.workdayEnd?'time':null;
   const choose=(explained:boolean)=>{w.dispatch({type:'priority',id:q.id,explained});setChosen(null);};
   return <article className="remainder-card" data-kind={q.id} key={q.id}>
    <h2><WorkKindIcon kind={q.id}/>{t('life.work.'+q.id)}</h2>
