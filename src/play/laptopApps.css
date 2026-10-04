@@ -1,0 +1,39 @@
+/* Application identity belongs to the workspace, independent of the outer theme. */
+.world-game .laptop-display[data-app=ide]{--app-accent:#365f9b;--app-tint:#e7edf7;--app-paper:#f5f7fc;--app-line:#cbd7e8;--app-code:#1f2a3d;--app-code-ink:#d5e6ff}
+.world-game .laptop-display[data-app=browser]{--app-accent:#16748b;--app-tint:#e0f1f6;--app-paper:#f9fcfd;--app-line:#bfdce6;--app-code:#153b49;--app-code-ink:#d8f4fa}
+.world-game .laptop-display[data-app=console]{--app-accent:#805318;--app-tint:#f4ead6;--app-paper:#f3f1eb;--app-line:#dccfb6;--app-code:#25282e;--app-code-ink:#f6d793}
+.world-game .laptop-display[data-app=chat]{--app-accent:#8a4a6a;--app-tint:#f5e6ed;--app-paper:#fffaf6;--app-line:#e7cdd8;--app-code:#423045;--app-code-ink:#f8ddec}
+.world-game .laptop-display[data-app]{--ink:#263244;--muted:#58657a;--paper:var(--app-paper);--line:var(--app-line)}
+.world-game .laptop-display[data-app] .laptop-content{background:var(--app-paper);color:var(--ink)}
+.world-game .laptop-display[data-app] .laptop-menubar{background:var(--app-tint);color:var(--app-accent);border-bottom:2px solid var(--app-line)}
+.world-game .laptop-display[data-app] .laptop-menubar>b{display:flex;align-items:center;gap:8px}
+.world-game .laptop-display[data-app] .laptop-menubar>b::before{content:'';width:7px;height:7px;background:var(--app-accent);border-radius:50%}
+.world-game .laptop-display[data-app] .laptop-apps>button.active{background:var(--app-tint);color:var(--app-accent);box-shadow:inset 0 0 0 1px var(--app-line)}
+.world-game .laptop-display[data-app] :is(h2,h3,h4){color:var(--ink)}
+.world-game .laptop-display[data-app] :is(.mechanic-brief,.step-label,.mechanic-instruction,.speaker span,.fine-print){color:var(--muted)}
+.world-game .laptop-display[data-app] .code-mock{background:var(--app-code);color:var(--app-code-ink);border-color:var(--app-code);box-shadow:0 4px 14px #15233715}
+.world-game .laptop-display[data-app] .code-top{background:#ffffff08;color:var(--app-code-ink);border-bottom:1px solid #ffffff18}
+.world-game .laptop-display[data-app] .code-mock :is(pre,code){color:var(--app-code-ink)}
+.world-game .laptop-display[data-app] :is(.work-artifact,.artifact-reference article,.artifact-action-option,.choice){background:var(--app-paper);border-color:var(--app-line)}
+.world-game .laptop-display[data-app] :is(.work-artifact header,.experiment-output,.speech,.read-only-notice){background:var(--app-tint);border-color:var(--app-line);color:var(--ink)}
+.world-game .laptop-display[data-app] .speech p{color:var(--ink)}
+.world-game .laptop-display[data-app] .artifact-records article>button:hover{background:var(--app-tint)}
+.world-game .laptop-display[data-app] :is(.artifact-records article>button span:last-child,.artifact-progress,.artifact-footer>p){color:var(--app-accent)}
+.world-game .laptop-display[data-app] .artifact-progress progress{accent-color:var(--app-accent)}
+.world-game .laptop-display[data-app] :is(.primary-button,.artifact-compare,.experiment-run){background:var(--app-accent);border-color:var(--app-accent);color:#fff;box-shadow:0 3px 0 #17223122}
+.world-game .laptop-display[data-app] :is(.primary-button,.artifact-compare,.experiment-run):hover:not(:disabled){background:var(--app-accent);filter:brightness(1.12)}
+.world-game .laptop-display[data-app] :is(.world-secondary,.experiment-conditions button[aria-pressed=true],.choice.decision-selected){background:var(--app-tint);border-color:var(--app-line);color:var(--app-accent)}
+.world-game .laptop-display[data-app] .world-secondary:hover:not(:disabled){background:var(--app-tint);filter:brightness(.97)}
+.world-game .laptop-display[data-app] .panel-action-slot{background:var(--app-paper);border-color:var(--app-line)}
+.world-game .laptop-display[data-app] .panel-action-dock .technical-actions>button:hover{background:var(--app-tint)}
+.world-game .laptop-display[data-app=ide] .code-mock{border-left:4px solid #719bd5}
+.world-game .laptop-display[data-app=console] .code-mock{border-radius:6px;font-family:Consolas,monospace}
+.world-game .laptop-display[data-app=console] .artifact-logs .artifact-data{background:#25282e;color:#f6d793;font-family:Consolas,monospace;padding-top:16px}
+.world-game .laptop-display[data-app=browser] .work-artifact{box-shadow:0 4px 16px #16748b0d}
+.world-game .laptop-display[data-app=chat] .speech{border-radius:18px 18px 18px 5px}
+.world-game .laptop-display[data-app=chat] .artifact-reference article{border-radius:18px 18px 18px 5px;background:var(--app-tint)}
+.world-game .laptop-display[data-app] :is(button,summary,select):focus-visible{outline-color:var(--app-accent)}
+
+.world-game .laptop-display[data-app] :is(.term-link,.observation-history>summary,.artifact-action-option>summary,.technical-actions>small){color:var(--app-accent)}
+.world-game .laptop-display[data-app] .technical-actions>button{background:var(--app-tint);border-color:var(--app-line);color:var(--ink)}
+.world-game .laptop-display[data-app] .technical-actions>button small{color:var(--muted)}
