@@ -151,3 +151,8 @@ Day and task list share the main column; illustrated character rail starts besid
 Generated asset: public/art/laptop-workspace.webp (built-in imagegen, converted to WebP). Prompt: premium illustrated cozy IT workspace, empty ergonomic chair, dual monitors with abstract code, amber lamp, coffee and plants, city sunset, navy/indigo/honey palette; no people or readable UI text.
 
 Final verification: all 317 tests across 48 files passed. Desktop screenshot showed both available task cards with their actions on the first screen; image loaded, no horizontal overflow, agreements closed by default and Tasks correctly selected.
+
+
+### v0.47.1 — Apps with distinct content
+
+Fixed rewarded-task navigation: app tabs no longer all render WorkDesk. AppContext scopes observations to the app and inspected artifact rows to source/network/metrics/task families. Completed legacy step code and selected evidence remain available. IDE has a structure/source viewer; Console a dark journal; Browser a light screen/data surface; Chat completed discussion bubbles. Future review text and unread artifact rows are withheld. Three data-isolation regression tests and five existing desk/workspace checks passed; production build passed. Desktop browser verified IDE/Console switching after completed work and no horizontal overflow in Console. Mobile and every profession have not been manually played.

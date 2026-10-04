@@ -33,3 +33,17 @@ text('appPurpose.chat','Вопросы, договорённости и пров
 
 text('desk.syncHint','Команда собирается: коротко сверим планы перед работой.','The team is gathering: align the plan before starting work.');
 text('desk.joinSync','К команде','Join the team');
+
+text('appContext.structure','Структура работы','Work structure');
+text('appContext.source','Просмотр исходника','Source viewer');
+text('appContext.noSource','Исходник ещё не открыт','Source not opened yet');
+text('appContext.noSourceHint','Здесь появятся код и связи компонентов, которые ты действительно исследовал.','Code and component relationships you actually inspected will appear here.');
+text('appContext.journal','Журнал исследования','Investigation journal');
+text('appContext.noLogs','Записей пока нет','No records yet');
+text('appContext.noLogsHint','Здесь сохраняются изученные метрики и наблюдения из Console.','Inspected metrics and Console observations are kept here.');
+text('appContext.preview','Экран и обмен данными','Screen and exchanged data');
+text('appContext.noPreview','Нет изученных данных','No inspected data');
+text('appContext.noPreviewHint','Здесь появятся просмотренные состояния экрана, окружения и сетевые записи.','Inspected screen states, environments and network records appear here.');
+text('appContext.thread','Рабочая переписка','Work conversation');
+text('appContext.noMessages','Обсуждение ещё впереди','Discussion is still ahead');
+text('appContext.noMessagesHint','Здесь будут завершённые обсуждения и наблюдения из Chat. Будущие ответы не раскрываются заранее.','Completed discussions and Chat observations appear here. Future replies are not revealed early.');
