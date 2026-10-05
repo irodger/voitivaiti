@@ -40,3 +40,13 @@ it('opens the first task goal and reports completed stages and elapsed time from
  task.progress[task.currentStepId].status='completed';task.taskElapsedMinutes=23;c=JSON.parse(JSON.stringify(c));useWorld.setState(c);task=activeTask(c)!;html=renderToStaticMarkup(<TaskBrief task={task}/>);expect(html).toContain(translate('taskScene.checked'));expect(html).toContain(translate('ui.min',{value:23}));expect(html).toContain('value="1"');
  activeCharacter(c).firstDay!.onboardingCompleted=true;useWorld.setState(c);html=renderToStaticMarkup(<TaskBrief task={task}/>);expect(html).not.toContain('first-task-status');expect(html).not.toContain('<details open=""');
 });
+
+import {FirstEveningGuide} from './FirstEveningGuide';
+it('keeps the first-evening guidance through reload and removes it after sleep',()=>{
+ let c=transition(emptyCampaign(),{type:'new',name:'Intro',avatarId:'1',professionId:'frontend',seed:1427}).campaign;
+ activeCharacter(c).firstDay!.currentOnboardingStep='farewell';c.schedule.forEach(event=>event.status='completed');
+ c=transition(c,{type:'end-day'}).campaign;c=JSON.parse(JSON.stringify(c));useWorld.setState(c);
+ let html=renderToStaticMarkup(<FirstEveningGuide/>);expect(html).toContain(translate('firstEvening.title'));expect(html).toContain(translate('firstEvening.sleep'));expect(html).toContain('aria-current="step"');expect(html).not.toContain('NaN');
+ c=transition(c,{type:'sleep'}).campaign;useWorld.setState(c);expect(renderToStaticMarkup(<FirstEveningGuide/>)).toBe('');
+ c.schedule.forEach(event=>event.status='completed');c=transition(c,{type:'end-day'}).campaign;useWorld.setState(c);expect(renderToStaticMarkup(<FirstEveningGuide/>)).toBe('');
+});
