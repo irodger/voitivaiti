@@ -1,3 +1,6 @@
+import {Trophy} from 'lucide-react';
+import '../content/premiumStages';
+import './stageJourney.css';
 import {ActionDock} from './ActionDock';
 import {resolveTaskTemplate} from '../content/scenarios';
 import {PerspectivePanel} from './PerspectivePanel';
@@ -19,7 +22,7 @@ export function TaskResult({onClose,closeLabel='result.close'}:{onClose:()=>void
  const delta=task.taskElapsedMinutes-template.estimate;
  if(w.perspective)return <section className="task-result"><small>{t('mastery.episodeTitle')}</small><h2>{t(template.titleKey)}</h2><PerspectivePanel/></section>;
  return <section className="task-result">
-  <small>{t('result.label')}</small><h2>{t(template.titleKey)}</h2>
+  <header className="premium-result-hero"><Trophy size={34}/><div><small>{t('premiumStage.delivered')}</small><h2>{t(template.titleKey)}</h2><p>{t(task.outcome?.kind==='temporary'?'premiumStage.temporary':task.outcome?.systemChanged===true?'premiumStage.system':'premiumStage.evidence')}</p></div></header>
   {task.outcome?<div className="result-outcome"><h3>{t('result.approach')}</h3><p><TermText>{t(task.outcome.summaryKey)}</TermText></p></div>:choice&&choiceStep?<div className="result-outcome"><h3>{t('result.approach')}</h3><p>{t(choice.labelKey)}</p><p>{choice.responseKey==='decision.committed'?decisionFeedback(choiceStep,task.progress[choiceStep.id],t):t(choice.responseKey)}</p></div>:<p>{t('result.finished')}</p>}
   {evidence&&<div className="result-outcome"><h3>{t('result.scope')}</h3><p>{decisionFeedback(evidence,task.progress[evidence.id],t)}</p></div>}
   <div className="time-comparison"><div><small>{t('ui.estimate')}</small><b>{t('ui.min',{value:template.estimate})}</b></div><div><small>{t('ui.timeActual')}</small><b>{t('ui.min',{value:task.taskElapsedMinutes})}</b></div></div>
