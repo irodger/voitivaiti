@@ -1,3 +1,5 @@
+import {isWorkday} from './calendar';
+export {isWorkday} from './calendar';
 import {gameConfig} from '../config/game';
 import {changeStress,stressAfterRecovery} from './stress';
 import {clamp as cap} from '../utils/numbers';
@@ -39,7 +41,6 @@ export function closeWorkDay(c:Campaign){ensureLife(c);const l=c.life!,ch=player
 export function reviewResponse(c:Campaign,accept:boolean){const l=c.life!,ch=player(c);if(!l.reviewDue)return;l.reviewDue=false;l.reviewedAt=l.calendarDay;l.reviewStage=Math.min(4,l.reviewStage+1);changeTrust(c,'sergey',accept?2:-8);changeStress(ch,accept?gameConfig.stress.performanceAccepted:gameConfig.stress.performanceRejected);if(!accept){decision(c,'communicationFailures');}c.company!.history.push({id:`review:${ch.id}:${l.calendarDay}:${l.reviewStage}`,day:l.calendarDay,kind:'performance-review',key:'life.stage'+Math.min(3,l.reviewStage),actorId:ch.id,values:{stage:l.reviewStage,accepted:accept?1:0}});if(l.reviewStage>=4)endCareer(c,'fired');updateMeta(c);}
 export function applyWorldEvent(c:Campaign){const l=c.life!,ch=player(c),id=worldEventIds[(c.company!.seed+Math.floor(l.calendarDay/14))%worldEventIds.length];l.worldEvents.push({id,day:l.calendarDay,until:l.calendarDay+(id==='payroll'?3:id==='move'?2:5)});l.worldEvents=l.worldEvents.slice(-30);l.nextEventDay=l.calendarDay+14;if(id==='rent')l.livingCost+=100;if(id==='director')c.company!.processMaturity=cap(c.company!.processMaturity+8);if(id==='audit')c.company!.projects.forEach(p=>p.securityLevel=cap(p.securityLevel+6));if(id==='sick'&&careerRank(ch)>=2)ch.skills.leadership++;}
 export const eventActive=(c:Campaign,id:string)=>c.life!.worldEvents.some(e=>e.id===id&&e.until>c.life!.calendarDay);
-export const isWorkday=(day:number)=>{const weekday=new Date(Date.UTC(2026,0,day)).getUTCDay();return weekday!==0&&weekday!==6;};
 export function chargeLivingCosts(c:Campaign){const l=c.life!,ch=player(c);if(l.lastExpenseCalendarDay===l.calendarDay)return 0;const cost=Math.min(ch.stats.money,Math.max(0,l.livingCost-600));ch.stats.money-=cost;l.lastExpenseCalendarDay=l.calendarDay;return cost;}
 export function settleCalendarDay(c:Campaign,workedDay=false){const income=payWork(c,workedDay),expenses=chargeLivingCosts(c),personal=settlePersonalFinance(c);return {salary:income,income:income+personal.income,expenses:expenses+personal.expenses};}
 export function payWork(c:Campaign,workedDay=false){const l=c.life!,ch=player(c);if(l.lastPaidCalendarDay===l.calendarDay)return 0;l.lastPaidCalendarDay=l.calendarDay;if(!workedDay&&!isWorkday(l.calendarDay))return 0;const pay=dailySalary(ch);if(eventActive(c,'payroll')){l.salaryHeld+=pay;return 0;}ch.stats.money+=pay;return pay;}

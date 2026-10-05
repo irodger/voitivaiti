@@ -45,7 +45,7 @@ describe('v0.24 confirmed responsibility',()=>{
   c=act(c,{type:'delegate-work',id:'feature',npcId:'oleg'});const d=c.company!.delegations![0];
   expect(d.context).toBeTruthy();expect(d.status).toBe('working');expect(activeCharacter(c).experience!.some(e=>e.tags.includes('delegation'))).toBe(false);
   c=act(c,{type:'delegation-result',id:d.id,response:'accept'});expect(c.company!.delegations![0].status).toBe('working');
-  advanceCalendar(c);expect(c.company!.delegations![0].status).toBe('working');advanceCalendar(c);
+  advanceCalendar(c);expect(c.company!.delegations![0].status).toBe('working');while(c.life!.calendarDay<d.dueDay)advanceCalendar(c);
   expect(c.company!.delegations![0].status).toBe('returned');expect(activeCharacter(c).experience!.some(e=>e.tags.includes('delegation'))).toBe(false);
   c=migrateLegacy(JSON.parse(JSON.stringify(c)));c=act(c,{type:'delegation-result',id:d.id,response:'clarify'});
   expect(c.life!.queue.find(q=>q.id==='feature')!.status).toBe('waiting');

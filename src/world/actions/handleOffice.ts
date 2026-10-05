@@ -1,3 +1,4 @@
+import {addWorkdays} from '../calendar';
 import { checkResponsibility } from '../responsibility';
 import { startPerspective, perspectiveAction } from '../perspective';
 import { communicateExpectation } from '../expectations';
@@ -102,7 +103,7 @@ export function handleOffice(ctx: ActionContext, action: Action): TransitionResu
         if (topic.id === 'context-review') {
             const q = c.life!.queue.find(q => q.id === 'review' && q.status !== 'done');
             if (q)
-                q.promisedDay = c.life!.calendarDay + 1;
+                q.promisedDay = addWorkdays(c.life!.calendarDay,1);
         }
         if (ch.conversationRewardDay !== c.company.currentDay) {
             ch.conversationRewardDay = c.company.currentDay;

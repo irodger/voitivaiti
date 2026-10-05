@@ -1,3 +1,4 @@
+import {addWorkdays} from './calendar';
 import type {Campaign} from './types';
 import type {WorkKind} from './lifeTypes';
 import {assignResponsibility,handoffCandidate} from './responsibility';
@@ -18,7 +19,7 @@ export function arrangeAbsence(c:Campaign,returnDay:number,arrangements:Vacation
   if(choice==='handoff'&&npc&&assignResponsibility(c,q.id,npc.id)){summary.push('absence.handed.'+q.id);continue;}
   // A colleague can agree to one noncritical extension, not endless new promises.
   if(choice==='postpone'&&e&&!e.extensionUsed&&q.urgency<4&&e.state!=='escalated'){
-   e.extensionUsed=true;e.communication='postpone';e.lastCommunicationDay=c.life!.calendarDay;e.dueDay=returnDay+1;e.reactionKey='absence.agreed';q.promisedDay=e.dueDay;
+   e.extensionUsed=true;e.communication='postpone';e.lastCommunicationDay=c.life!.calendarDay;e.dueDay=addWorkdays(returnDay,1);e.reactionKey='absence.agreed';q.promisedDay=e.dueDay;
    summary.push('absence.moved.'+q.id);continue;
   }
   unagreed.push(q.id);summary.push('absence.waited.'+q.id);

@@ -1,3 +1,4 @@
+import {addWorkdays,isWorkday,nextWorkdayOnOrAfter} from './calendar';
 import {changeStress} from './stress';
 import type {Campaign} from './types';
 import type {WorkKind} from './lifeTypes';
@@ -12,7 +13,8 @@ export function ensureWorkExpectations(c:Campaign){
   if(q.status==='done'||!availableWork(ch).includes(q.id))continue;
   const {project,problem}=ordinaryProblem(c,q.id);
   if(problem){q.projectId=project.id;q.problemId=problem.id;}
-  q.expectation??={state:q.status==='selected'?'assigned':'waiting',dueDay:q.promisedDay??c.life.calendarDay+2};
+  q.expectation??={state:q.status==='selected'?'assigned':'waiting',dueDay:q.promisedDay??addWorkdays(c.life.calendarDay,2)};
+  if(['assigned','waiting'].includes(q.expectation.state))q.expectation.dueDay=nextWorkdayOnOrAfter(q.expectation.dueDay);
  }
 }
 export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|'blocker'|'defer'){
@@ -23,7 +25,7 @@ export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|
  // A repeated promise is not a fresh postponement. It must lead to work or handoff.
  if(choice!=='defer'&&e.extensionUsed)return false;
  e.communication=choice;e.lastCommunicationDay=day;
- if(choice!=='defer'){e.extensionUsed=true;e.dueDay=Math.max(day,e.dueDay)+(choice==='blocker'?1:2);e.state='waiting';}
+ if(choice!=='defer'){e.extensionUsed=true;e.dueDay=addWorkdays(Math.max(day,e.dueDay),choice==='blocker'?1:2);e.state='waiting';}
  e.reactionKey='expect.reply.'+choice;
  c.time+=choice==='defer'?2:10;
  const event={id:`expect-${q.id}-${day}-${choice}`,day,kind:'obligation',key:e.reactionKey,actorId:workOwner[q.id],projectId:q.projectId,problemId:q.problemId,values:{characterId:c.activeCharacterId,work:q.id,choice}};
@@ -32,12 +34,13 @@ export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|
 }
 export function expectationPressure(c:Campaign){
  ensureWorkExpectations(c);
+ if(!isWorkday(c.life!.calendarDay))return;
  const l=c.life!,ch=c.characters.find(x=>x.id===c.activeCharacterId)!;
  l.obligations??=[];
  for(const q of l.queue){
   const e=q.expectation;
   if(!e||q.status==='done'||q.delegatedTo||e.state==='resolved'||l.calendarDay<=e.dueDay||e.lastReactionDay===l.calendarDay)continue;
-  const escalated=l.calendarDay>=e.dueDay+2;
+  const escalated=l.calendarDay>=addWorkdays(e.dueDay,2);
   e.state=escalated?'escalated':'overdue';e.lastReactionDay=l.calendarDay;
   e.reactionKey='expect.reaction.'+(escalated?'escalated':e.communication?'explained':'waiting');
   const npcId=workOwner[q.id];
