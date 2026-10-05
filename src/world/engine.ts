@@ -1,3 +1,4 @@
+import {newRunTiming} from './runTiming';
 import { createActionServices } from './actions/services';
 import { attendConference } from './conferences';
 import { resolveTaskTemplate } from '../content/scenarios';
@@ -25,6 +26,7 @@ export function transition(source: Campaign, action: Action): {
         if (!professionById[action.professionId] || !['start', 'create'].includes(c.phase))
             return { campaign: source, feedback };
         const fresh = emptyCampaign(), world = generateWorld(action.seed >>> 0), ch = makeCharacter(crypto.randomUUID(), action.name.trim().slice(0, 24) || 'Саша', action.avatarId, action.professionId);
+        ch.runTiming=newRunTiming();
         ch.currentProjectIds = [world.company.projects[0].id];
         const meta = c.meta;
         Object.assign(c, fresh, world, { activeCharacterId: ch.id, characters: [...world.characters, ch], phase: 'office' });

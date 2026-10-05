@@ -1,3 +1,4 @@
+import {newRunTiming} from '../runTiming';
 import { personalLifeSnapshot } from '../companyRuntime';
 import { startFirstDay } from '../firstDay';
 import { ensureLife, initLife, archiveCareer, endCareer } from '../life';
@@ -42,6 +43,7 @@ export function handleCareer(ctx: ActionContext, action: Action): TransitionResu
         archiveCareer(c, 'hired_successor');
         ch.playable = false;
         candidate.playable = true;
+        candidate.runTiming=newRunTiming();
         candidate.relationships.push({ characterId: ch.id, trust: 15 });
         ch.relationships.push({ characterId: candidate.id, trust: 15 });
         c.characters.push(candidate);

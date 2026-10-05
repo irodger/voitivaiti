@@ -1,3 +1,4 @@
+import {useRunTiming} from '../hooks/useRunTiming';
 import {InstallGame} from '../play/InstallGame';
 import {ThemeSettings} from '../play/ThemeSettings';
 import './themes.css';
@@ -36,7 +37,7 @@ const Team=lazy(()=>import('../play/Team').then(module=>({default:module.Team}))
 const EndedCareer=lazy(()=>import('../play/EndedCareer').then(module=>({default:module.EndedCareer})));
 type Tab='work'|'team'|'skills'|'home'|'career'|'company';
 const tabs=[{id:'work',Icon:BriefcaseBusiness},{id:'team',Icon:UsersRound},{id:'skills',Icon:ChartNoAxesColumnIncreasing},{id:'home',Icon:House},{id:'career',Icon:Flag},{id:'company',Icon:Building2}] as const;
-export default function App(){useAmbientAudio();const w=useWorld(),{t,locale,contentMode}=useI18n(),prefs=usePreferences(),ch=w.company?activeCharacter(w):undefined,[tab,setTab]=useState<Tab>('work'),[settings,setSettings]=useState(false),[confirm,setConfirm]=useState(false),[laptop,setLaptop]=useState(false),[toast,setToast]=useState('');const firstDay=!!ch?.firstDay&&!ch.firstDay.onboardingCompleted,firstScene=firstDay&&ch!.firstDay!.currentOnboardingStep!=='work';const onboarding=w.phase==='start'||w.phase==='create';
+export default function App(){useRunTiming();useAmbientAudio();const w=useWorld(),{t,locale,contentMode}=useI18n(),prefs=usePreferences(),ch=w.company?activeCharacter(w):undefined,[tab,setTab]=useState<Tab>('work'),[settings,setSettings]=useState(false),[confirm,setConfirm]=useState(false),[laptop,setLaptop]=useState(false),[toast,setToast]=useState('');const firstDay=!!ch?.firstDay&&!ch.firstDay.onboardingCompleted,firstScene=firstDay&&ch!.firstDay!.currentOnboardingStep!=='work';const onboarding=w.phase==='start'||w.phase==='create';
  const pageRef=useRef<HTMLDivElement>(null),previousPage=useRef(tab);
  useLayoutEffect(()=>{if(previousPage.current===tab)return;previousPage.current=tab;const page=pageRef.current;if(!page)return;page.scrollTop=0;page.querySelectorAll<HTMLElement>('.world-collection,.office-content').forEach(element=>{element.scrollTop=0;});if(typeof window.matchMedia==='function'&&window.matchMedia('(max-width:1023px)').matches)window.scrollTo({top:0,behavior:'instant'});},[tab]);
  const closeLaptop=useCallback(()=>{if(useWorld.getState().phase==='reward')useWorld.getState().dispatch({type:'reward-close'});setLaptop(false);},[]);
