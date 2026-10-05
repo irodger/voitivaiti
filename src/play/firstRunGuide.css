@@ -1,0 +1,3 @@
+.first-run-guide{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--app-line,#d9c8ef);border-radius:14px;background:var(--app-tint,#f4effc);color:var(--app-accent,#654699);margin-bottom:16px;flex-shrink:0}
+.first-run-guide>svg{flex-shrink:0;margin-top:2px}.first-run-guide b{font-size:12px;letter-spacing:.03em}.first-run-guide p{font-size:13px;line-height:1.6;margin:5px 0 0;color:inherit}.first-day .office-content{min-height:0;overflow:auto}.first-day .panel-action-slot{flex-shrink:0}.first-day form .primary-button{width:100%}
+@media(max-width:600px){.first-run-guide{padding:11px 12px;gap:9px}.first-run-guide p{font-size:12px}}
