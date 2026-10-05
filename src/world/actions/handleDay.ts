@@ -1,7 +1,7 @@
 import { gameConfig } from '../../config/game';
 import { currentWalk } from '../walk';
 import { carryQueue, finishOfficeHours } from '../workLoop';
-import { closeWorkDay, advanceCalendar, settleCalendarDay } from '../life';
+import { closeWorkDay, advanceToNextWorkday, settleCalendarDay } from '../life';
 import { homeState, recovery } from '../economy';
 import { clamp, history, makeSchedule } from '../simulation';
 import type { Action, TransitionResult } from './types';
@@ -13,8 +13,7 @@ export function handleDay(ctx: ActionContext, action: Action): TransitionResult 
             return { campaign: source, feedback };
         const stop = c.life!.montage.stop;
         c.life!.montage = null;
-        if (stop === 'recovery.return')
-            advanceCalendar(c);
+        advanceToNextWorkday(c);
         c.company.currentDay++;
         c.life!.playedDay++;
         carryQueue(c);
@@ -38,7 +37,7 @@ export function handleDay(ctx: ActionContext, action: Action): TransitionResult 
             ch.firstDay.currentOnboardingStep = 'done';
         }
         c.phase = 'home';
-        const settled = settleCalendarDay(c), home = homeState(ch);
+        const settled = settleCalendarDay(c,true), home = homeState(ch);
         if (home.paidDay !== c.company.currentDay) {
             const pay = settled.salary;
             ch.home = { ...home, paidDay: c.company.currentDay, lastPay: pay };
@@ -54,7 +53,7 @@ export function handleDay(ctx: ActionContext, action: Action): TransitionResult 
             return { campaign: source, feedback };
         const rest = recovery(ch);
         effects([{ target: 'energy', value: rest.energy }, { target: 'stress', value: -rest.stress }]);
-        advanceCalendar(c);
+        advanceToNextWorkday(c);
         c.life!.playedDay++;
         c.company.currentDay++;
         carryQueue(c);
