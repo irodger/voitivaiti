@@ -20,3 +20,14 @@ it('guides the actual first-day flow through reload without advancing it',()=>{
  c=transition(c,{type:'onboarding'}).campaign;c=transition(c,{type:'take-task'}).campaign;useWorld.setState(c);expect(renderToStaticMarkup(<FirstRunGuide/>)).toContain(translate('firstGuide.work'));
  activeCharacter(c).firstDay!.onboardingCompleted=true;useWorld.setState(c);expect(renderToStaticMarkup(<FirstRunGuide/>)).toBe('');
 });
+
+it('shows factual progress in either introduction order and keeps result in the work stage',()=>{
+ for(const firstChoice of ['team','project']){
+  let c=transition(emptyCampaign(),{type:'new',name:'Intro',avatarId:'1',professionId:'frontend',seed:1427}).campaign;
+  c=transition(c,{type:'onboarding',name:'Player'}).campaign;c=transition(c,{type:'onboarding',choice:firstChoice}).campaign;
+  useWorld.setState(c);let html=renderToStaticMarkup(<FirstRunGuide/>);expect(html).toContain('value="1"');expect(html).toContain('aria-current="step"');
+  c=transition(c,{type:'onboarding'}).campaign;useWorld.setState(c);expect(renderToStaticMarkup(<FirstRunGuide/>)).toContain('value="1"');
+  c=transition(c,{type:'onboarding'}).campaign;useWorld.setState(c);expect(renderToStaticMarkup(<FirstRunGuide/>)).toContain('value="2"');
+  c.phase='reward';useWorld.setState(c);html=renderToStaticMarkup(<FirstRunGuide/>);expect(html).toContain('value="4"');expect(html).toContain(translate('firstGuide.result'));
+ }
+});
