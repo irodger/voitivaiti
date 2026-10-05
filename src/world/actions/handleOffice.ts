@@ -1,7 +1,7 @@
 import {addWorkdays} from '../calendar';
 import { checkResponsibility } from '../responsibility';
 import { startPerspective, perspectiveAction } from '../perspective';
-import { communicateExpectation } from '../expectations';
+import { communicateExpectation, setWorkDeadline } from '../expectations';
 import { takeVacation } from '../life';
 import { selectPriority, reviewResponse, decision, montage } from '../life';
 import { availableTopics } from '../../content/contextDialogue';
@@ -103,7 +103,7 @@ export function handleOffice(ctx: ActionContext, action: Action): TransitionResu
         if (topic.id === 'context-review') {
             const q = c.life!.queue.find(q => q.id === 'review' && q.status !== 'done');
             if (q)
-                q.promisedDay = addWorkdays(c.life!.calendarDay,1);
+                setWorkDeadline(q,addWorkdays(c.life!.calendarDay,1));
         }
         if (ch.conversationRewardDay !== c.company.currentDay) {
             ch.conversationRewardDay = c.company.currentDay;

@@ -1,7 +1,7 @@
 import {addWorkdays,isWorkday,nextWorkdayOnOrAfter} from './calendar';
 import {changeStress} from './stress';
 import type {Campaign} from './types';
-import type {WorkKind} from './lifeTypes';
+import type {WorkItem,WorkKind} from './lifeTypes';
 import {ordinaryProblem} from './roleRouting';
 import {availableWork,workOwner} from './workLoop';
 import '../content/expectations';
@@ -17,6 +17,12 @@ export function ensureWorkExpectations(c:Campaign){
   if(['assigned','waiting'].includes(q.expectation.state))q.expectation.dueDay=nextWorkdayOnOrAfter(q.expectation.dueDay);
  }
 }
+/** One agreed date for queue promises and the colleague's visible expectation. */
+export function setWorkDeadline(q:WorkItem,day:number){
+ const dueDay=nextWorkdayOnOrAfter(day);
+ q.promisedDay=dueDay;
+ if(q.expectation){q.expectation.dueDay=dueDay;q.expectation.state='waiting';q.expectation.lastReactionDay=undefined;q.expectation.reactionKey=undefined;}
+}
 export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|'blocker'|'defer'){
  ensureWorkExpectations(c);
  const q=c.life!.queue.find(q=>q.id===id),e=q?.expectation;
@@ -25,7 +31,7 @@ export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|
  // A repeated promise is not a fresh postponement. It must lead to work or handoff.
  if(choice!=='defer'&&e.extensionUsed)return false;
  e.communication=choice;e.lastCommunicationDay=day;
- if(choice!=='defer'){e.extensionUsed=true;e.dueDay=addWorkdays(Math.max(day,e.dueDay),choice==='blocker'?1:2);e.state='waiting';}
+ if(choice!=='defer'){e.extensionUsed=true;setWorkDeadline(q,addWorkdays(Math.max(day,e.dueDay),choice==='blocker'?1:2));}
  e.reactionKey='expect.reply.'+choice;
  c.time+=choice==='defer'?2:10;
  const event={id:`expect-${q.id}-${day}-${choice}`,day,kind:'obligation',key:e.reactionKey,actorId:workOwner[q.id],projectId:q.projectId,problemId:q.problemId,values:{characterId:c.activeCharacterId,work:q.id,choice}};
