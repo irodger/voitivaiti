@@ -5,7 +5,7 @@ vi.mock('../content/localization',async original=>{const actual=await original<t
 vi.mock('../world/store',async original=>{const actual=await original<typeof import('../world/store')>();const hook=Object.assign((selector?: (state:ReturnType<typeof actual.useWorld.getState>)=>unknown)=>selector?selector(actual.useWorld.getState()):actual.useWorld.getState(),actual.useWorld);return {...actual,useWorld:hook};});
 import {FirstDay} from './FirstDay';
 import {transition} from '../world/engine';
-import {emptyCampaign,activeCharacter} from '../world/simulation';
+import {emptyCampaign,activeCharacter,activeTask} from '../world/simulation';
 import {useWorld} from '../world/store';
 import {translate} from '../content/localization';
 it('team introduction explains the scene and names the actual next destination',()=>{let c=transition(emptyCampaign(),{type:'new',name:'Intro',avatarId:'1',professionId:'frontend',seed:1427}).campaign;const f=activeCharacter(c).firstDay!;f.currentOnboardingStep='team';f.visited=['project'];useWorld.setState(c);let html=renderToStaticMarkup(<FirstDay/>);expect(html).toContain('team-intro-list');expect(html).toContain(translate('first.teamHelp'));expect(html).toContain(translate('first.toMeeting'));expect(html).not.toContain('aria-label="Поговорить:');f.visited=[];useWorld.setState(c);html=renderToStaticMarkup(<FirstDay/>);expect(html).toContain(translate('first.toProject'));});
@@ -30,4 +30,13 @@ it('shows factual progress in either introduction order and keeps result in the 
   c=transition(c,{type:'onboarding'}).campaign;useWorld.setState(c);expect(renderToStaticMarkup(<FirstRunGuide/>)).toContain('value="2"');
   c.phase='reward';useWorld.setState(c);html=renderToStaticMarkup(<FirstRunGuide/>);expect(html).toContain('value="4"');expect(html).toContain(translate('firstGuide.result'));
  }
+});
+
+import {TaskBrief} from './TaskBrief';
+it('opens the first task goal and reports completed stages and elapsed time from saved work',()=>{
+ let c=transition(emptyCampaign(),{type:'new',name:'Intro',avatarId:'1',professionId:'frontend',seed:1427}).campaign;
+ for(const action of [{type:'onboarding',name:'Player'},{type:'onboarding',choice:'team'},{type:'onboarding'},{type:'onboarding'},{type:'onboarding',choice:'ready'},{type:'onboarding'},{type:'take-task'}] as const)c=transition(c,action).campaign;
+ useWorld.setState(c);let task=activeTask(c)!;let html=renderToStaticMarkup(<TaskBrief task={task}/>);expect(html).toContain('<details open=""');expect(html).toContain(translate('taskScene.act'));expect(html).toContain('value="0"');
+ task.progress[task.currentStepId].status='completed';task.taskElapsedMinutes=23;c=JSON.parse(JSON.stringify(c));useWorld.setState(c);task=activeTask(c)!;html=renderToStaticMarkup(<TaskBrief task={task}/>);expect(html).toContain(translate('taskScene.checked'));expect(html).toContain(translate('ui.min',{value:23}));expect(html).toContain('value="1"');
+ activeCharacter(c).firstDay!.onboardingCompleted=true;useWorld.setState(c);html=renderToStaticMarkup(<TaskBrief task={task}/>);expect(html).not.toContain('first-task-status');expect(html).not.toContain('<details open=""');
 });

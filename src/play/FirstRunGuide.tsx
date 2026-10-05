@@ -22,7 +22,7 @@ const copy:Record<string,[string,string]>={
  meeting:['Выбери любую реплику. Это знакомство на ежедневной встрече, здесь нет неправильного ответа.','Choose any reply. This is an introduction at the daily meeting, with no wrong answer.'],
  brief:['Возьми первую задачу. Ноутбук откроется сразу: там ты увидишь условия и сделаешь первый шаг.','Take your first task. The laptop opens immediately so you can see the brief and take the first step.'],
  work:['Читай текущий шаг и выбирай действие внизу. Этапы сверху показывают путь; нужное приложение открывается автоматически. Незнакомые подчёркнутые слова можно нажимать.','Read the current step and choose an action below. The stages above show your path; the relevant app opens automatically. Click unfamiliar underlined terms for an explanation.'],
- result:['Проверь, что получилось и какие ограничения остались. Передай результат — затем можно закончить первый день.','Check the result and remaining limitations. Hand it over, then you can finish your first day.'],
+ result:['Проверь, что получилось и какие ограничения остались. Закрой итог — затем можно закончить первый день.','Check the result and remaining limitations. Close the summary, then you can finish your first day.'],
  farewell:['Первая работа позади. Закончи день: дома можно отдохнуть, а после сна начнётся следующий рабочий день.','Your first task is behind you. Finish the day: rest at home, then sleep to start the next workday.']
 };
 Object.entries(copy).forEach(([key,[ru,en]])=>text('firstGuide.'+key,ru,en));
