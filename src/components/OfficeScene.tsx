@@ -6,7 +6,7 @@ import { useI18n } from '../content/localization';
 import { useWorld } from '../world/store';
 function Plant({x,y,scale=1}:{x:number;y:number;scale?:number}){return <g transform={`translate(${x} ${y}) scale(${scale})`}><ellipse cy="34" rx="23" ry="8" fill="#59654b" opacity=".12"/><path d="M-16 5h32l-5 29h-22Z" fill="#c38561"/><ellipse cy="5" rx="16" ry="6" fill="#875b42"/><path d="M0 8v-65M0-18Q-29-50-24-62Q0-62 0-18M0-30Q25-65 30-48Q26-26 0-20M0-2Q-32-24-28-36Q-2-31 0-2M0 0Q27-32 33-20Q26 0 0 2" fill="#5d8262" stroke="#496c4e" strokeWidth="2"/></g>}
 function Desk({x,y,shirt='#799084',hair='#443d35',flip=false}:{x:number;y:number;shirt?:string;hair?:string;flip?:boolean}){return <g transform={`translate(${x} ${y}) ${flip?'scale(-1 1)':''}`}><ellipse cx="0" cy="107" rx="100" ry="20" fill="#526049" opacity=".1"/><path d="M-84 21v72m155-63v65" stroke="#8f6950" strokeWidth="8"/><path d="M-97-1 48-23 101 18-49 42Z" fill="#ddbd8e" stroke="#987951" strokeWidth="2"/><path d="M-97-1v9l48 43 150-25v-8L-49 42Z" fill="#c49d70"/><path d="M-13-15v-47l57-8v48Z" fill="#394a43" stroke="#293830" strokeWidth="3"/><path d="M-7-22v-34l44-7v34Z" fill="#94b9a5"/><path d="m0-48 19-3m-19 10 31-5m-31 12 20-3" stroke="#d8e9c3" strokeWidth="3"/><path d="M15-19v13m-13 3 30-5" stroke="#3e5148" strokeWidth="5"/><path d="m7 9 34-5 13 10-34 5Z" fill="#f1ead8"/><path d="M65-2v-14h12V-2q-6 4-12 0m12-10q10-2 6 7h-6" fill="#f4eee0" stroke="#ac835a" strokeWidth="2"/><path d="M-60 56v42m34-42v46" stroke="#3b4c43" strokeWidth="8"/><path d="m-65 103 10 5m25-1 11 2" stroke="#343d34" strokeWidth="8" strokeLinecap="round"/><path d="M-74 61V27q0-19 22-20t24 17v41Z" fill={shirt}/><path d="M-69 29-48 36-18 21" fill="none" stroke={shirt} strokeWidth="14" strokeLinecap="round"/><path d="m-22 22 10-4" stroke="#e3ad89" strokeWidth="8" strokeLinecap="round"/><path d="M-63 3v15h17V0" fill="#d59e77"/><ellipse cx="-54" cy="-13" rx="20" ry="24" fill="#e4b38c"/><path d="M-76-10q-8-34 21-30 25-4 22 23l-10-5-21 5v16Z" fill={hair}/><path d="M-76 43h38v26h-38Z" fill="#536d60" stroke="#344d40" strokeWidth="3"/><path d="M-57 69v38m-23 0 23-5 23 7" stroke="#45534a" strokeWidth="4"/></g>}
-export function OfficeScene({home=false,hero=false}:{home?:boolean;hero?:boolean}){
+export function OfficeScene({home=false,hero=false,onWork}:{home?:boolean;hero?:boolean;onWork?:()=>void}){
  const [selected,setSelected]=useState<string|null>(null); const id=useId().replaceAll(':','');const world=useWorld(),{t}=useI18n();const npc=world.characters.find(n=>n.id===selected);
  return <div className={`office-scene ${home?'home-scene':''} ${hero?'hero-scene':''} ${!home?'cinematic-office':''}`}>
   <div className="scene-top"><span><i className="live-dot"/>{home?t('ui.away'):t('ui.officeName',{name:t(world.company?.nameKey??'company.craft')})}</span><span>{home?'☾':t('ui.floor')}</span></div>
@@ -22,7 +22,7 @@ export function OfficeScene({home=false,hero=false}:{home?:boolean;hero?:boolean
   {!home&&<img className="office-render" src={hero?"./art/office-premium.webp":"./art/office-six.webp"} alt={t('ui.officeAlt')} fetchPriority="high"/>}
   {!home&&!hero&&world.company&&<OfficeSimulation onTalk={setSelected} paused={selected!==null}/>}
   <div className="scene-bottom"><Coffee size={15}/>{t(home?'ui.homeCaption':'ui.officeCaption')}</div>
-  {npc&&<Conversation npcId={npc.id} onClose={()=>setSelected(null)}/>}
+  {npc&&<Conversation onWork={onWork} npcId={npc.id} onClose={()=>setSelected(null)}/>}
  </div>
 }
 
