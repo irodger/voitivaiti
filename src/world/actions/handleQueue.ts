@@ -1,3 +1,4 @@
+import {waitingTask} from '../waitingTask';
 import { gameConfig } from '../../config/game';
 import { assignResponsibility } from '../responsibility';
 import { rankOf } from '../mastery';
@@ -7,7 +8,14 @@ import type { Action, TransitionResult } from './types';
 import type { ActionContext } from './context';
 export function handleQueue(ctx: ActionContext, action: Action): TransitionResult | undefined {
     const { c, source, feedback, ch, task, effects, tick, emit } = ctx;
-    if (action.type === 'pause-task') {
+    if(action.type==='wait-for-reply'){
+        const pending=c.tasks.find(t=>t.id===action.id);
+        if(!pending)return {campaign:source,feedback};
+        const state=waitingTask(c,pending);
+        if(!state.canWait)return {campaign:source,feedback};
+        tick(state.waitMinutes);
+    }
+    else if (action.type === 'pause-task') {
         if (!task || task.rewarded || !Object.values(task.progress).some(p => p.dependency && !p.dependency.ready))
             return { campaign: source, feedback };
         task.paused = true;
@@ -45,7 +53,7 @@ export function handleQueue(ctx: ActionContext, action: Action): TransitionResul
         if (!selected) {
             if (autonomy(ch) > 0 && ch.firstDay?.onboardingCompleted)
                 return { campaign: source, feedback };
-            selected = c.life!.queue.find(q => q.status === 'waiting' && availableWork(ch).includes(q.id));
+            selected = c.life!.queue.find(q => q.status === 'waiting' && availableWork(ch).includes(q.id)&&!c.tasks.some(t=>t.paused&&!t.rewarded&&t.characterId===ch.id&&t.workKind===q.id));
             if (!selected)
                 return { campaign: source, feedback };
             selected.status = 'selected';

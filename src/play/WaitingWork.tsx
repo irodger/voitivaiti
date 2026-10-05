@@ -18,6 +18,7 @@ export function WaitingWork(){
    {state.dependency&&<div className="waiting-work-person">{npc&&<CharacterAvatar id={npc.avatarId} size={36}/>}<div>{npc&&<b>{characterName(npc,t)}</b>}<small>{t('waitingWork.expected',{date:formatCalendarDate(state.dependency.dueDay,locale),time:formatTime(state.dependency.dueMinute)})}</small></div></div>}
    {!state.ready&&<><p className="waiting-work-count"><Clock3 size={14}/>{t(state.remaining>0?(state.today?'waitingWork.minutes':'waitingWork.future'):'waitingWork.waiting',{minutes:state.remaining})}</p><p>{t('waitingWork.tip')}</p></>}
    {!state.canResume&&<p>{t(w.phase==='office'?'waitingWork.busy':'waitingWork.offDuty')}</p>}
+   {state.canWait&&<><Button secondary onClick={()=>w.dispatch({type:'wait-for-reply',id:task.id})}>{t('waitingWork.wait',{minutes:state.waitMinutes})}</Button><p>{t('waitingWork.waitNote')}</p></>}
    <Button secondary disabled={!state.canResume} onClick={()=>w.dispatch({type:'resume-task',id:task.id})}>{t('story.resume')}</Button>
   </article>;
  })}</>;

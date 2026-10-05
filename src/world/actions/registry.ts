@@ -38,6 +38,7 @@ export const actionHandlers: Partial<Record<Action['type'], ActionHandler>> = {
     'conversation': handleOffice,
     'survey-open': handleOffice,
     'talk': handleOffice,
+    'wait-for-reply': handleQueue,
     'pause-task': handleQueue,
     'resume-task': handleQueue,
     'take-task': handleQueue,

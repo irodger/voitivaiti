@@ -1,5 +1,8 @@
 import {text} from './localization';
 [
+ ['only','Новая работа сейчас недоступна. Сохранённые задачи и ответы коллег — ниже.','No new work is available right now. Saved tasks and colleague replies are below.'],
+ ['wait','Подождать ответ · {minutes} мин','Wait for reply · {minutes} min'],
+ ['waitNote','Это расходует игровое время, без опыта и улучшения проекта. Можно вместо этого взять другую работу.','This spends game time without experience or project improvements. You can take other work instead.'],
  ['ready','Ответ получен','Reply received'],['pending','Ждём коллегу','Waiting for a colleague'],['expected','Ожидаемый ответ: {date}, {time}','Expected reply: {date}, {time}'],
  ['minutes','Ещё {minutes} игровых минут','{minutes} game minutes remaining'],['waiting','Срок ответа подошёл; ждём результат коллеги.','The expected reply time has arrived; the colleague’s result is still pending.'],
  ['future','Ответ ожидается в другой календарный день. Его готовность проверяется при продвижении игрового календаря.','The reply is expected on a later calendar day. Its availability is checked when the game calendar advances.'],

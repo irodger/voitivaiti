@@ -15,6 +15,9 @@ export type Action = {
     actionId: string;
     rowId: string;
 } | {
+    type: 'wait-for-reply';
+    id: string;
+} | {
     type: 'pause-task';
 } | {
     type: 'resume-task';

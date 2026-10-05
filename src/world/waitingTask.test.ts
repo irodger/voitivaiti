@@ -15,3 +15,21 @@ it('retains timing through reload and explains resume restrictions without losin
  loaded.activeTaskId=saved.id;expect(waitingTask(loaded,saved)).toMatchObject({busy:true,canResume:false});loaded.activeTaskId=null;loaded.phase='home';expect(waitingTask(loaded,saved).canResume).toBe(false);
  saved.progress[saved.currentStepId].dependency!.dueDay++;expect(waitingTask(loaded,saved).today).toBe(false);
 });
+
+import {deskAvailability} from './deskAvailability';
+it('spends only the needed game minutes, unlocks replies and grants no task experience',()=>{
+ const {c,task}=waiting();const before=structuredClone(activeCharacter(c)),project=structuredClone(c.company!.projects[0]),minutes=task.taskElapsedMinutes;
+ expect(waitingTask(c,task)).toMatchObject({canWait:true,waitMinutes:30});const after=transition(c,{type:'wait-for-reply',id:task.id}).campaign,saved=after.tasks.find(t=>t.id===task.id)!;
+ expect(after.time).toBe(c.time+30);expect(saved.progress[saved.currentStepId].dependency!.ready).toBe(true);expect(saved.taskElapsedMinutes).toBe(minutes);expect(activeCharacter(after).experience).toEqual(before.experience);expect(activeCharacter(after).skills).toEqual(before.skills);expect(after.company!.projects[0]).toEqual(project);
+ expect(transition(after,{type:'wait-for-reply',id:task.id}).campaign).toEqual(after);
+ const restored=migrateLegacy(JSON.parse(JSON.stringify(after)));const resumed=transition(restored,{type:'resume-task',id:task.id}).campaign;expect(activeTask(resumed)?.id).toBe(task.id);
+});
+it('caps waiting at the shift boundary and rejects waiting at home or during other work',()=>{
+ const {c,task}=waiting();c.time=1070;task.progress[task.currentStepId].dependency!.dueMinute=1100;expect(waitingTask(c,task).waitMinutes).toBe(10);
+ let after=transition(c,{type:'wait-for-reply',id:task.id}).campaign;expect(after.time).toBe(1080);expect(waitingTask(after,after.tasks.find(t=>t.id===task.id)!).canWait).toBe(false);
+ c.phase='home';expect(transition(c,{type:'wait-for-reply',id:task.id}).campaign).toEqual(c);c.phase='office';c.activeTaskId=task.id;expect(transition(c,{type:'wait-for-reply',id:task.id}).campaign).toEqual(c);
+});
+it('does not advertise the same paused task as new work',()=>{
+ const {c,task}=waiting();task.workKind='bug';c.life!.queue.forEach(q=>q.status=q.id==='bug'?'waiting':'done');expect(deskAvailability(c)).toMatchObject({eligible:[],reason:'waiting'});
+ const after=transition(c,{type:'take-task'}).campaign;expect(after.activeTaskId).toBeNull();expect(after.tasks).toHaveLength(c.tasks.length);
+});
