@@ -68,7 +68,7 @@ it('keeps promotion discussion available and exposes the hidden requirements',as
  const markup=renderToStaticMarkup(<PromotionCard nodeId="level-1"/>);
  expect(markup).toContain('Обсудить повышение');expect(markup).not.toContain('disabled');
  expect(markup).toContain('Самостоятельно исследовать рабочую проблему');expect(markup).not.toContain('5 / 90');
- expect(markup).toContain('Разобраться в разных типах проблем');expect(markup).toContain('Нет действующих предупреждений');
+ expect(markup).toContain('Разобраться в разных типах проблем');expect(markup).toContain('Повышению мешает предупреждение');
  expect(markup).not.toContain('Подтвердить повышение');
 });
 
