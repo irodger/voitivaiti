@@ -3,8 +3,9 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {emptyCampaign,activeCharacter} from '../world/simulation';
 import {transition} from '../world/engine';
 let campaign=transition(emptyCampaign(),{type:'new',name:'Promotion',avatarId:'1',professionId:'frontend',seed:1427}).campaign;
-vi.mock('../world/store',()=>({useWorld:()=>campaign}));
+vi.mock('../world/store',()=>({useWorld:(selector?:(state:typeof campaign)=>unknown)=>selector?selector(campaign):campaign}));
 vi.mock('../content/localization',async original=>{const actual=await original<typeof import('../content/localization')>();return {...actual,useI18n:()=>({t:(key:string,values?:Record<string,unknown>)=>key+(values?JSON.stringify(values):''),locale:'ru'})};});
+import {Skills} from './Skills';
 import {PromotionRequirements} from './PromotionRequirements';
 it('a warning shows the real level and remaining streak, without a boolean 0/1',()=>{
  activeCharacter(campaign).reviewStage=2;campaign.life!.goodDays=1;
@@ -20,4 +21,10 @@ it('recorded recent issues are separate from the recovery rule',()=>{
  campaign.life!.decisionHistory=[{day:campaign.life!.calendarDay,kind:'riskyDeploys'}];
  const html=renderToStaticMarkup(<PromotionRequirements nodeId="level-1"/>);
  expect(html).toContain('promotionClarity.issues');expect(html).toContain('life.riskyDeploys');expect(html).toContain('promotionClarity.rule');
+});
+
+it('the skills growth plan uses the same warning recovery explanation as career',()=>{
+ activeCharacter(campaign).reviewStage=1;campaign.life!.goodDays=2;
+ const html=renderToStaticMarkup(<Skills onWork={()=>{}}/>);
+ expect(html).toContain('promotionClarity.blocked');expect(html).toContain('&quot;days&quot;:1');expect(html).toContain('promotionClarity.work');expect(html).not.toContain('skillMap.plan');expect(html).not.toContain('promotion.warning');
 });
