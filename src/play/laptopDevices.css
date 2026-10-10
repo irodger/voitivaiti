@@ -1,0 +1,29 @@
+/* Hardware stays distinct from the selected in-game application and UI palette. */
+.world-game .laptop-shell[data-device="PacBook"]{background:linear-gradient(145deg,#dee2e9,#a5adbb);border-color:#c4cbd6;border-radius:25px 25px 19px 19px;box-shadow:0 30px 90px #10192a70,inset 0 1px #fff}
+.world-game .laptop-shell[data-device="PacBook"] .laptop-bezel>span{color:#596575;letter-spacing:1.4px}
+.world-game .laptop-shell[data-device="PacBook"] .laptop-bezel>button{color:#354153}
+.world-game .laptop-shell[data-device="PacBook"] .camera{background:#182132;border-color:#8b95a7;box-shadow:0 0 0 3px #bcc3ce}
+.world-game .laptop-shell[data-device="PacBook"] .laptop-chin{color:#465061;font-size:10px;letter-spacing:1.2px;font-weight:500}
+.world-game .laptop-shell[data-device="PacBook"] .laptop-base{background:linear-gradient(#e6e9ef,#9ca6b5)}
+.world-game .laptop-shell[data-device="PacBook"] .laptop-base i{background:#8f99a8}
+.world-game .laptop-shell[data-device="Hell"]{background:linear-gradient(145deg,#626c7c,#333d4c);border-color:#8490a1;border-radius:15px 15px 12px 12px}
+.world-game .laptop-shell[data-device="Hell"] .laptop-chin{color:#e0e5ed;font-size:11px;letter-spacing:1px;font-weight:700}
+.world-game .laptop-shell[data-device="Hell"] .laptop-base{background:linear-gradient(#a1aab8,#5e6a7b)}
+.world-game .laptop-shell[data-device="TankPad"]{background:linear-gradient(135deg,#292c32,#111419);border-color:#51565f;border-radius:9px 9px 6px 6px;box-shadow:0 30px 90px #080c1680,inset 0 1px #ffffff20}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-display{border-radius:3px}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-chin{color:#e4e5e7;font-size:11px;letter-spacing:.6px;font-weight:800;font-family:Consolas,monospace}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-chin span::after{content:"";display:inline-block;width:5px;height:5px;margin-left:5px;border-radius:50%;background:#f16a61;box-shadow:0 0 5px #ee655350;vertical-align:middle}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-base{background:linear-gradient(#484d56,#1b2028);border-radius:2px 2px 8px 8px}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-base i{background:#161b22}
+.laptop-taskbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;min-height:36px;padding:3px 12px;background:#dce2ec;border-top:1px solid #bbc5d5;color:#344258}
+.laptop-taskbar nav{display:flex;gap:5px;min-width:0}
+.world-game .laptop-taskbar button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:34px;min-height:30px;padding:5px 8px;border-radius:5px;border:1px solid transparent;background:transparent;color:#42516a;position:relative}
+.world-game .laptop-taskbar button.active{background:#fff;border-color:#b2bfd4;box-shadow:inset 0 -2px #5269a8}
+.world-game .laptop-taskbar button:hover{background:#f0f3f9}
+.world-game .laptop-taskbar button:focus-visible{outline:2px solid #785cc2;outline-offset:1px}
+.laptop-taskbar-status{display:flex;align-items:center;gap:8px;font-size:10px;font-variant-numeric:tabular-nums}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-taskbar{background:#20252d;border-color:#454c58;color:#c6ccd5;font-family:Consolas,monospace}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-taskbar button{color:#c6ccd5;border-radius:2px}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-taskbar button.active{background:#373f4b;border-color:#657082;box-shadow:inset 0 -2px #e98276}
+.world-game .laptop-shell[data-device="TankPad"] .laptop-taskbar button:hover{background:#414957}
+@media(max-width:600px){.laptop-taskbar{padding:3px 6px}.laptop-taskbar nav{gap:2px}.world-game .laptop-taskbar button{min-height:36px;padding:5px 6px}.laptop-taskbar-status{gap:5px}.laptop-taskbar-status>svg{display:none}}
