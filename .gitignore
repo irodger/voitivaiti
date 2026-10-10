@@ -5,3 +5,4 @@ dist/
 .vite/
 .pnpm-store/
 .tools/
+e2e-artifacts/

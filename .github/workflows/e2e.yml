@@ -1,0 +1,33 @@
+name: Profession E2E
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  professions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install testing browser and Linux libraries
+        run: npx puppeteer browsers install chrome --install-deps
+      - name: Profession journeys
+        run: npm run test:e2e
+      - name: Failure screenshots and diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: profession-e2e-failures
+          path: e2e-artifacts/
+          if-no-files-found: ignore
