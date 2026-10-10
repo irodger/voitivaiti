@@ -1,3 +1,6 @@
+import {paymentState,recordPaymentCompletion,deliverPaymentReply} from './paymentCausal';
+import {causalKey} from '../content/paymentCausalCopy';
+import {paymentCausalScene} from '../content/paymentCausalScenes';
 import type {Campaign,Problem,Task,TaskTemplate,SceneFamily} from './types';
 import {storyScene} from '../content/storyScenes';
 import {rankOf} from './mastery';
@@ -27,15 +30,35 @@ export function prepareEncounter(c:Campaign,task:Task,base:TaskTemplate,problem:
  if(!task.templateId.startsWith('lens.'))return;
  const story=ensureProblemStory(c,problem),ch=c.characters.find(n=>n.id===task.characterId)!,grade=rankOf(ch),last=story.encounters.at(-1),count=story.encounters.length;
  const chain=problem.paymentChain;
+ if(problem.category==='payment'&&(ch.profession==='frontend'||problem.paymentCausal||chain)){
+  const state=paymentState(problem),fresh=!last&&!chain;
+  if(state.cause==='fresh_problem'&&last){const prior=c.tasks.find(t=>t.id===last.taskId);if(prior?.outcome?.systemChanged===true){state.phase='stable';state.cause='verified_fix';}else if(story.limitations.length){state.cause='unresolved_limit';}state.previousDecisionId=last.taskId+':'+(Object.values(prior?.progress??{}).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome');state.originTaskId??=last.taskId;}
+  const inherited=chain?.stage==='fixed'&&chain.fixedBy!==ch.id;
+  task.encounter={cause:state.cause,causeKey:fresh?base.descriptionKey:state.cause==='mitigation_effect'?causalKey('effect'):problem.latestOutcomeKey,recurrenceKind:chain?.stage==='returned'?'same-symptom-new-condition':state.contractChanged?'external-contract-change':state.phase==='incident'?'accepted-risk-impact':undefined,previousDecisionId:state.previousDecisionId,version:story.version,grade,previousTaskId:state.lastTaskId??last?.taskId,originTaskId:chain?.taskId??state.originTaskId,previousActorId:chain?.fixedBy??chain?.actorId??last?.actorId,contextKeys:[...(fresh?[]:['story.past']),...(state.cause==='verified_fix'||chain?.stage==='fixed'?['story.stable']:[]),...(chain?.stage==='returned'?['story.environment']:[]),...story.limitations]};
+  if(inherited||state.phase==='stable'&&chain?.stage==='fixed'){
+   task.sceneFamily='review';task.scene=paymentChainScene(base,problem,true,inherited);if(state.contractChanged){const verify=task.scene.steps[0].actionFlow!.actions.find(a=>a.id==='verify-inherited');verify?.artifact?.rows.push({id:'new-contract',labelKey:causalKey('contractChanged'),detailKey:causalKey('statusVerified')});}return;
+  }
+  if(chain?.stage==='returned'&&!state.contractChanged&&state.phase==='dependency'){
+   task.sceneFamily='recurrence';task.scene=paymentChainScene(base,problem,false);
+   const extra=paymentCausalScene(base,problem,grade).steps[0].actionFlow!.actions;
+   task.scene.steps[0].actionFlow!.actions.find(a=>a.id==='trace')!.next=grade>=3?['causal-delegate','contract']:grade>=2?['contract','causal-backend','causal-metrics']:['contract','causal-backend'];
+   task.scene.steps[0].actionFlow!.actions.push(...extra.filter(a=>!['causal-network','causal-client','causal-contract-hypothesis'].includes(a.id)));
+   return;
+  }
+  if(fresh&&grade===0){
+   task.sceneFamily='investigation';task.scene=structuredClone(base);
+   const check=task.scene.steps.flatMap(s=>s.actionFlow?.actions??[]).find(a=>a.id==='verify-limited');
+   if(check?.outcome){check.observationKey=paymentChainKeys.temporary;check.outcome.summaryKey=paymentChainKeys.temporary;check.outcome.followupKey=paymentChainKeys.recurrence;}
+   return;
+  }
+  task.sceneFamily=state.phase==='stable'||state.phase==='review'?'review':state.phase==='incident'?'incident':grade>=3?'delegation':'dependency';
+  task.scene=paymentCausalScene(base,problem,grade);return;
+ }
+
  if(chain?.stage==='returned'&&ch.profession==='frontend'||chain?.stage==='fixed'){
   task.sceneFamily=chain.stage==='fixed'?'review':'recurrence';
   task.encounter={version:story.version,grade,previousTaskId:chain.fixedTaskId??chain.taskId,originTaskId:chain.taskId,previousActorId:chain.fixedBy??chain.actorId,contextKeys:[chain.stage==='fixed'?paymentChainKeys.fixed:paymentChainKeys.recurrence,...(chain.stage==='returned'?['story.environment']:[]),...story.limitations]};
   task.scene=paymentChainScene(base,problem,chain.stage==='fixed',chain.fixedBy!==ch.id);return;
- }
- if(problem.category==='payment'&&ch.profession==='frontend'&&!chain){
-  task.scene=structuredClone(base);
-  const check=task.scene.steps.flatMap(s=>s.actionFlow?.actions??[]).find(a=>a.id==='verify-limited')!;
-  check.observationKey=paymentChainKeys.temporary;check.outcome!.summaryKey=paymentChainKeys.temporary;check.outcome!.followupKey=paymentChainKeys.recurrence;
  }
  let family:SceneFamily='investigation';
  if(grade>=3)family=count%2?'coordination':'delegation';
@@ -67,12 +90,13 @@ export function recordEncounter(c:Campaign,task:Task,problem:Problem){
  }else if(problem.paymentChain?.stage==='fixed'&&problem.paymentChain.fixedBy!==ch.id&&actions.includes('verify-inherited')&&actions.includes('handoff')){
   problem.paymentChain.stage='verified';problem.paymentChain.verifiedBy=ch.id;problem.status='resolved';
  }
- story.encounters.push({taskId:task.id,actorId:task.characterId,profession:ch.profession,grade:task.encounter?.grade??rankOf(ch),family:task.sceneFamily??'investigation',version:task.encounter?.version??story.version,approach,debtImpact,riskKeys:task.outcome?.kind==='temporary'?[task.outcome.summaryKey]:[],result:task.outcome?.kind??'checked',observations,day:c.life!.calendarDay});
+ recordPaymentCompletion(c,task,problem);
+ story.encounters.push({taskId:task.id,cause:task.encounter?.cause,previousDecisionId:task.encounter?.previousDecisionId,actorId:task.characterId,profession:ch.profession,grade:task.encounter?.grade??rankOf(ch),family:task.sceneFamily??'investigation',version:task.encounter?.version??story.version,approach,debtImpact,riskKeys:task.outcome?.kind==='temporary'?[task.outcome.summaryKey]:[],result:task.outcome?.kind??'checked',observations,day:c.life!.calendarDay});
  story.affectedRoles=[...new Set([...story.affectedRoles,ch.profession])];
  story.observations=[...new Set([...story.observations,...observations])].slice(-12);
  if(task.outcome?.kind==='temporary')story.limitations=[...new Set([...story.limitations,task.outcome.summaryKey])];
  else if(task.outcome?.systemChanged===true){story.version++;story.limitations=[];story.change=undefined;}
- const event={id:task.id+':encounter',day:c.life!.calendarDay,kind:'problem-encounter',key:task.outcome?.summaryKey??'story.past',actorId:task.characterId,projectId:task.projectId,problemId:task.problemId,values:{family:task.sceneFamily??'investigation',version:story.version,approach}};
+ const event={id:task.id+':encounter',day:c.life!.calendarDay,kind:'problem-encounter',key:task.outcome?.summaryKey??'story.past',actorId:task.characterId,projectId:task.projectId,problemId:task.problemId,values:{cause:task.encounter?.cause??'legacy',previousDecisionId:task.encounter?.previousDecisionId??'',family:task.sceneFamily??'investigation',version:story.version,approach}};
  problem.history.push(event);
 }
 export function refreshTaskReplies(c:Campaign){
@@ -80,5 +104,6 @@ export function refreshTaskReplies(c:Campaign){
   const d=progress.dependency;if(!d||d.ready)continue;
   const job=c.company!.delegations?.find(job=>job.id===d.delegationId);
   d.ready=d.delegationId?!!job&&job.status!=='working':c.life!.calendarDay>d.dueDay||(c.life!.calendarDay===d.dueDay&&c.time>=d.dueMinute);
+  deliverPaymentReply(c,task,progress);
  }
 }

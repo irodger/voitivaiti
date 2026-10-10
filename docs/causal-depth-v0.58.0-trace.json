@@ -1,0 +1,430 @@
+{
+  "scope": "engine fixture: deliberately bound payment encounters, not a natural playthrough",
+  "problemId": "problem-1427-0-1",
+  "encounters": [
+    {
+      "taskId": "task-1-0-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "fresh_problem",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "investigation",
+      "version": 1,
+      "approach": "inspect → trace → limited → verify-limited → handoff",
+      "debtImpact": 2,
+      "riskKeys": [
+        "payment.chain.temporary"
+      ],
+      "result": "temporary",
+      "observations": [
+        "lens.frontend.payment.inspect.observation",
+        "lens.frontend.payment.trace.observation",
+        "lens.frontend.payment.limited.observation",
+        "payment.chain.temporary",
+        "lens.frontend.payment.handoff.limited"
+      ],
+      "day": 1
+    },
+    {
+      "taskId": "task-1-1-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "qa_reproduction",
+      "previousDecisionId": "task-1-0-60abc971-a8e3-4747-a352-ae10d1592209:limited",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "recurrence",
+      "version": 1,
+      "approach": "previous → trace → contract → shared → verify-shared → handoff",
+      "debtImpact": -2,
+      "riskKeys": [],
+      "result": "durable",
+      "observations": [
+        "payment.chain.temporary",
+        "payment.chain.recurrence",
+        "payment.chain.contract.observation",
+        "payment.chain.repair.observation",
+        "payment.chain.fixed",
+        "payment.chain.fixed"
+      ],
+      "day": 5
+    },
+    {
+      "taskId": "task-1-2-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "returned_review",
+      "previousDecisionId": "task-1-1-60abc971-a8e3-4747-a352-ae10d1592209:shared",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "review",
+      "version": 2,
+      "approach": "causal-diff → causal-comment → causal-wait-rework → causal-rework → causal-return",
+      "debtImpact": 0,
+      "riskKeys": [
+        "payment.causal.deferred"
+      ],
+      "result": "temporary",
+      "observations": [
+        "payment.causal.reviewOld",
+        "payment.causal.reviewComment",
+        "payment.causal.reviewComment",
+        "payment.causal.reviewNew",
+        "payment.causal.deferred"
+      ],
+      "day": 6
+    },
+    {
+      "taskId": "task-1-3-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "qa_reproduction",
+      "previousDecisionId": "task-1-2-60abc971-a8e3-4747-a352-ae10d1592209:causal-return",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "dependency",
+      "version": 2,
+      "approach": "causal-network → causal-client → causal-backend → causal-wait-backend → causal-reply → causal-qa → causal-defer",
+      "debtImpact": 0,
+      "riskKeys": [
+        "payment.causal.deferred"
+      ],
+      "result": "temporary",
+      "observations": [
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.backendReply",
+        "payment.causal.qaEvidence",
+        "payment.causal.deferred"
+      ],
+      "day": 7
+    },
+    {
+      "taskId": "task-1-4-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "unresolved_limit",
+      "previousDecisionId": "60abc971-a8e3-4747-a352-ae10d1592209:oleg:payment-causal:problem-1427-0-1:1:task-1-3-60abc971-a8e3-4747-a352-ae10d1592209:qa_reproduction:scope",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "review",
+      "version": 2,
+      "approach": "causal-diff → causal-bounded",
+      "debtImpact": 0,
+      "riskKeys": [
+        "payment.causal.risk"
+      ],
+      "result": "temporary",
+      "observations": [
+        "payment.causal.reviewOld",
+        "payment.causal.risk"
+      ],
+      "day": 9
+    },
+    {
+      "taskId": "task-1-5-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "accepted_risk",
+      "previousDecisionId": "task-1-4-60abc971-a8e3-4747-a352-ae10d1592209:causal-bounded",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "incident",
+      "version": 2,
+      "approach": "causal-triage → causal-contain → causal-wait-effect → causal-observe → causal-investigate",
+      "debtImpact": 0,
+      "riskKeys": [
+        "payment.causal.effect"
+      ],
+      "result": "temporary",
+      "observations": [
+        "payment.causal.incident",
+        "payment.causal.mitigated",
+        "payment.causal.mitigated",
+        "payment.causal.effect",
+        "payment.causal.effect"
+      ],
+      "day": 13
+    },
+    {
+      "taskId": "task-1-6-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "qa_reproduction",
+      "previousDecisionId": "task-1-5-60abc971-a8e3-4747-a352-ae10d1592209:causal-investigate",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "dependency",
+      "version": 2,
+      "approach": "causal-network → causal-client → causal-backend → causal-wait-backend → causal-reply → causal-contract → causal-repair → causal-verify",
+      "debtImpact": 0,
+      "riskKeys": [],
+      "result": "durable",
+      "observations": [
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.backendPendingReply",
+        "payment.causal.contractRule",
+        "payment.causal.repairBuilt",
+        "payment.causal.proper"
+      ],
+      "day": 14
+    },
+    {
+      "taskId": "task-1-7-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "backend_contract",
+      "previousDecisionId": "task-1-6-60abc971-a8e3-4747-a352-ae10d1592209:causal-verify",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "dependency",
+      "version": 3,
+      "approach": "causal-network → causal-client → causal-backend → causal-wait-backend → causal-reply → causal-contract → causal-defer",
+      "debtImpact": 0,
+      "riskKeys": [
+        "payment.causal.deferred"
+      ],
+      "result": "temporary",
+      "observations": [
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.backendPendingReply",
+        "payment.causal.contractChanged",
+        "payment.causal.deferred"
+      ],
+      "day": 19
+    },
+    {
+      "taskId": "task-1-8-60abc971-a8e3-4747-a352-ae10d1592209",
+      "cause": "qa_reproduction",
+      "previousDecisionId": "task-1-7-60abc971-a8e3-4747-a352-ae10d1592209:causal-defer",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "profession": "frontend",
+      "grade": 0,
+      "family": "dependency",
+      "version": 3,
+      "approach": "causal-network → causal-client → causal-backend → causal-wait-backend → causal-reply → causal-qa → causal-repair → causal-verify",
+      "debtImpact": 0,
+      "riskKeys": [],
+      "result": "durable",
+      "observations": [
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.qaEvidence",
+        "payment.causal.backendPendingReply",
+        "payment.causal.qaEvidence",
+        "payment.causal.repairBuilt",
+        "payment.causal.proper"
+      ],
+      "day": 20
+    },
+    {
+      "taskId": "task-1-9-max",
+      "cause": "verified_fix",
+      "previousDecisionId": "task-1-8-60abc971-a8e3-4747-a352-ae10d1592209:causal-verify",
+      "actorId": "max",
+      "profession": "qa",
+      "grade": 2,
+      "family": "review",
+      "version": 4,
+      "approach": "inspect-inherited → verify-inherited → handoff",
+      "debtImpact": 0,
+      "riskKeys": [],
+      "result": "durable",
+      "observations": [
+        "payment.chain.fixed",
+        "payment.chain.verified",
+        "payment.chain.verified"
+      ],
+      "day": 20
+    }
+  ],
+  "state": {
+    "phase": "stable",
+    "cause": "verified_fix",
+    "revision": 2,
+    "peerRevision": 1,
+    "originTaskId": "task-1-0-60abc971-a8e3-4747-a352-ae10d1592209",
+    "lastTaskId": "task-1-9-max",
+    "previousDecisionId": "task-1-8-60abc971-a8e3-4747-a352-ae10d1592209:causal-verify",
+    "pending": [],
+    "facts": [
+      "payment.causal.qaEvidence",
+      "payment.causal.reviewDue",
+      "payment.causal.reviewComment",
+      "payment.causal.reviewNew",
+      "payment.causal.backendReply",
+      "payment.causal.scope",
+      "payment.causal.risk",
+      "payment.causal.incident",
+      "payment.causal.mitigated",
+      "payment.causal.effect",
+      "payment.causal.backendPendingReply",
+      "payment.causal.proper",
+      "payment.causal.contractChanged"
+    ],
+    "acceptedRisk": false,
+    "scope": "full",
+    "metrics": {
+      "duplicates": 0,
+      "pending": 0
+    },
+    "contractChanged": true
+  },
+  "history": [
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-0-60abc971-a8e3-4747-a352-ae10d1592209:limited:evidence",
+      "day": 5,
+      "kind": "payment-causal",
+      "key": "payment.causal.qaEvidence",
+      "actorId": "max",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-1-60abc971-a8e3-4747-a352-ae10d1592209:shared:review",
+      "day": 6,
+      "kind": "payment-causal",
+      "key": "payment.causal.reviewDue",
+      "actorId": "ilya",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-2-60abc971-a8e3-4747-a352-ae10d1592209:causal-comment",
+      "day": 6,
+      "kind": "payment-causal",
+      "key": "payment.causal.reviewComment",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-2-60abc971-a8e3-4747-a352-ae10d1592209:rework-delivered",
+      "day": 6,
+      "kind": "payment-causal",
+      "key": "payment.causal.reviewNew",
+      "actorId": "ilya",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-2-60abc971-a8e3-4747-a352-ae10d1592209:causal-rework",
+      "day": 6,
+      "kind": "payment-causal",
+      "key": "payment.causal.reviewNew",
+      "actorId": "ilya",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-2-60abc971-a8e3-4747-a352-ae10d1592209:causal-return:evidence",
+      "day": 7,
+      "kind": "payment-causal",
+      "key": "payment.causal.qaEvidence",
+      "actorId": "max",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-3-60abc971-a8e3-4747-a352-ae10d1592209:causal-defer:evidence",
+      "day": 8,
+      "kind": "payment-causal",
+      "key": "payment.causal.qaEvidence",
+      "actorId": "max",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "60abc971-a8e3-4747-a352-ae10d1592209:oleg:payment-causal:problem-1427-0-1:1:task-1-3-60abc971-a8e3-4747-a352-ae10d1592209:qa_reproduction:scope:scope",
+      "day": 9,
+      "kind": "payment-causal",
+      "key": "payment.causal.scope",
+      "actorId": "oleg",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-4-60abc971-a8e3-4747-a352-ae10d1592209:causal-bounded",
+      "day": 9,
+      "kind": "payment-causal",
+      "key": "payment.causal.risk",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-4-60abc971-a8e3-4747-a352-ae10d1592209:causal-bounded:incident",
+      "day": 13,
+      "kind": "payment-causal",
+      "key": "payment.causal.incident",
+      "actorId": "max",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-5-60abc971-a8e3-4747-a352-ae10d1592209:causal-contain",
+      "day": 13,
+      "kind": "payment-causal",
+      "key": "payment.causal.mitigated",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-5-60abc971-a8e3-4747-a352-ae10d1592209:causal-observe",
+      "day": 13,
+      "kind": "payment-causal",
+      "key": "payment.causal.effect",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-5-60abc971-a8e3-4747-a352-ae10d1592209:causal-investigate:evidence",
+      "day": 14,
+      "kind": "payment-causal",
+      "key": "payment.causal.qaEvidence",
+      "actorId": "max",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-6-60abc971-a8e3-4747-a352-ae10d1592209:causal-verify",
+      "day": 14,
+      "kind": "payment-causal",
+      "key": "payment.causal.proper",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-6-60abc971-a8e3-4747-a352-ae10d1592209:causal-verify:contract",
+      "day": 19,
+      "kind": "payment-causal",
+      "key": "payment.causal.contractChanged",
+      "actorId": "sergey",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-7-60abc971-a8e3-4747-a352-ae10d1592209:causal-defer:evidence",
+      "day": 20,
+      "kind": "payment-causal",
+      "key": "payment.causal.qaEvidence",
+      "actorId": "max",
+      "problemId": "problem-1427-0-1"
+    },
+    {
+      "projectId": "project-1427-0",
+      "id": "task-1-8-60abc971-a8e3-4747-a352-ae10d1592209:causal-verify",
+      "day": 20,
+      "kind": "payment-causal",
+      "key": "payment.causal.proper",
+      "actorId": "60abc971-a8e3-4747-a352-ae10d1592209",
+      "problemId": "problem-1427-0-1"
+    }
+  ]
+}

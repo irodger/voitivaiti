@@ -1,3 +1,4 @@
+import {applyPaymentAction} from '../paymentCausal';
 import { recordEncounter } from '../problemStories';
 import { handoffCandidate } from '../responsibility';
 import { assignResponsibility, checkResponsibility } from '../responsibility';
@@ -102,9 +103,9 @@ export function handleTask(ctx: ActionContext, action: Action): TransitionResult
         progress.responseKey = undefined;
         tick(next.minutes, task);
         if (next.dependency) {
-            const q = c.life!.queue.find(q => q.id === task.workKind), npc = q && handoffCandidate(c, q);
+            const q = c.life!.queue.find(q => q.id === task.workKind), npc = next.dependencyRole?c.characters.find(n=>n.id!==ch.id&&n.employed&&n.profession===next.dependencyRole):q && handoffCandidate(c, q);
             if (npc) {
-                progress.dependency = { npcId: npc.id, dueDay: c.life!.calendarDay, dueMinute: c.time + 30, ready: false };
+                progress.dependency = { npcId: npc.id, dueDay: c.life!.calendarDay, dueMinute: c.time + 30, ready: false, responseKey:next.dependencyResponseKey };
                 if (next.delegates && q && assignResponsibility(c, q.id, npc.id)) {
                     const job = c.company.delegations!.at(-1)!;
                     job.dueDay = c.life!.calendarDay;
@@ -113,8 +114,10 @@ export function handleTask(ctx: ActionContext, action: Action): TransitionResult
                 }
             }
             else
-                progress.dependency = { npcId: template!.author, dueDay: c.life!.calendarDay, dueMinute: c.time + 30, ready: false };
+                progress.dependency = { npcId: template!.author, dueDay: c.life!.calendarDay, dueMinute: c.time + 30, ready: false, responseKey:next.dependencyResponseKey };
         }
+        if(next.id==='causal-delegate'&&!progress.dependency?.delegationId)progress.observations![next.id]='payment.causal.delegateBusy';
+        applyPaymentAction(c,task,next);
         if (next.completes && progress.dependency?.delegationId)
             checkResponsibility(c, progress.dependency.delegationId, next.id === 'bounded-result' ? 'clarify' : 'accept');
         task.attemptsByStep[step.id] = (task.attemptsByStep[step.id] ?? 0) + 1;

@@ -1,3 +1,4 @@
+import {choosePaymentConversation} from '../paymentCausal';
 import {addWorkdays} from '../calendar';
 import { checkResponsibility } from '../responsibility';
 import { startPerspective, perspectiveAction } from '../perspective';
@@ -98,8 +99,10 @@ export function handleOffice(ctx: ActionContext, action: Action): TransitionResu
         const key = action.npcId + ':' + action.topicId;
         if (!npc || !topic || !choice || ch.conversations?.[key])
             return { campaign: source, feedback };
+        if(topic.paymentProblemId&&!choosePaymentConversation(c,topic.paymentProblemId,choice.id,npc.id,[ch.id,npc.id,topic.id,choice.id].join(':')))return {campaign:source,feedback};
         ch.conversations = { ...ch.conversations, [key]: choice.id };
         ch.dialogueHistory = { ...ch.dialogueHistory, [key]: { topic, choiceId: choice.id, day: c.life!.calendarDay } };
+        if(topic.paymentProblemId){emit('conversation_choice',{characterId:npc.id,topicId:topic.id,choiceId:choice.id});return;}
         if (topic.id === 'context-review') {
             const q = c.life!.queue.find(q => q.id === 'review' && q.status !== 'done');
             if (q)

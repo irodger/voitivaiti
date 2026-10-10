@@ -21,7 +21,7 @@ export function recordWorkExperience(c:Campaign,task:Task){
  if(did(['verify-shared','verify-limited','verified-result','bounded-result'])&&did(['handoff']))add('ownership');
  if(did(['inspect-review','comment','approve-bounds']))add('review');
  if(task.outcome?.systemChanged===true&&did(['verify-shared','verified-result']))add('production');
- if(performed.some(a=>a.delegates))add('delegation');
+ if(performed.some(a=>a.delegates&&(a.id!=='causal-delegate'||Object.values(task.progress).some(p=>p.dependency?.delegationId))))add('delegation');
  // Legacy mechanics have completion evidence even without an action log.
  const mechanical=completed.filter(s=>!s.actionFlow);
  if(mechanical.some(s=>['planning','estimate','resource-allocation','dependency-map','architecture-diagram'].includes(s.type)))add('planning');
