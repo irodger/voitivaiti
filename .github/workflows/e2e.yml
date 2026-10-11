@@ -26,7 +26,8 @@ jobs:
       - name: Allow testing browser sandbox in AppArmor
         # Ubuntu restricts user namespaces for Chrome for Testing by default.
         run: |
-          chrome_path="$(node --input-type=module -e 'import puppeteer from "puppeteer"; console.log(puppeteer.executablePath());')"
+          chrome_path="$(node --input-type=module -e 'import puppeteer from "puppeteer"; console.log(await puppeteer.executablePath());')"
+          test -x "$chrome_path"
           sudo tee /etc/apparmor.d/puppeteer-chrome > /dev/null <<EOF
           abi <abi/4.0>,
           include <tunables/global>
