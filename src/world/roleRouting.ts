@@ -1,3 +1,4 @@
+import {causalContext} from './causalRouting';
 import {paymentEncounterAvailable} from './paymentCausal';
 import type {Campaign} from './types';
 import type {WorkKind} from './lifeTypes';
@@ -11,13 +12,16 @@ export function ordinaryProblem(c:Campaign,kind:WorkKind='bug'){
  if(inherited)return {project,problem:inherited};
  const returned=project.problems.find(p=>p.category==='payment'&&p.paymentCausal?.ready&&paymentEncounterAvailable(p,ch.id));
  if(returned&&(kind==='bug'||kind==='support'))return {project,problem:returned};
+ const continuing=project.problems.filter(p=>supportedLensCategory(p.category)&&causalContext(c,p));
+ continuing.sort((a,b)=>{const x=causalContext(c,a)!,y=causalContext(c,b)!;return Number(y.family==='incident')-Number(x.family==='incident')||x.day-y.day||a.id.localeCompare(b.id);});
+ if(continuing.length)return {project,problem:continuing[0]};
  const item=c.life?.queue.find(q=>q.id===kind);
  const bound=c.company!.projects.find(p=>p.id===item?.projectId)?.problems.find(p=>p.id===item?.problemId);
  if(bound&&supportedLensCategory(bound.category)&&paymentEncounterAvailable(bound,ch.id))return {project:c.company!.projects.find(p=>p.id===item!.projectId)!,problem:bound};
  const preference=kind==='feature'?'interface':kind==='debt'?'performance':kind==='support'?'payment':undefined;
  const candidates=project.problems.filter(p=>supportedLensCategory(p.category)&&paymentEncounterAvailable(p,ch.id));
- candidates.sort((a,b)=>Number(b.status!=='resolved')-Number(a.status!=='resolved')||Number(b.category===preference)-Number(a.category===preference)||
-  (b.severity+(b.workaround?4:0)-(b.category==='payment'?0:3*(b.story?.encounters.length??ch.scenarioCounts[`lens.${ch.profession}.${b.category}`]??0)))-(a.severity+(a.workaround?4:0)-(a.category==='payment'?0:3*(a.story?.encounters.length??ch.scenarioCounts[`lens.${ch.profession}.${a.category}`]??0)))||a.id.localeCompare(b.id));
+ candidates.sort((a,b)=>Number(!!a.story?.encounters.length)-Number(!!b.story?.encounters.length)||Number(b.status!=='resolved')-Number(a.status!=='resolved')||Number(b.category===preference)-Number(a.category===preference)||
+  (b.severity+(b.workaround?4:0))-(a.severity+(a.workaround?4:0))||a.id.localeCompare(b.id));
  return {project,problem:candidates[0]};
 }
 export function ordinaryTemplateId(c:Campaign,kind:WorkKind){

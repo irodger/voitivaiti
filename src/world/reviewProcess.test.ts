@@ -1,5 +1,6 @@
 import {describe,it,expect,vi} from 'vitest';
 vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
+import {advanceCalendar} from './life';
 import {transition} from './engine';
 import {activeCharacter,activeTask,emptyCampaign,makeSchedule} from './simulation';
 import {finishPlaytestTask} from './playtestHelpers';
@@ -8,7 +9,7 @@ import {availableTechnicalActions} from './technicalActions';
 import {migrateLegacy} from './store';
 import type {Campaign} from './types';
 function assign(c:Campaign){const p=c.company!.projects[0],q=c.life!.queue.find(q=>q.id==='bug')!;q.status='selected';q.explained=true;q.projectId=p.id;q.problemId=p.problems.find(p=>p.category==='interface')!.id;c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';return transition(c,{type:'take-task'}).campaign;}
-function startReview(){let c=transition(emptyCampaign(),{type:'new',name:'Review',avatarId:'1',professionId:'frontend',seed:1427}).campaign;delete activeCharacter(c).firstDay;activeCharacter(c).completedWork=['one','two'];c=assign(finishPlaytestTask(assign(c)));expect(activeTask(c)!.sceneFamily).toBe('review');return c;}
+function startReview(){let c=transition(emptyCampaign(),{type:'new',name:'Review',avatarId:'1',professionId:'frontend',seed:1427}).campaign;delete activeCharacter(c).firstDay;activeCharacter(c).completedWork=['one','two'];c=finishPlaytestTask(assign(c));const due=activeTask(c)!.outcome!.delayDays+c.life!.calendarDay;while(c.life!.calendarDay<due)advanceCalendar(c);c=assign(c);expect(activeTask(c)!.sceneFamily).toBe('review');return c;}
 const act=(c:Campaign,id:string)=>transition(c,{type:'technical-action',id}).campaign;
 function state(c:Campaign){const task=activeTask(c)!,step=resolveTaskTemplate(task).steps[0];return {task,step,progress:task.progress[step.id]};}
 describe('review as a colleague process',()=>{

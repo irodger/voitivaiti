@@ -26,14 +26,14 @@ describe('v0.24 confirmed responsibility',()=>{
  });
  it('120 ordinary assignments reach Senior without optional mentoring',()=>{
   let c=start();for(let i=0;i<120;i++){
-   c=work(c,['interface','payment','performance'][i%3]);
+   c=work(c,['interface','payment','performance'][i%3],i%4===0?'limited':'shared');advanceCalendar(c);
    for(const node of ['level-1','level-2'])if(canPromote(activeCharacter(c),node))c=act(c,{type:'promote',nodeId:node});
   }
   expect(activeCharacter(c).completedWork.length).toBe(122);
   expect(activeCharacter(c).careerNodeId).toBe('level-2');
   expect(activeCharacter(c).experience!.some(e=>e.tags.includes('mentoring'))).toBe(false);
   expect(canPromote(activeCharacter(c),'level-3')).toBe(false);
- },30000);
+ },60000);
  it('repeating one context or unconfirmed tags cannot substitute for diversity',()=>{
   let c=start();for(let i=0;i<10;i++)c=work(c,'interface');
   rememberExperience(c,['delegation','people','ownership','planning'],'click','ui.work');

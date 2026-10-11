@@ -1,7 +1,8 @@
+import {causalContext} from './causalRouting';
 import {paymentState,recordPaymentCompletion,deliverPaymentReply} from './paymentCausal';
 import {causalKey} from '../content/paymentCausalCopy';
 import {paymentCausalScene} from '../content/paymentCausalScenes';
-import type {Campaign,Problem,Task,TaskTemplate,SceneFamily} from './types';
+import type {Campaign,Problem,Task,TaskTemplate} from './types';
 import {storyScene} from '../content/storyScenes';
 import {rankOf} from './mastery';
 import {paymentChainKeys,paymentChainScene} from '../content/paymentChain';
@@ -28,7 +29,7 @@ export function ensureProblemStory(c:Campaign,problem:Problem){
 }
 export function prepareEncounter(c:Campaign,task:Task,base:TaskTemplate,problem:Problem){
  if(!task.templateId.startsWith('lens.'))return;
- const story=ensureProblemStory(c,problem),ch=c.characters.find(n=>n.id===task.characterId)!,grade=rankOf(ch),last=story.encounters.at(-1),count=story.encounters.length;
+ const story=ensureProblemStory(c,problem),ch=c.characters.find(n=>n.id===task.characterId)!,grade=rankOf(ch),last=story.encounters.at(-1);
  const chain=problem.paymentChain;
  if(problem.category==='payment'){
   const state=paymentState(problem),fresh=!last&&!chain;
@@ -61,19 +62,13 @@ export function prepareEncounter(c:Campaign,task:Task,base:TaskTemplate,problem:
   task.encounter={version:story.version,grade,previousTaskId:chain.fixedTaskId??chain.taskId,originTaskId:chain.taskId,previousActorId:chain.fixedBy??chain.actorId,contextKeys:[chain.stage==='fixed'?paymentChainKeys.fixed:paymentChainKeys.recurrence,...(chain.stage==='returned'?['story.environment']:[]),...story.limitations]};
   task.scene=paymentChainScene(base,problem,chain.stage==='fixed',chain.fixedBy!==ch.id);return;
  }
- let family:SceneFamily='investigation';
- if(grade>=3)family=count%2?'coordination':'delegation';
- else if(problem.workaround&&count&&count%2)family='recurrence';
- else if(count||grade){
-  const families:SceneFamily[]=grade>=2?['dependency','review','incident','artifact','coordination']:['artifact','review','dependency','incident','coordination'];
-  family=families[count%families.length];
- }
- // A new report names its changed condition. A verified earlier result remains in history.
- if(last&&!story.change)story.change=last.result==='temporary'?'environment':'contract';
- const origin=problem.workaround?[...story.encounters].reverse().find(e=>e.result==='temporary'):undefined;
+ const cause=causalContext(c,problem);
+ const family=cause?.family??(grade>=3?'delegation':grade>=2?'dependency':grade===1?'artifact':'investigation');
  task.sceneFamily=family;
- task.encounter={version:story.version,grade,previousTaskId:last?.taskId,originTaskId:origin?.taskId,previousActorId:last?.actorId,contextKeys:[...(last?['story.past']:[]),...(problem.latestOutcomeKey?[problem.latestOutcomeKey]:[]),...(last?[last.result==='temporary'?'story.environment':'story.stable','story.'+(story.change??'contract')]:[]),...story.limitations]};
+ task.encounter={triggerId:cause?.id,triggerDay:cause?.day,causeKey:cause?.key,previousDecisionId:cause?.decisionId,version:story.version,grade,previousTaskId:cause?.previousTaskId,originTaskId:cause?.previousTaskId,previousActorId:cause?.actorId,contextKeys:cause?['story.past',...cause.contextKeys]:[]};
  if(family!=='investigation')task.scene=storyScene(base,family,grade,problem);
+ if(cause&&task.scene){task.scene.descriptionKey=cause.key;task.scene.steps[0].bodyKey=cause.key;}
+
 }
 export function recordEncounter(c:Campaign,task:Task,problem:Problem){
  const story=ensureProblemStory(c,problem);if(story.encounters.some(e=>e.taskId===task.id))return;
