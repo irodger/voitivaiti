@@ -13,3 +13,5 @@ const states=[
 ];
 states.forEach(([id,ru,en])=>text('mail.state.'+id,ru,en));
 text('mail.previousResult','Переданный результат','Result handed over');
+
+text('mail.earlier','Раньше','Earlier');text('mail.later','Далее','Later');
