@@ -1,3 +1,4 @@
+import {advanceCompanyStructure} from './companyEngine';
 import {resolvePaymentEvents} from './paymentCausal';
 import {isWorkday} from './calendar';
 export {isWorkday} from './calendar';
@@ -45,7 +46,7 @@ export const eventActive=(c:Campaign,id:string)=>c.life!.worldEvents.some(e=>e.i
 export function chargeLivingCosts(c:Campaign){const l=c.life!,ch=player(c);if(l.lastExpenseCalendarDay===l.calendarDay)return 0;const cost=Math.min(ch.stats.money,Math.max(0,l.livingCost-600));ch.stats.money-=cost;l.lastExpenseCalendarDay=l.calendarDay;return cost;}
 export function settleCalendarDay(c:Campaign,workedDay=false){const income=payWork(c,workedDay),expenses=chargeLivingCosts(c),personal=settlePersonalFinance(c);return {salary:income,income:income+personal.income,expenses:expenses+personal.expenses};}
 export function payWork(c:Campaign,workedDay=false){const l=c.life!,ch=player(c);if(l.lastPaidCalendarDay===l.calendarDay)return 0;l.lastPaidCalendarDay=l.calendarDay;if(!workedDay&&!isWorkday(l.calendarDay))return 0;const pay=dailySalary(ch);if(eventActive(c,'payroll')){l.salaryHeld+=pay;return 0;}ch.stats.money+=pay;return pay;}
-export function advanceCalendar(c:Campaign){ensureLife(c);const l=c.life!,ch=player(c);l.calendarDay++;l.daysAtCompany++;resolveResponsibilities(c);resolveDecisions(c);resolveSceneConsequences(c);resolvePaymentEvents(c);if(isWorkday(l.calendarDay))expectationPressure(c);if(l.salaryHeld&&!eventActive(c,'payroll')){ch.stats.money+=l.salaryHeld;l.salaryHeld=0;}if(!l.montage&&eventActive(c,'heat'))changeStress(ch,gameConfig.stress.heatPerDay);if(eventActive(c,'audit')||eventActive(c,'move'))changeStress(ch,gameConfig.stress.disruptionPerDay);if(l.calendarDay>=l.nextEventDay)applyWorldEvent(c);updateMeta(c);}
+export function advanceCalendar(c:Campaign){ensureLife(c);const l=c.life!,ch=player(c);l.calendarDay++;l.daysAtCompany++;advanceCompanyStructure(c);resolveResponsibilities(c);resolveDecisions(c);resolveSceneConsequences(c);resolvePaymentEvents(c);if(isWorkday(l.calendarDay))expectationPressure(c);if(l.salaryHeld&&!eventActive(c,'payroll')){ch.stats.money+=l.salaryHeld;l.salaryHeld=0;}if(!l.montage&&eventActive(c,'heat'))changeStress(ch,gameConfig.stress.heatPerDay);if(eventActive(c,'audit')||eventActive(c,'move'))changeStress(ch,gameConfig.stress.disruptionPerDay);if(l.calendarDay>=l.nextEventDay)applyWorldEvent(c);updateMeta(c);}
 /** Sleep/absence returns start a new unpaid workday, never an already settled day. */
 export function advanceToNextWorkday(c:Campaign){
  c.time=gameConfig.clock.workdayStart;

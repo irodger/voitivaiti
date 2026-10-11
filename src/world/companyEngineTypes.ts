@@ -1,0 +1,2 @@
+export type CompanyTeam={id:string;departmentId:string;nameKey:string;purposeKey:string;owns:string[];dependsOn:string[];contactId?:string;contactProfession:string};
+export type CompanyStructure={version:1;type:'studio'|'growing'|'established';industryKey:string;product:{projectId:string;nameKey:string;purposeKey:string};departments:{id:string;nameKey:string;teamIds:string[]}[];teams:CompanyTeam[];campaign:{id:string;sourceTeamId:string;targetTeamId:string;plannedDay:number;state:'planned'|'launched';problemId?:string;launchedDay?:number}};

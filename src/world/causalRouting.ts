@@ -18,6 +18,8 @@ export function causalContext(c:Campaign,p:Problem):CausalContext|undefined{
    const index=p.consequences!.indexOf(origin);
    if(p.consequences!.slice(index+1).some(e=>e.outcome.systemChanged!==false&&e.outcome.kind==='durable'))continue;
    family=origin.outcome.systemChanged===false?(origin.outcome.kind==='temporary'?'coordination':'artifact'):origin.outcome.kind==='temporary'?'recurrence':'review';
+  }else if(event.kind==='marketing-campaign'){
+   if(p.status==='resolved')continue;family='investigation';
   }else if(event.kind==='delegation-result'){
    if(c.company?.delegations?.some(d=>d.id+':result'===event.id&&d.status==='checked'))continue;
    family='review';
@@ -26,7 +28,8 @@ export function causalContext(c:Campaign,p:Problem):CausalContext|undefined{
   if(!family||consumed.has(event.id)||reserved.has(event.id))continue;
   const previousTaskId=event.kind==='scene-followup'?event.id.slice(0,-':outcome:followup'.length):event.kind==='scene-outcome'?event.id.slice(0,-':outcome'.length):last?.taskId;
   const prior=c.tasks.find(t=>t.id===previousTaskId),source=p.story?.encounters.find(e=>e.taskId===previousTaskId);
-  candidates.push({id:event.id,day:event.day,family,key:event.key,actorId:event.actorId,previousTaskId,decisionId:prior?prior.id+':'+(Object.values(prior.progress).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome'):event.id,contextKeys:[event.key,...(prior?.outcome?[prior.outcome.summaryKey]:[]),...(source?.observations??[]),...(p.story?.limitations??[])]});
+  const teams=event.kind==='marketing-campaign'?c.company?.structure?.teams.filter(t=>t.id===event.values?.sourceTeamId||t.id===event.values?.ownerTeamId).map(t=>t.nameKey)??[]:[];
+  candidates.push({id:event.id,day:event.day,family,key:event.key,actorId:event.actorId,previousTaskId,decisionId:prior?prior.id+':'+(Object.values(prior.progress).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome'):event.id,contextKeys:[event.key,...teams,...(prior?.outcome?[prior.outcome.summaryKey]:[]),...(source?.observations??[]),...(p.story?.limitations??[])]});
  }
  return candidates.sort((a,b)=>Number(b.family==='incident')-Number(a.family==='incident')||a.day-b.day||a.id.localeCompare(b.id))[0];
 }
