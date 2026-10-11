@@ -1,3 +1,5 @@
+import type {CompanyMailMessage} from '../world/companyMailTypes';
+import {mailWorkTarget} from './mailWorkTarget';
 import {MailInbox} from './MailInbox';
 import type {LaptopAppId} from './laptopAppIds';
 import {unreadCompanyMail} from '../world/companyMail';
@@ -36,9 +38,9 @@ export function Laptop({ onClose }: {
     const present = useIsPresent(), world = useWorld(), { t } = useI18n(), task = activeTask(world), template = task ? resolveTaskTemplate(task) : undefined, step = template?.steps.find(s => s.id === task?.currentStepId), [app, setApp] = useState<LaptopAppId>(step?.app ?? 'ide'), [view, setView] = useState<Step | null>(null), [board, setBoard] = useState(!task || task.rewarded && world.phase !== 'reward'), ref = useRef<HTMLDivElement>(null), contentRef = useRef<HTMLDivElement>(null);
     const device = laptopFamily(world.characters.find(ch => ch.id === world.activeCharacterId)?.profession ?? '');
     const openDesk = () => { setBoard(true); setView(null); };
-    const openMailWork=(problemId:string)=>{
- const target=[...world.tasks].reverse().find(t=>t.problemId===problemId&&!t.rewarded&&t.characterId===world.activeCharacterId);
- if(target&&(target.id===task?.id||target.paused&&(!task||task.rewarded)&&world.phase==='office')){
+    const openMailWork=(mail:CompanyMailMessage)=>{
+ const route=mailWorkTarget(world,mail),target=route.related;
+ if(target&&route?.canOpen){
   if(target.paused)world.dispatch({type:'resume-task',id:target.id});
   const current=resolveTaskTemplate(target).steps.find(s=>s.id===target.currentStepId);setBoard(false);setView(null);if(current)setApp(current.app);
  }else openDesk();
