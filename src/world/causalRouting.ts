@@ -1,5 +1,5 @@
 import type {Campaign,Problem,SceneFamily} from './types';
-export type CausalContext={id:string;day:number;family:SceneFamily;key:string;actorId?:string;previousTaskId?:string;decisionId?:string;contextKeys:string[]};
+export type CausalContext={teamContext?:import('./companyEngineTypes').CompanyInteractionContext;id:string;day:number;family:SceneFamily;key:string;actorId?:string;previousTaskId?:string;decisionId?:string;contextKeys:string[]};
 /** Read existing world evidence. No timer, counter or new simulation mechanic. */
 export function causalContext(c:Campaign,p:Problem):CausalContext|undefined{
  if(p.category==='payment')return;
@@ -28,8 +28,9 @@ export function causalContext(c:Campaign,p:Problem):CausalContext|undefined{
   if(!family||consumed.has(event.id)||reserved.has(event.id))continue;
   const previousTaskId=event.kind==='scene-followup'?event.id.slice(0,-':outcome:followup'.length):event.kind==='scene-outcome'?event.id.slice(0,-':outcome'.length):last?.taskId;
   const prior=c.tasks.find(t=>t.id===previousTaskId),source=p.story?.encounters.find(e=>e.taskId===previousTaskId);
-  const teams=event.kind==='marketing-campaign'?c.company?.structure?.teams.filter(t=>t.id===event.values?.sourceTeamId||t.id===event.values?.ownerTeamId).map(t=>t.nameKey)??[]:[];
-  candidates.push({id:event.id,day:event.day,family,key:event.key,actorId:event.actorId,previousTaskId,decisionId:prior?prior.id+':'+(Object.values(prior.progress).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome'):event.id,contextKeys:[event.key,...teams,...(prior?.outcome?[prior.outcome.summaryKey]:[]),...(source?.observations??[]),...(p.story?.limitations??[])]});
+  const teams=event.values?.sourceTeamId?c.company?.structure?.teams.filter(t=>t.id===event.values?.sourceTeamId||t.id===event.values?.ownerTeamId||t.id===event.values?.consumerTeamId).map(t=>t.nameKey)??[]:[];
+  const values=event.values,teamContext=values&&typeof values.sourceTeamId==='string'&&typeof values.ownerTeamId==='string'&&typeof values.consumerTeamId==='string'&&typeof values.originEventId==='string'?{sourceTeamId:values.sourceTeamId,ownerTeamId:values.ownerTeamId,consumerTeamId:values.consumerTeamId,originEventId:values.originEventId}:undefined;
+  candidates.push({teamContext,id:event.id,day:event.day,family,key:event.key,actorId:event.actorId,previousTaskId,decisionId:prior?prior.id+':'+(Object.values(prior.progress).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome'):event.id,contextKeys:[event.key,...teams,...(prior?.outcome?[prior.outcome.summaryKey]:[]),...(source?.observations??[]),...(p.story?.limitations??[])]});
  }
  return candidates.sort((a,b)=>Number(b.family==='incident')-Number(a.family==='incident')||a.day-b.day||a.id.localeCompare(b.id))[0];
 }

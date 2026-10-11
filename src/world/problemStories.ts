@@ -1,3 +1,4 @@
+import {deliverCampaignReply} from './companyEngine';
 import {causalContext} from './causalRouting';
 import {paymentState,recordPaymentCompletion,deliverPaymentReply} from './paymentCausal';
 import {causalKey} from '../content/paymentCausalCopy';
@@ -65,7 +66,7 @@ export function prepareEncounter(c:Campaign,task:Task,base:TaskTemplate,problem:
  const cause=causalContext(c,problem);
  const family=cause?.family??(grade>=3?'delegation':grade>=2?'dependency':grade===1?'artifact':'investigation');
  task.sceneFamily=family;
- task.encounter={triggerId:cause?.id,triggerDay:cause?.day,causeKey:cause?.key,previousDecisionId:cause?.decisionId,version:story.version,grade,previousTaskId:cause?.previousTaskId,originTaskId:cause?.previousTaskId,previousActorId:cause?.actorId,contextKeys:cause?['story.past',...cause.contextKeys]:[]};
+ task.encounter={teamContext:cause?.teamContext,triggerId:cause?.id,triggerDay:cause?.day,causeKey:cause?.key,previousDecisionId:cause?.decisionId,version:story.version,grade,previousTaskId:cause?.previousTaskId,originTaskId:cause?.previousTaskId,previousActorId:cause?.actorId,contextKeys:cause?['story.past',...cause.contextKeys]:[]};
  if(family!=='investigation')task.scene=storyScene(base,family,grade,problem,task.encounter);
  if(cause&&task.scene){task.scene.descriptionKey=cause.key;task.scene.steps[0].bodyKey=cause.key;}
 
@@ -100,6 +101,6 @@ export function refreshTaskReplies(c:Campaign){
   const d=progress.dependency;if(!d||d.ready)continue;
   const job=c.company!.delegations?.find(job=>job.id===d.delegationId);
   d.ready=d.delegationId?!!job&&job.status!=='working':c.life!.calendarDay>d.dueDay||(c.life!.calendarDay===d.dueDay&&c.time>=d.dueMinute);
-  deliverPaymentReply(c,task,progress);
+  deliverPaymentReply(c,task,progress);deliverCampaignReply(c,task,progress);
  }
 }

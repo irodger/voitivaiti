@@ -1,9 +1,10 @@
+import {recordCampaignOutcome} from './companyEngine';
 import type {Campaign,Task} from './types';
 
 export function commitSceneOutcome(c:Campaign,task:Task){
  if(!task.outcome)return;
  const project=c.company!.projects.find(p=>p.id===task.projectId)!,problem=project.problems.find(p=>p.id===task.problemId)!;
- const outcome=task.outcome;
+ const outcome=task.outcome;if(task.encounter?.teamContext)outcome.teamContext??={...task.encounter.teamContext};
  problem.latestOutcomeKey=outcome.summaryKey;
  if(outcome.kind==='temporary')problem.workaround=true;
  else if(outcome.systemChanged!==false)problem.workaround=false;
@@ -12,8 +13,9 @@ export function commitSceneOutcome(c:Campaign,task:Task){
  const id=task.id+':outcome';
  problem.consequences??=[];
  if(problem.consequences!.some(e=>e.id===id))return;
+ recordCampaignOutcome(c,task);
  problem.consequences.push({id,actorId:task.characterId,dueDay:c.life!.calendarDay+outcome.delayDays,outcome,resolved:false});
- const event={id,day:c.life!.calendarDay,kind:'scene-outcome',key:outcome.summaryKey,actorId:task.characterId,projectId:project.id,problemId:problem.id};
+ const event={id,day:c.life!.calendarDay,kind:'scene-outcome',values:outcome.teamContext?{...outcome.teamContext}:undefined,key:outcome.summaryKey,actorId:task.characterId,projectId:project.id,problemId:problem.id};
  problem.history.push(event);project.history.push(event);c.company!.history.push(event);
 }
 export function resolveSceneConsequences(c:Campaign){
@@ -32,7 +34,7 @@ export function resolveSceneConsequences(c:Campaign){
    const item=c.life!.queue.find(q=>q.problemId===problem.id);
    if(item&&item.status==='done'){item.status='waiting';item.age=0;item.expectation=undefined;}
   }
-  const event={id:pending.id+':followup',day:c.life!.calendarDay,kind:'scene-followup',key:pending.outcome.followupKey,actorId:pending.actorId,projectId:project.id,problemId:problem.id};
+  const event={id:pending.id+':followup',day:c.life!.calendarDay,kind:'scene-followup',values:pending.outcome.teamContext?{...pending.outcome.teamContext}:undefined,key:pending.outcome.followupKey,actorId:pending.actorId,projectId:project.id,problemId:problem.id};
   problem.history.push(event);project.history.push(event);c.company!.history.push(event);
  }
 }

@@ -1,3 +1,4 @@
+import {encounterTeam} from '../companyEngine';
 import {applyPaymentAction} from '../paymentCausal';
 import { recordEncounter } from '../problemStories';
 import { handoffCandidate } from '../responsibility';
@@ -9,7 +10,7 @@ import { availableTechnicalActions } from '../technicalActions';
 import { isConsequential, recordDecision } from '../decisions';
 import { decision } from '../life';
 import type { Effect } from '../types';
-import { clamp, history } from '../simulation';
+import { clamp, history, makeCharacter } from '../simulation';
 import type { Action, TransitionResult } from './types';
 import type { ActionContext } from './context';
 export function handleTask(ctx: ActionContext, action: Action): TransitionResult | undefined {
@@ -103,7 +104,7 @@ export function handleTask(ctx: ActionContext, action: Action): TransitionResult
         progress.responseKey = undefined;
         tick(next.minutes, task);
         if (next.dependency) {
-            const q = c.life!.queue.find(q => q.id === task.workKind), npc = next.dependencyRole?c.characters.find(n=>n.id!==ch.id&&n.employed&&n.profession===next.dependencyRole):q && handoffCandidate(c, q);
+            const q = c.life!.queue.find(q => q.id === task.workKind), npc = next.dependencyTeamId?encounterTeam(c,next.dependencyTeamId,makeCharacter):next.dependencyRole?c.characters.find(n=>n.id!==ch.id&&n.employed&&n.profession===next.dependencyRole):q && handoffCandidate(c, q);
             if (npc) {
                 progress.dependency = { npcId: npc.id, dueDay: c.life!.calendarDay, dueMinute: c.time + 30, ready: false, responseKey:next.dependencyResponseKey };
                 if (next.delegates && q && assignResponsibility(c, q.id, npc.id)) {
