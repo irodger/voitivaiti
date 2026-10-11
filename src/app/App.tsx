@@ -5,6 +5,7 @@ import {useRunTiming} from '../hooks/useRunTiming';
 import {InstallGame} from '../play/InstallGame';
 import {ThemeSettings} from '../play/ThemeSettings';
 import './themes.css';
+import '../play/screenUx.css';
 import {useAmbientAudio} from './useAmbientAudio';
 import {AudioSettings} from '../play/AudioSettings';
 import { PwaSettings } from '../play/PwaSettings';

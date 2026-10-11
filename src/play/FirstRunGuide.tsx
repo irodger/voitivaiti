@@ -14,6 +14,7 @@ const copy:Record<string,[string,string]>={
  workLabel:['Работа в ноутбуке','Laptop work'],
  homeLabel:['Домой','Go home'],
  next:['Твой следующий шаг','Your next step'],
+ workShort:['Прочитай условие и выбери действие ниже.','Read the brief and choose an action below.'],
  map:['Маршрут первого дня','First-day journey'],
  arrival:['Представься команде: введи имя и нажми «Представиться». Это имя твоего героя.','Introduce yourself: enter your name and press the introduction button. This is your character’s name.'],
  order:['Выбери, с чего начать: проект или люди. Ты увидишь оба знакомства, порядок — на твой вкус.','Choose the project or the people first. You will see both introductions; the order is up to you.'],
@@ -26,13 +27,14 @@ const copy:Record<string,[string,string]>={
  farewell:['Первая работа позади. Закончи день: дома можно отдохнуть, а после сна начнётся следующий рабочий день.','Your first task is behind you. Finish the day: rest at home, then sleep to start the next workday.']
 };
 Object.entries(copy).forEach(([key,[ru,en]])=>text('firstGuide.'+key,ru,en));
-export function FirstRunGuide(){
+export function FirstRunGuide({compact=false}:{compact?:boolean}={}){
  const w=useWorld(),{t}=useI18n(),first=activeCharacter(w).firstDay;
  if(!first||first.onboardingCompleted)return null;
  const stage=w.phase==='reward'?'result':first.currentOnboardingStep;
  if(stage==='work'&&!activeTask(w))return null;
  const current=['arrival','order','project','team'].includes(stage)?(stage==='arrival'?0:1):stage==='meeting'?2:stage==='brief'?3:stage==='work'||stage==='result'?4:5;
  const nodes=[{label:'introLabel',Icon:UserRound},{label:'contextLabel',Icon:UsersRound},{label:'meetingLabel',Icon:MessagesSquare},{label:'briefLabel',Icon:ClipboardList},{label:'workLabel',Icon:Laptop},{label:'homeLabel',Icon:House}];
+ if(compact&&stage==='work')return <aside className="first-run-guide first-guide-compact" aria-label={t('firstGuide.title')}><details><summary><Compass size={18} aria-hidden="true"/><span><b>{t('firstGuide.next')}</b><span>{t('firstGuide.workShort')}</span></span></summary><p>{t('firstGuide.work')}</p></details></aside>;
  return <aside className="first-run-guide" aria-label={t('firstGuide.title')}>
   <header className="first-guide-heading"><span className="first-guide-emblem"><Compass size={24} aria-hidden="true"/></span><div><small>{t('firstGuide.map')}</small><b>{t('firstGuide.title')}</b></div><span className="first-guide-count">{t('firstGuide.progress',{done:current,total:nodes.length})}</span></header>
   <progress className="first-guide-progress" value={current} max={nodes.length} aria-label={t('firstGuide.map')}/>

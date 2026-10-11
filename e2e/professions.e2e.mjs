@@ -37,7 +37,7 @@ async function waitState(page, predicate, ...args) {
 async function clickText(page, text, scope = '') {
   const selector = `${scope ? scope + ' ' : ''}button`;
   const button = await page.waitForFunction((selector, text) => [...document.querySelectorAll(selector)].find(el => !el.disabled && el.textContent.trim() === text), { timeout: 10000 }, selector, text);
-  await button.asElement().click();
+  await button.asElement().asLocator().click();
   await button.dispose();
 }
 async function firstDay(page, role) {
@@ -76,11 +76,11 @@ async function inspectFirstAction(page) {
   ].find(selector => [...document.querySelectorAll(selector)].some(el => !el.disabled && el.getClientRects().length)), { timeout: 10000 });
   let target = await selector.jsonValue();
   if (target.endsWith('summary')) {
-    await page.click(target);
+    await page.locator(target).click();
     target = '.technical-actions .artifact-action-option[open] .artifact-records button';
     await page.waitForSelector(target);
   }
-  await page.click(target);
+  await page.locator(target).click();
 }
 
 for (const role of selected) {
@@ -90,7 +90,7 @@ for (const role of selected) {
     const errors = [];
     page.on('pageerror', error => errors.push(String(error)));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-    await page.setViewport({ width: 1366, height: 900 });
+    await page.setViewport({ width: 1366, height: 720 });
     await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await page.evaluateOnNewDocument(() => localStorage.setItem('voiti-vaiti-preferences', JSON.stringify({ state: { locale: 'en', contentMode: 'clean', colorScheme: 'violet', soundEnabled: false }, version: 0 })));
     try {
@@ -103,6 +103,18 @@ for (const role of selected) {
       const task = initial.tasks.find(task => task.id === initial.activeTaskId);
       assert.equal(task.templateId, role.firstTask);
       assert.equal(task.status, 'active');
+      assert.equal(await page.$eval('.app-work-identity', el => getComputedStyle(el).display), 'none', 'Working app identity must not displace the brief');
+      assert.ok(await page.$('.task-journey-fold:not([open])'), 'The step map should start compact');
+      await page.waitForFunction(() => {
+        const container = document.querySelector('.laptop-content').getBoundingClientRect();
+        const title = document.querySelector('.mechanic>h2').getBoundingClientRect();
+        const brief = document.querySelector('.mechanic-brief').getBoundingClientRect();
+        return title.top >= container.top && title.bottom <= container.bottom && brief.top < container.bottom - 20;
+      }, { timeout: 10000 });
+      if (['frontend', 'backend', 'qa'].includes(role.id)) {
+        await mkdir('e2e-artifacts/ui', { recursive: true });
+        await page.screenshot({ path: `e2e-artifacts/ui/${role.id}-work.png` });
+      }
       assert.equal(await page.$eval('.laptop-chin', el => el.textContent.trim()), role.device);
       assert.equal(await page.$eval('.laptop-shell', el => el.dataset.device), role.device);
       assert.equal(await page.$$('.laptop-taskbar').then(nodes => nodes.length), role.device === 'PacBook' ? 0 : 1);
@@ -111,11 +123,12 @@ for (const role of selected) {
       const appNav = role.device === 'PacBook' ? '.laptop-launcher' : '.laptop-taskbar';
       for (const name of ['Chat', 'IDE', 'Browser', 'Console']) {
         if (role.device === 'PacBook') await clickText(page, name, appNav);
-        else await page.click(`${appNav} button[aria-label="${name}"]`);
+        else await page.locator(`${appNav} button[aria-label="${name}"]`).click();
         await page.waitForFunction(app => document.querySelector('.laptop-display')?.dataset.app === app, {}, name.toLowerCase());
       }
       assert.equal((await campaign(page)).time, initial.time);
       // Back to the actual work step via the journey, irrespective of the role's application.
+      if (await page.$('.task-journey-fold:not([open])')) await page.click('.task-journey-fold>summary');
       await page.click('.stage-journey button:not(:disabled)');
       const before = JSON.stringify((await campaign(page)).tasks.find(item => item.id === task.id).progress);
       await inspectFirstAction(page);
@@ -146,7 +159,7 @@ for (const role of selected) {
         assert.ok(layout.width <= 390, 'Mobile viewport has horizontal overflow');
         assert.ok(layout.chinTop >= 0 && layout.chinBottom <= 844, 'Device name is outside the mobile screen');
         if (role.device !== 'PacBook') {
-          await page.click('.laptop-taskbar button[aria-label="Chat"]');
+          await page.locator('.laptop-taskbar button[aria-label="Chat"]').click();
           await page.waitForSelector('.laptop-taskbar button[aria-label="Chat"][aria-pressed="true"]');
         }
       }
@@ -155,8 +168,52 @@ for (const role of selected) {
       const path = `e2e-artifacts/${role.id}`;
       await mkdir(path, { recursive: true });
       await page.screenshot({ path: `${path}/failure.png`, fullPage: true }).catch(() => {});
-      await writeFile(`${path}/errors.json`, JSON.stringify({ error: String(error.stack), browserErrors: errors, campaign: await campaign(page).catch(() => null) }, null, 2));
+      const layout = await page.evaluate(() => Object.fromEntries(['.laptop-content', '.mechanic>h2', '.mechanic-brief'].map(selector => {
+        const box = document.querySelector(selector)?.getBoundingClientRect();
+        return [selector, box ? { top: box.top, bottom: box.bottom, height: box.height } : null];
+      }))).catch(() => null);
+      await writeFile(`${path}/errors.json`, JSON.stringify({ error: String(error.stack), browserErrors: errors, layout, campaign: await campaign(page).catch(() => null) }, null, 2));
       throw error;
     } finally { await context.close(); }
   });
 }
+
+if (selected.some(role => role.id === 'frontend')) test('frontend: glossary Escape closes the term before the laptop', { timeout: 60000 }, async () => {
+  const context = await browser.createBrowserContext(), page = await context.newPage();
+  await page.setViewport({ width: 1366, height: 900 });
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await page.evaluateOnNewDocument(() => localStorage.setItem('voiti-vaiti-preferences', JSON.stringify({ state: { locale: 'en', contentMode: 'clean', soundEnabled: false }, version: 0 })));
+  try {
+    await firstDay(page, professions.find(role => role.id === 'frontend'));
+    // An explicit UI path to the review containing the glossary term. No task injection.
+    await page.locator('::-p-text(Open Hero.tsx)').click();
+    for (const row of ['File fragment', 'How this connects to the screen']) {
+      const button = await page.waitForFunction(text => [...document.querySelectorAll('.artifact-action-option[open] .artifact-records button')].find(el => el.textContent.includes(text)), {}, row);
+      await button.asElement().click(); await button.dispose();
+    }
+    await page.click('.panel-action-dock .artifact-compare');
+    await clickText(page, 'Continue');
+    await page.locator('::-p-text(Inspect spacing in the browser)').click();
+    await page.locator('::-p-text(Try −10 px in the browser)').click();
+    await clickText(page, 'Continue');
+    await page.locator('::-p-text(Set the top margin to −10 px)').click();
+    await page.locator('::-p-text(Refresh the preview)').click();
+    await clickText(page, 'Continue');
+    await clickText(page, 'Run checks');
+    await clickText(page, 'Continue');
+    await clickText(page, 'Send for review');
+    await page.waitForSelector('.inline-term button');
+    const term = await page.waitForFunction(() => [...document.querySelectorAll('.inline-term button')].find(el => el.textContent === 'CSS variable'));
+    await term.asElement().click(); await term.dispose();
+    await page.waitForSelector('.term-overlay:popover-open');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('.term-overlay:popover-open'));
+    assert.ok(await page.$('.laptop-shell'), 'Closing a glossary term must keep the laptop open');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('.laptop-shell'));
+  } catch (error) {
+    await mkdir('e2e-artifacts/glossary', { recursive: true });
+    await page.screenshot({ path: 'e2e-artifacts/glossary/failure.png', fullPage: true }).catch(() => {});
+    throw error;
+  } finally { await context.close(); }
+});
