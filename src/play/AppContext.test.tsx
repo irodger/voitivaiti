@@ -20,3 +20,13 @@ it('uninspected source fragments are excluded from the evidence collection',()=>
  expect(collectAppEvidence(task,'ide').sources).not.toContain('later discovered source');
  expect(collectAppEvidence(task,'browser').records.map(x=>x.row.id)).toEqual(['seen']);
 });
+it('empty reference apps have one return and no empty viewer or zero counters',()=>{
+ const emptyTask={...task,progress:{source:{status:'active'},logs:{status:'locked'},review:{status:'locked'}}} as unknown as Task;
+ for(const app of ['ide','browser','console','chat'] as const){
+  const html=renderToStaticMarkup(<AppContext app={app} task={emptyTask} onContinue={()=>{}}/>);
+  expect(html.match(/<button/g)).toHaveLength(1);
+  expect(html).toContain('context-empty-reference');
+  expect(html).not.toContain('evidence-counts');expect(html).not.toContain('context-next');
+  expect(html).not.toContain('future-review-answer');
+ }
+});

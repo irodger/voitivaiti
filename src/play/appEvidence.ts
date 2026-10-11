@@ -11,3 +11,5 @@ export function collectAppEvidence(task:Task,app:AppId){
  const completed=relevant.filter(s=>task.progress[s.id]?.status==='completed');
  return {template,step,relevant,notes,sources,records,completed};
 }
+
+export function appHasEvidence(task:Task,app:AppId){const e=collectAppEvidence(task,app);return !!(e.notes.length||e.records.length||e.sources.length||app==='chat'&&e.completed.length);}

@@ -61,12 +61,12 @@ it('shows the chosen approach and accurate timing in laptop results without inte
  expect(c.phase).toBe('office');expect(activeCharacter(c).stats.money).toBe(money);
 });
 
-it('keeps promotion discussion available and exposes the hidden requirements',async()=>{
+it('offers the promotion path when requirements are unmet',async()=>{
  const {PromotionCard}=await import('./PromotionCard');
  const c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'designer',seed:1427}).campaign;
  const ch=activeCharacter(c);ch.roleTenure=5;ch.reviewStage=1;ch.performanceMilestones=0;useWorld.setState(c);
  const markup=renderToStaticMarkup(<PromotionCard nodeId="level-1"/>);
- expect(markup).toContain('Обсудить повышение');expect(markup).not.toContain('disabled');
+ expect(markup).toContain('Посмотреть путь к повышению');expect(markup).not.toContain('Обсудить повышение');expect(markup).not.toContain('disabled');
  expect(markup).toContain('Самостоятельно исследовать рабочую проблему');expect(markup).not.toContain('5 / 90');
  expect(markup).toContain('Разобраться в разных типах проблем');expect(markup).toContain('Повышению мешает предупреждение');
  expect(markup).not.toContain('Подтвердить повышение');
@@ -83,4 +83,13 @@ it('shows choice help only for an active decision with alternatives',()=>{
  expect(render({...step,type:'review'})).not.toContain('decision-help');
  expect(render(step,true)).not.toContain('decision-help');
  task.progress[step.id].status='completed';useWorld.setState(c);expect(render()).not.toContain('decision-help');
+});
+
+it('offers a promotion discussion only with confirmed experience and no unfinished task',async()=>{
+ const {PromotionCard}=await import('./PromotionCard');
+ const c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'frontend',seed:1427}).campaign;
+ const ch=activeCharacter(c);ch.experience=Array.from({length:4},(_,i)=>({id:'work:'+i,titleKey:'proof',profession:ch.profession,grade:0,day:1,confirmed:true,context:i%2?'payment':'interface',tags:['autonomy','planning','cross-team'],resultKind:'checked'}));useWorld.setState(c);
+ expect(renderToStaticMarkup(<PromotionCard nodeId="level-1"/>)).toContain('Обсудить повышение');
+ delete ch.firstDay;const synced=transition(c,{type:'event',id:c.schedule[0].id,choiceId:'plan'}).campaign;const next=transition(synced,{type:'take-task'}).campaign;const task=activeTask(next);if(!task)throw new Error('Expected active task');useWorld.setState(next);
+ const html=renderToStaticMarkup(<PromotionCard nodeId="level-1"/>);expect(html).toContain('Посмотреть путь к повышению');expect(html).not.toContain('Обсудить повышение');
 });

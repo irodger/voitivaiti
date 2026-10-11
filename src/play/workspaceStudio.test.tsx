@@ -24,3 +24,7 @@ it('the office prioritizes a pending morning meeting over available work',()=>{
  const html=renderToStaticMarkup(<OfficeBrief openLaptop={()=>{}} openTeam={()=>{}}/>);
  expect(html).toContain('studio.sync');expect(html).toContain('studio.syncHint');expect(html).toContain('studio.team');expect(html).not.toContain('office-brief-progress');
 });
+it('an empty reference header leaves its return action to the compact empty state',()=>{
+ const html=renderToStaticMarkup(<LaptopAppHeader app="ide" task={task} steps={steps} view={null} emptyReference onDesk={()=>{}} onCurrent={()=>{}}/>);
+ expect(html).not.toContain('studio.goCurrent');expect(html).not.toContain('app-work-count');expect(html).toContain('data-empty-reference="true"');
+});
