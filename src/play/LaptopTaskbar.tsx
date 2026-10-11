@@ -1,12 +1,13 @@
-import { Grid2X2, ListTodo, Code2, Globe, Terminal, MessageSquare, Wifi, BatteryFull } from 'lucide-react';
+import type {LaptopAppId} from './laptopAppIds';
+import { Grid2X2, ListTodo, Code2, Globe, Terminal, MessageSquare, Mail, Wifi, BatteryFull } from 'lucide-react';
 import { useI18n } from '../content/localization';
 import { formatTime } from './shared';
-import type { AppId } from '../world/types';
 
-const apps = [{ id: 'ide' as AppId, Icon: Code2 }, { id: 'browser' as AppId, Icon: Globe }, { id: 'console' as AppId, Icon: Terminal }, { id: 'chat' as AppId, Icon: MessageSquare }];
+
+const apps = [{ id: 'ide' as LaptopAppId, Icon: Code2 }, { id: 'browser' as LaptopAppId, Icon: Globe }, { id: 'console' as LaptopAppId, Icon: Terminal }, { id: 'chat' as LaptopAppId, Icon: MessageSquare }, { id: 'mail' as LaptopAppId, Icon: Mail }];
 
 export function LaptopTaskbar({ board, selectedApp, time, onDesk, onApp }: {
-    board: boolean; selectedApp: AppId; time: number; onDesk: () => void; onApp: (id: AppId) => void;
+    board: boolean; selectedApp: LaptopAppId; time: number; onDesk: () => void; onApp: (id: LaptopAppId) => void;
 }) {
     const { t } = useI18n();
     return <footer className="laptop-taskbar">

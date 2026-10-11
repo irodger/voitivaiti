@@ -1,3 +1,4 @@
+import {handleMail} from './handleMail';
 import { handleTask } from './handleTask';
 import type { Action } from './types';
 import type { ActionHandler } from './context';
@@ -7,6 +8,8 @@ import { handleCareer } from './handleCareer';
 import { handleOffice } from './handleOffice';
 import { handleQueue } from './handleQueue';
 export const actionHandlers: Partial<Record<Action['type'], ActionHandler>> = {
+    'mail-read':handleMail,
+    'mail-unread':handleMail,
     'order': handleHome,
     'inspect-delivery': handleHome,
     'close-delivery': handleHome,

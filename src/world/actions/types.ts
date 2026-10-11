@@ -1,5 +1,5 @@
 import type { WorkKind } from '../lifeTypes';
-export type Action = {
+export type Action = {type:'mail-read'|'mail-unread';id:string} | {
     type: "conference";
     mode: "online" | "visit" | "skip";
     topic: "evidence" | "handoff";

@@ -83,3 +83,11 @@ export function recordCampaignOutcome(c:Campaign,task:Task){
  if(!campaign||!context||!outcome||task.problemId!==campaign.problemId||context.originEventId!==campaign.id+':risk'||!['org.campaign.bounded','org.campaign.proper','org.campaign.evidence'].includes(outcome.summaryKey))return;
  campaign.result={taskId:task.id,kind:outcome.kind==='temporary'?'bounded':outcome.systemChanged===false?'evidence':'verified',coverageMultiplier:outcome.kind==='temporary'?2:campaign.expectedLoad?.expectedMultiplier??3,day:c.life!.calendarDay};
 }
+
+/** Correspondence comes from an actual request/context action on the existing task. */
+export function recordCampaignCorrespondence(c:Campaign,task:Task,actionId:string,progress:StepProgress){
+ const context=task.encounter?.teamContext,campaign=c.company?.structure?.campaign;if(!context||task.problemId!==campaign?.problemId||!['trace','campaign-local'].includes(actionId)||progress.dependency?.responseKey!=='org.campaign.reply.result')return;
+ const id=task.id+':'+actionId+':correspondence',kind=actionId==='trace'?'company-team-request':'company-team-context',key=actionId==='trace'?'mail.requestBody':'org.campaign.local.result';
+ const event={id,day:c.life!.calendarDay,kind,key,actorId:task.characterId,projectId:task.projectId,problemId:task.problemId,values:{...context,sourceTaskId:task.id,minute:c.time}};
+ const project=c.company!.projects.find(p=>p.id===task.projectId)!,problem=project.problems.find(p=>p.id===task.problemId)!;if(!problem.history.some(e=>e.id===id)){problem.history.push(event);project.history.push(event);c.company!.history.push(event);}
+}

@@ -1,4 +1,4 @@
-import {encounterTeam} from '../companyEngine';
+import {encounterTeam,recordCampaignCorrespondence} from '../companyEngine';
 import {applyPaymentAction} from '../paymentCausal';
 import { recordEncounter } from '../problemStories';
 import { handoffCandidate } from '../responsibility';
@@ -118,7 +118,7 @@ export function handleTask(ctx: ActionContext, action: Action): TransitionResult
                 progress.dependency = { npcId: template!.author, dueDay: c.life!.calendarDay, dueMinute: c.time + 30, ready: false, responseKey:next.dependencyResponseKey };
         }
         if(next.id==='causal-delegate'&&!progress.dependency?.delegationId)progress.observations![next.id]='payment.causal.delegateBusy';
-        applyPaymentAction(c,task,next);
+        applyPaymentAction(c,task,next);recordCampaignCorrespondence(c,task,next.id,progress);
         if (next.completes && progress.dependency?.delegationId)
             checkResponsibility(c, progress.dependency.delegationId, next.id === 'bounded-result' ? 'clarify' : 'accept');
         task.attemptsByStep[step.id] = (task.attemptsByStep[step.id] ?? 0) + 1;
