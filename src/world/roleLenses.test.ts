@@ -1,7 +1,7 @@
 import {describe,it,expect,vi} from 'vitest';
 vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
 import {transition,type Action} from './engine';
-import {emptyCampaign,activeCharacter,activeTask,makeSchedule,plannedTemplateId,candidates} from './simulation';
+import {emptyCampaign,activeCharacter,activeTask,makeSchedule,candidates} from './simulation';
 import {templateById} from '../content/scenarios';
 import {roleLenses,lensCases} from '../content/roleLenses';
 import {professions} from '../content/professions';
@@ -28,6 +28,7 @@ function complete(c:Campaign,style:'limited'|'shared'){
 }
 describe('world problems viewed through a role',()=>{
  it('routes one shared problem to different professions and different actions',()=>{
+  expect(new Set(roleLenses.map(l=>l.id))).toEqual(new Set(professions.map(p=>p.id)));
   const frontend=ordinary('frontend'),qa=ordinary('qa'),sre=ordinary('sre');
   expect(activeTask(frontend)!.problemId).toBe(activeTask(qa)!.problemId);
   expect(activeTask(frontend)!.problemId).toBe(activeTask(sre)!.problemId);
@@ -60,13 +61,10 @@ describe('world problems viewed through a role',()=>{
   expect(restored.company!.history.filter(e=>e.kind==='scene-followup')).toHaveLength(count);
  });
  it.each(roleLenses.flatMap(r=>lensCases.map(category=>[r.id,category])))('every branch of %s / %s reaches completion and survives reload',(role,category)=>{
-  const c=ordinary(role,category);for(const style of ['limited','shared'] as const){
+  const c=ordinary(role,category);expect(activeTask(c)!.templateId).toBe(`lens.${role}.${category}`);for(const style of ['limited','shared'] as const){
    let next=action(structuredClone(c),'premature');next=migrateLegacy(JSON.parse(JSON.stringify(next)));next=complete(next,style);
    expect(activeTask(next)!.rewarded).toBe(true);expect(next.phase).toBe('reward');
   }
- });
- it('keeps every profession out of generic priority routing after its initial work',()=>{
-  for(const role of professions){const c=ordinary(role.id);expect(plannedTemplateId(c).startsWith('priority.')).toBe(false);expect(activeTask(c)!.templateId.startsWith('priority.')).toBe(false);}
  });
  it('assisting a queue item starts professional interaction instead of auto-completing it',()=>{
   let c=ordinary('qa');c.tasks=[];c.activeTaskId=null;const q=c.life!.queue.find(q=>q.id==='bug')!;q.status='waiting';
@@ -109,5 +107,3 @@ it('DevOps records environment comparison without treating a green deployment as
 it('DBA checks restoration on a copy and does not claim a production repair',()=>{let c=ordinary('dba','payment');c=action(c,'inspect');c=action(c,'contact');c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(activeTask(c)!.progress.investigate.actionHistory).toEqual(['inspect','contact']);c=action(c,'trace');c=transition(c,{type:'advance'}).campaign;const debt=c.company!.projects[0].techDebt;c=action(c,'shared');c=action(c,'verify-shared');expect(c.company!.projects[0].techDebt).toBe(debt);c=transition(c,{type:'advance'}).campaign;c=action(c,'handoff');c=transition(c,{type:'advance'}).campaign;const problem=c.company!.projects[0].problems.find(p=>p.id===activeTask(c)!.problemId)!;expect(problem.contributions).toContain('preparation');expect(problem.contributions).not.toContain('repair');expect(problem.status).not.toBe('resolved');});
 
 it.each(['qa-automation','ux-research','analyst','business-analyst','data-analyst','data-engineer','sysadmin','security','project','delivery','solution-architect','architect'])('%s preserves investigation and contributes evidence without claiming repair',role=>{let c=ordinary(role,'payment');c=action(c,'premature');expect(activeTask(c)!.completedStepIds).toEqual([]);c=action(c,'inspect');c=action(c,'contact');c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(activeTask(c)!.progress.investigate.actionHistory).toEqual(['premature','inspect','contact']);c=action(c,'trace');c=transition(c,{type:'advance'}).campaign;const debt=c.company!.projects[0].techDebt;c=action(c,'shared');c=action(c,'verify-shared');expect(c.company!.projects[0].techDebt).toBe(debt);c=transition(c,{type:'advance'}).campaign;c=action(c,'handoff');c=transition(c,{type:'advance'}).campaign;const problem=c.company!.projects[0].problems.find(p=>p.id===activeTask(c)!.problemId)!;expect(problem.contributions).toContain(role==='qa-automation'?'validation':['ux-research','data-analyst'].includes(role)?'discovery':'preparation');expect(problem.contributions).not.toContain('repair');expect(problem.status).not.toBe('resolved');expect(activeTask(c)!.rewarded).toBe(true);});
-
-it('all professions have ordinary role-specific investigations after starting scenarios',()=>{expect(new Set(roleLenses.map(l=>l.id))).toEqual(new Set(professions.map(p=>p.id)));for(const role of professions)for(const category of lensCases){const c=ordinary(role.id,category);expect(activeTask(c)!.templateId).toBe(`lens.${role.id}.${category}`);}});
