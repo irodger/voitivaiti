@@ -3,13 +3,21 @@ import type {PaymentCausalState} from './paymentCausalTypes';
 import {addWorkdays,isWorkday} from './calendar';
 import {causalKey} from '../content/paymentCausalCopy';
 export function paymentState(problem:Problem):PaymentCausalState{
- if(problem.paymentCausal)return problem.paymentCausal;
+ if(problem.paymentCausal){const s=problem.paymentCausal;
+  if(!s.causalVersion){s.causalVersion=2;s.handledEventIds=[];
+   const deliveredKeys=['qaEvidence','contractChanged','reviewDue','incident','scope','whyEvidence','whyContract','whyReview','whyIncident','whyScope'].map(causalKey);
+   const last=problem.history.filter(e=>e.kind==='payment-causal'&&deliveredKeys.includes(e.key)).at(-1);
+   const completedAfter=problem.story?.encounters.some(e=>e.day>= (last?.day??Infinity)&&e.cause===s.cause);
+   // Upgrade only a delivered, still-open report; a saved phase alone is not a new event.
+   if(last&&!completedAfter&&s.phase!=='stable'&&!s.pending.length)s.ready={id:last.id,sourceId:s.previousDecisionId??last.id,npcId:last.actorId??'max',day:last.day,cause:s.cause,reasonKey:causalKey('whyEvidence')};
+  }return s;
+ }
  const chain=problem.paymentChain,fixed=chain?.stage==='fixed'||chain?.stage==='verified';
- return problem.paymentCausal={phase:fixed?'stable':'dependency',cause:fixed?'verified_fix':chain?.stage==='returned'?'qa_reproduction':chain?'unresolved_limit':'fresh_problem',revision:1,peerRevision:0,originTaskId:chain?.taskId,lastTaskId:chain?.fixedTaskId??chain?.taskId,previousDecisionId:chain?(chain.fixedTaskId??chain.taskId)+':'+(fixed?'verify-shared':'limited'):undefined,limitation:chain&&!fixed?'lost-reply':undefined,pending:[],facts:[]};
+ return problem.paymentCausal={causalVersion:2,handledEventIds:[],ready:chain?.stage==='returned'?{id:chain.taskId+':legacy-report',sourceId:chain.taskId+':limited',npcId:'max',day:problem.story?.encounters.at(-1)?.day??1,cause:'qa_reproduction',reasonKey:causalKey('whyEvidence')}:undefined,phase:fixed?'stable':'dependency',cause:fixed?'verified_fix':chain?.stage==='returned'?'qa_reproduction':chain?'unresolved_limit':'fresh_problem',revision:1,peerRevision:0,originTaskId:chain?.taskId,lastTaskId:chain?.fixedTaskId??chain?.taskId,previousDecisionId:chain?(chain.fixedTaskId??chain.taskId)+':'+(fixed?'verify-shared':'limited'):undefined,limitation:chain&&!fixed?'lost-reply':undefined,pending:[],facts:[]};
 }
 function event(c:Campaign,p:Problem,key:string,id:string,actorId:string){
  const project=c.company!.projects.find(project=>project.problems.some(problem=>problem.id===p.id))!;
- const entry={projectId:project.id,id,day:c.life!.calendarDay,kind:'payment-causal',key,actorId,problemId:p.id};
+ const entry={projectId:project.id,id,day:c.life!.calendarDay,kind:'payment-causal',key,actorId,problemId:p.id,values:{sourceId:paymentState(p).previousDecisionId??''}};
  if(!p.history.some(e=>e.id===id)){p.history.push(entry);project.history.push(entry);c.company!.history.push(entry);}
  p.latestOutcomeKey=key;const s=paymentState(p);s.facts=[...new Set([...s.facts,key])];
 }
@@ -20,17 +28,24 @@ function queue(c:Campaign,p:Problem,kind:PaymentCausalState['pending'][number]['
 export function resolvePaymentEvents(c:Campaign){
  if(!c.life||!c.company||!isWorkday(c.life.calendarDay))return;
  for(const p of c.company.projects.flatMap(p=>p.problems)){
-  const s=p.paymentCausal;if(!s)continue;
+  if(!p.paymentCausal)continue;const s=paymentState(p);
+  // Keep the current task's evidence snapshot intact; later facts remain queued for the next encounter.
+  if(c.tasks.some(t=>t.id===c.activeTaskId&&!t.rewarded&&t.problemId===p.id))continue;
   for(const e of s.pending.filter(e=>e.day<=c.life!.calendarDay)){
-   if(e.kind==='incident'&&!s.acceptedRisk)continue;
-   if(e.kind==='contract'){s.contractChanged=true;s.revision++;s.limitation='pending';s.metrics={duplicates:0,pending:1};s.phase='dependency';s.cause='backend_contract';event(c,p,causalKey('contractChanged'),e.id,e.npcId);}
-   if(e.kind==='review'){s.phase='review';s.cause='returned_review';event(c,p,causalKey('reviewDue'),e.id,e.npcId);}
-   if(e.kind==='incident'&&s.acceptedRisk){s.phase='incident';s.cause='accepted_risk';s.metrics={duplicates:3,pending:2};event(c,p,causalKey('incident'),e.id,e.npcId);}
-   if(e.kind==='evidence'){s.phase='dependency';s.cause='qa_reproduction';event(c,p,causalKey('qaEvidence'),e.id,e.npcId);}
-   if(e.kind==='scope'){s.scope='completed-only';s.acceptedRisk=true;s.phase='review';s.cause='unresolved_limit';event(c,p,causalKey('scope'),e.id,e.npcId);}
-   s.previousDecisionId=e.sourceId;p.status='planned';p.discovered=true;
+   if(s.handledEventIds?.includes(e.id)){s.pending=s.pending.filter(p=>p.id!==e.id);continue;}
+   if(e.kind==='evidence'&&!s.limitation){s.pending=s.pending.filter(p=>p.id!==e.id);continue;}
+   if(e.kind==='incident'&&!s.acceptedRisk){s.pending=s.pending.filter(p=>p.id!==e.id);continue;}
+   if(s.ready){if(!['scope','incident','contract'].includes(e.kind))continue;s.supersededEventIds=[...new Set([...(s.supersededEventIds??[]),s.ready.id])];}
+   s.previousDecisionId=e.sourceId;
+   if(e.kind==='contract'){s.contractChanged=true;s.revision++;s.limitation='pending';s.metrics={duplicates:0,pending:1};s.phase='dependency';s.cause='backend_contract';event(c,p,causalKey('whyContract'),e.id,e.npcId);}
+   if(e.kind==='review'){s.phase='review';s.cause='returned_review';event(c,p,causalKey('whyReview'),e.id,e.npcId);}
+   if(e.kind==='incident'&&s.acceptedRisk){s.phase='incident';s.cause='accepted_risk';s.metrics={duplicates:3,pending:2};event(c,p,causalKey('whyIncident'),e.id,e.npcId);}
+   if(e.kind==='evidence'){s.phase='dependency';s.cause='qa_reproduction';event(c,p,causalKey('whyEvidence'),e.id,e.npcId);}
+   if(e.kind==='scope'){s.scope='completed-only';s.acceptedRisk=true;s.phase='review';s.cause='unresolved_limit';event(c,p,causalKey('whyScope'),e.id,e.npcId);}
+   s.ready={id:e.id,sourceId:e.sourceId,npcId:e.npcId,day:c.life!.calendarDay,cause:s.cause,reasonKey:causalKey(e.kind==='contract'?'whyContract':e.kind==='review'?'whyReview':e.kind==='incident'?'whyIncident':e.kind==='scope'?'whyScope':'whyEvidence')};
+   s.pending=s.pending.filter(p=>p.id!==e.id);p.status='planned';p.discovered=true;
   }
-  s.pending=s.pending.filter(e=>e.day>c.life!.calendarDay);
+
  }
 }
 export function applyPaymentAction(c:Campaign,task:Task,action:TechnicalAction){
@@ -47,7 +62,7 @@ export function applyPaymentAction(c:Campaign,task:Task,action:TechnicalAction){
  if(action.paymentCausal==='approve-rework'||action.paymentCausal==='proper-fix'){
   s.phase='stable';s.cause='verified_fix';s.pending=s.pending.filter(e=>e.kind==='contract');s.acceptedRisk=false;s.limitation=undefined;if(action.paymentCausal==='proper-fix')s.metrics={duplicates:0,pending:0};event(c,p,causalKey(action.paymentCausal==='approve-rework'?'reviewApproved':'proper'),id,task.characterId);
   if(action.paymentCausal==='approve-rework'&&(s.metrics?.pending??0)>0){s.phase='dependency';s.cause='mitigation_effect';s.limitation='contained-pending';queue(c,p,'evidence',id,'max');}
-  if(!s.contractChanged)queue(c,p,'contract',id,'sergey',3);
+  if(action.paymentCausal==='approve-rework'&&!s.contractChanged)queue(c,p,'contract',id,'sergey',3);
   else if(s.phase==='stable')p.status='resolved';
   if(action.paymentCausal==='proper-fix'&&p.paymentChain){p.paymentChain.stage='fixed';p.paymentChain.fixedBy=task.characterId;p.paymentChain.fixedTaskId=task.id;p.paymentChain.debt=0;}
  }
@@ -56,6 +71,7 @@ export function recordPaymentCompletion(c:Campaign,task:Task,p:Problem){
  if(p.category!=='payment'||!p.paymentCausal)return;
  const s=p.paymentCausal,actions=Object.values(task.progress).flatMap(v=>v.actionHistory??[]);
  s.originTaskId??=task.id;s.lastTaskId=task.id;
+ if(task.encounter?.triggerId){s.handledEventIds=[...new Set([...(s.handledEventIds??[]),task.encounter.triggerId])];if(s.ready?.id===task.encounter.triggerId)s.ready=undefined;}
  if(actions.includes('verify-limited')&&!actions.some(a=>a.startsWith('causal-'))){s.cause='unresolved_limit';s.phase='dependency';s.limitation='lost-reply';s.previousDecisionId=task.id+':limited';queue(c,p,'evidence',s.previousDecisionId,'max',2);}
  if(actions.includes('verify-shared')&&!actions.some(a=>a.startsWith('causal-'))){s.phase='stable';s.cause='verified_fix';s.limitation=undefined;s.acceptedRisk=false;s.pending=s.pending.filter(e=>e.kind==='contract');s.previousDecisionId=task.id+':shared';queue(c,p,'review',s.previousDecisionId,'ilya');}
 }
@@ -74,4 +90,12 @@ export function deliverPaymentReply(c:Campaign,task:Task,progress:import('./type
  d.delivered=true;
  if(d.responseKey===causalKey('effect')){p.paymentCausal.metrics={duplicates:0,pending:7};p.paymentCausal.limitation='contained-pending';}
  if(d.responseKey===causalKey('reviewNew')){p.paymentCausal.peerRevision++;event(c,p,d.responseKey,task.id+':rework-delivered',d.npcId);}
+}
+
+/** A phase describes the world; only an unhandled fact authorizes another encounter. */
+export function paymentEncounterAvailable(p:Problem,characterId:string){
+ if(p.category!=='payment')return true;
+ if(!p.paymentCausal&&!p.paymentChain&&!p.story?.encounters.length)return true;
+ const s=paymentState(p);
+ return !!s.ready||(!s.originTaskId&&!s.lastTaskId&&!p.story?.encounters.length)||s.phase==='stable'&&p.paymentChain?.stage==='fixed'&&p.paymentChain.fixedBy!==characterId;
 }

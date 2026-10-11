@@ -15,13 +15,13 @@ const problem=(c:Campaign)=>project(c).problems.find(p=>p.category==='payment')!
 function start(){const c=act(emptyCampaign(),{type:'new',name:'Original',avatarId:'1',professionId:'frontend',seed:1427});delete activeCharacter(c).firstDay;activeCharacter(c).completedWork=['intro1','intro2'];return c;}
 function assign(c:Campaign){c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';const q=c.life!.queue.find(q=>q.id==='bug')!;q.status='selected';q.explained=true;q.projectId=project(c).id;q.problemId=problem(c).id;return act(c,{type:'take-task'});}
 function perform(c:Campaign,id:string){const task=activeTask(c)!,step=resolveTaskTemplate(task).steps.find(s=>s.id===task.currentStepId)!;const action=availableTechnicalActions(step,task.progress[step.id]).find(a=>a.id===id)!;expect(action).toBeTruthy();if(action.artifact){for(const row of action.artifact.rows.filter(r=>!r.optional))c=act(c,{type:'artifact-inspect',actionId:id,rowId:row.id});return act(c,{type:'artifact-compare',id});}return act(c,{type:'technical-action',id});}
-function returned(){let c=finishPlaytestTask(assign(start()),'limited');for(let i=0;i<2;i++)advanceCalendar(c);return c;}
+function returned(){let c=finishPlaytestTask(assign(start()),'limited');const due=problem(c).paymentCausal!.pending[0].day;while(c.life!.calendarDay<due)advanceCalendar(c);return c;}
 describe('one causal payment history',()=>{
  it('keeps the workaround cost, waits for the report and returns the same problem with different evidence',()=>{
   let c=start();const debt=project(c).techDebt;c=finishPlaytestTask(assign(c),'limited');const id=problem(c).id,origin=activeTask(c)!.id;
   expect(project(c).techDebt).toBe(debt+2);expect(problem(c).paymentChain).toMatchObject({stage:'workaround',taskId:origin,debt:2});
   expect(problem(c).latestOutcomeKey).toBe(paymentChainKeys.temporary);expect(activeCharacter(c).experience!.at(-1)!.tags).not.toContain('review');
-  advanceCalendar(c);expect(problem(c).paymentChain!.stage).toBe('workaround');advanceCalendar(c);c=assign(migrateLegacy(JSON.parse(JSON.stringify(c))));
+  advanceCalendar(c);expect(problem(c).paymentChain!.stage).toBe('workaround');const due=problem(c).paymentCausal!.pending[0].day;while(c.life!.calendarDay<due)advanceCalendar(c);c=assign(migrateLegacy(JSON.parse(JSON.stringify(c))));
   expect(activeTask(c)!.problemId).toBe(id);expect(activeTask(c)!.encounter!.originTaskId).toBe(origin);
   const actions=resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.actions;
   expect(actions.find(a=>a.id==='trace')!.artifact!.rows[1].detailKey).toBe('payment.chain.before.1.data');

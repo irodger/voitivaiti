@@ -81,6 +81,9 @@ it('ten linked episodes have explicit decision and event causes rather than a fa
  episode(['causal-diff','causal-bounded']);waitEvent();
  // 6: incident is only partly contained, so the team requests evidence.
  episode(['causal-triage','causal-contain','causal-wait-effect','causal-observe','causal-investigate']);waitEvent();
+ // Backend has a concrete requested follow-up, not an automatic post-fix transition.
+ const backend=c.characters.find(n=>n.employed&&n.profession==='backend')!,backendTopic=availableTopics(c,backend).find(t=>t.paymentProblemId===problem(c).id)!;
+ c=transition(c,{type:'conversation',npcId:backend.id,topicId:backendTopic.id,choiceId:'evidence'}).campaign;
  // 7: the reply and contract are checked before a changed handler is verified.
  episode(['causal-network','causal-client','causal-backend','causal-wait-backend','causal-reply','causal-contract','causal-repair','causal-verify']);waitEvent();
  // 8: the announced Backend revision is a real world event; its uncovered state is deferred.

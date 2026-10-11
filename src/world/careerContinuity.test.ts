@@ -4,12 +4,13 @@ vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}}
 import {transition,type Action} from './engine';
 import {emptyCampaign,activeCharacter,activeTask,candidates,canPromote,makeSchedule} from './simulation';
 import {migrateLegacy} from './store';
-import {ensureLife,takeVacation} from './life';
+import {ensureLife,takeVacation,advanceCalendar} from './life';
 import {promotionChecks} from './mastery';
 import type {Campaign} from './types';
 function start(){const c=transition(emptyCampaign(),{type:'new',name:'Original',avatarId:'1',professionId:'frontend',seed:1427}).campaign;activeCharacter(c).firstDay!.onboardingCompleted=true;activeCharacter(c).firstDay!.currentOnboardingStep='done';activeCharacter(c).completedWork=['intro1','intro2'];return c;}
 function act(c:Campaign,a:Action){return transition(c,a).campaign;}
 function work(c:Campaign,category='interface',style='shared'){
+ if(category==='payment'){c.activeTaskId=null;const due=c.company!.projects[0].problems.find(p=>p.category===category)!.paymentCausal?.pending[0]?.day;while(due&&c.life!.calendarDay<due)advanceCalendar(c);}
  const q=c.life!.queue.find(q=>q.id==='bug')!,p=c.company!.projects[0];q.status='selected';q.explained=true;q.projectId=p.id;q.problemId=p.problems.find(p=>p.category===category)!.id;
  c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';c=act(c,{type:'take-task'});
  return finishPlaytestTask(c,style);

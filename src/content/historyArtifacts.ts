@@ -21,7 +21,7 @@ export function historyArtifact(problem:Problem):WorkArtifact|undefined{
  const previous=problem.story?.encounters.at(-1);if(!previous)return undefined;
  return {kind:'task',titleKey:'evidence.history',promptKey:'evidence.prompt',rows:[
   {id:'previous-result',labelKey:'evidence.result',detailKey:problem.history.find(event=>event.id===previous.taskId+':encounter')?.key??previous.observations.at(-1)??'story.past'},
-  {id:'new-condition',labelKey:'evidence.new',detailKey:problem.story?.change?'story.'+problem.story.change:problem.workaround?'story.environment':'story.stable'},
+  {id:'new-condition',labelKey:'evidence.new',detailKey:problem.paymentCausal?.ready?.reasonKey??(problem.story?.change?'story.'+problem.story.change:problem.workaround?'story.environment':'story.stable')},
   ...(problem.story?.limitations??[]).map((detailKey,i)=>({id:'limitation-'+i,optional:true,labelKey:'evidence.limitation',detailKey})),
   ...previous.observations.slice(-2).map((detailKey,i)=>({id:'observation-'+i,optional:true,labelKey:'evidence.observations',detailKey}))
  ]};
