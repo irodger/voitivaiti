@@ -23,6 +23,29 @@ jobs:
       - name: Install testing browser and Linux libraries
         # Root is required for Linux libraries; retain the runner's Node and browser cache.
         run: sudo env "PATH=$PATH" "HOME=$HOME" npx puppeteer browsers install chrome --install-deps
+      - name: Allow testing browser sandbox in AppArmor
+        # Ubuntu restricts user namespaces for Chrome for Testing by default.
+        run: |
+          chrome_path="$(node --input-type=module -e 'import puppeteer from "puppeteer"; console.log(puppeteer.executablePath());')"
+          sudo tee /etc/apparmor.d/puppeteer-chrome > /dev/null <<EOF
+          abi <abi/4.0>,
+          include <tunables/global>
+          profile puppeteer-chrome "$chrome_path" flags=(unconfined) {
+            userns,
+          }
+          EOF
+          sudo apparmor_parser -r /etc/apparmor.d/puppeteer-chrome
+      - name: Verify browser launch
+        run: |
+          node --input-type=module <<'EOF'
+          import puppeteer from 'puppeteer';
+          const browser = await puppeteer.launch({ headless: true });
+          try {
+            console.log(await browser.version());
+          } finally {
+            await browser.close();
+          }
+          EOF
       - name: Profession journeys
         run: npm run test:e2e
       - name: Failure screenshots and diagnostics
