@@ -1,5 +1,5 @@
 import {text} from './localization';
-import type {Problem,WorkArtifact} from '../world/types';
+import type {Problem,WorkArtifact,Task} from '../world/types';
 const key=(id:string,ru:string,en:string)=>text('evidence.'+id,ru,en);
 key('history','Материалы прошлой работы','Previous work materials');
 key('result','Что передали в прошлый раз','Previously delivered result');
@@ -17,11 +17,11 @@ key('original','Исходный случай','Original case');
 key('neighbor','Соседний случай','Neighboring case');
 key('original.data','В отчёте есть условия и успешный результат исходного случая.','The report includes conditions and a passing result for the original case.');
 key('neighbor.data','В отчёте нет результата соседнего случая. Это ограничение проверки, а не доказанный сбой.','The report has no result for the neighboring case. This is a verification limit, not a proven failure.');
-export function historyArtifact(problem:Problem):WorkArtifact|undefined{
- const previous=problem.story?.encounters.at(-1);if(!previous)return undefined;
+export function historyArtifact(problem:Problem,encounter?:Task['encounter']):WorkArtifact|undefined{
+ const previous=encounter?.previousTaskId?problem.story?.encounters.find(e=>e.taskId===encounter.previousTaskId):problem.story?.encounters.at(-1);if(!previous)return undefined;
  return {kind:'task',titleKey:'evidence.history',promptKey:'evidence.prompt',rows:[
   {id:'previous-result',labelKey:'evidence.result',detailKey:problem.history.find(event=>event.id===previous.taskId+':encounter')?.key??previous.observations.at(-1)??'story.past'},
-  {id:'new-condition',labelKey:'evidence.new',detailKey:problem.paymentCausal?.ready?.reasonKey??(problem.story?.change?'story.'+problem.story.change:problem.workaround?'story.environment':'story.stable')},
+  {id:'new-condition',labelKey:'evidence.new',detailKey:encounter?.causeKey??problem.paymentCausal?.ready?.reasonKey??(problem.story?.change?'story.'+problem.story.change:problem.workaround?'story.environment':'story.stable')},
   ...(problem.story?.limitations??[]).map((detailKey,i)=>({id:'limitation-'+i,optional:true,labelKey:'evidence.limitation',detailKey})),
   ...previous.observations.slice(-2).map((detailKey,i)=>({id:'observation-'+i,optional:true,labelKey:'evidence.observations',detailKey}))
  ]};

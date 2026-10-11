@@ -25,8 +25,8 @@ export function causalContext(c:Campaign,p:Problem):CausalContext|undefined{
   else if(event.kind==='contract-change'||event.kind==='environment-change')family='artifact';
   if(!family||consumed.has(event.id)||reserved.has(event.id))continue;
   const previousTaskId=event.kind==='scene-followup'?event.id.slice(0,-':outcome:followup'.length):event.kind==='scene-outcome'?event.id.slice(0,-':outcome'.length):last?.taskId;
-  const prior=c.tasks.find(t=>t.id===previousTaskId);
-  candidates.push({id:event.id,day:event.day,family,key:event.key,actorId:event.actorId,previousTaskId,decisionId:prior?prior.id+':'+(Object.values(prior.progress).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome'):event.id,contextKeys:[event.key,...(prior?.outcome?[prior.outcome.summaryKey]:[]),...(last?.observations??[]),...(p.story?.limitations??[])]});
+  const prior=c.tasks.find(t=>t.id===previousTaskId),source=p.story?.encounters.find(e=>e.taskId===previousTaskId);
+  candidates.push({id:event.id,day:event.day,family,key:event.key,actorId:event.actorId,previousTaskId,decisionId:prior?prior.id+':'+(Object.values(prior.progress).flatMap(p=>p.actionHistory??[]).at(-1)??'outcome'):event.id,contextKeys:[event.key,...(prior?.outcome?[prior.outcome.summaryKey]:[]),...(source?.observations??[]),...(p.story?.limitations??[])]});
  }
  return candidates.sort((a,b)=>Number(b.family==='incident')-Number(a.family==='incident')||a.day-b.day||a.id.localeCompare(b.id))[0];
 }

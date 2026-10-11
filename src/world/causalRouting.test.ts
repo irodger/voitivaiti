@@ -31,4 +31,11 @@ describe('existing domain consequences route the next encounter',()=>{
   const c=start(),p=problem(c,'interface');c.company!.delegations=[{id:'handoff',actorId:c.activeCharacterId,npcId:'max',work:'bug',projectId:c.company!.projects[0].id,problemId:p.id,context:'interface',grade:0,profession:'frontend',startedDay:1,dueDay:2,status:'returned',result:'bounded'}];c.company!.history.push({id:'handoff:result',kind:'delegation-result',day:2,key:'responsibility.result.bounded',problemId:p.id,actorId:'max'});
   expect(ordinaryProblem(c,'debt').problem!.id).toBe(p.id);expect(causalContext(c,p)!.actorId).toBe('max');c.company!.delegations[0].status='checked';expect(causalContext(c,p)).toBeUndefined();
  });
+ it('ties observations to the decision that caused the report, not the latest encounter',()=>{
+  let c=finishPlaytestTask(assign(start(),'interface'),'limited');const p=problem(c,'interface'),prior=structuredClone(p.story!.encounters[0]),due=p.consequences![0].dueDay;
+  p.story!.encounters.push({...prior,taskId:'unrelated',observations:['story.review.reply.result']});while(c.life!.calendarDay<due)advanceCalendar(c);
+  const context=causalContext(c,p)!;expect(context.previousTaskId).toBe(prior.taskId);for(const key of prior.observations)expect(context.contextKeys).toContain(key);expect(context.contextKeys).not.toContain('story.review.reply.result');
+  c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(causalContext(c,problem(c,'interface'))).toEqual(context);
+ });
+
 });

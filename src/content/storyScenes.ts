@@ -1,7 +1,7 @@
 import {measurementArtifact,crossSourceArtifact} from './measurementArtifacts';
 import {historyArtifact,environmentArtifact,reviewArtifact} from './historyArtifacts';
 import {text} from './localization';
-import type {SceneFamily,TaskTemplate,Step,TechnicalAction,Problem} from '../world/types';
+import type {SceneFamily,TaskTemplate,Step,TechnicalAction,Problem,Task} from '../world/types';
 
 const copy=[
  ['past','Это продолжение прежней работы. Сначала сопоставь сохранённый результат с новым обращением.','This continues earlier work. Compare the saved result with the new report first.'],
@@ -72,7 +72,7 @@ const copy=[
 ];
 copy.forEach(([id,ru,en])=>text('story.'+id,ru,en));
 
-export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,problem:Problem):TaskTemplate{
+export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,problem:Problem,encounter?:Task['encounter']):TaskTemplate{
  const scene=structuredClone(base),investigate=base.steps[0].actionFlow!,resolve=base.steps[1].actionFlow!;
  const fact=investigate.actions.find(a=>a.id==='trace')!,limited=resolve.actions.find(a=>a.id==='verify-limited')!,shared=resolve.actions.find(a=>a.id==='verify-shared')!;
  const action=(id:string,label:string,observation:string,next?:string[],completes=false):TechnicalAction=>({id,labelKey:'story.'+label,observationKey:'story.'+observation,minutes:10,next,completes});
@@ -95,12 +95,12 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
  if(family==='artifact'){
   const open=action('open-artifact','artifact.open','artifact.seen',['experiment']);
   open.artifact={kind:'task',titleKey:'story.artifact.title',promptKey:'artifact.hint',rows:[{id:'saved',labelKey:'story.artifact.open',detailKey:'story.artifact.seen'},{id:'report',labelKey:'story.hypothesis.environment',detailKey:'story.environment'}]};
-  open.artifact=historyArtifact(problem)??open.artifact;
+  open.artifact=historyArtifact(problem,encounter)??open.artifact;
   const experiment=action('experiment','experiment','experiment.result',grade===0?['apply-shared']:['environment','metrics']);
   scene.steps=[makeStep('artifact','artifact.title',[open,experiment,environment,metrics,cross,applyShared,applyLimited,sharedResult,limitedResult],['open-artifact'],`saved version: ${problem.story?.version??1}\noriginal case: passed\nnew report: state changes between actions`),base.steps[2]];
  }else if(family==='recurrence'){
   const previous=action('previous','artifact.open','environment',grade===0?['environment']:['environment','metrics']);
-  previous.artifact=historyArtifact(problem);
+  previous.artifact=historyArtifact(problem,encounter);
   if(grade===0)cross.next=['apply-shared'];
   scene.steps=[makeStep('recurrence','recurrence.title',[previous,environment,metrics,cross,applyShared,applyLimited,sharedResult,limitedResult],['previous']),base.steps[2]];
  }else if(family==='dependency'||family==='delegation'){
@@ -118,6 +118,8 @@ export function storyScene(base:TaskTemplate,family:SceneFamily,grade:number,pro
  }else if(family==='review'){
   const inspect=action('inspect-review','inspect-review','inspect-review.result',['comment','approve-bounds']);
   inspect.artifact=structuredClone(reviewArtifact);
+  const history=encounter?.triggerId?historyArtifact(problem,encounter):undefined;
+  if(history)inspect.artifact.rows.push(...history.rows.map(row=>({...row,id:'history-'+row.id,optional:true})));
   const comment=action('comment','comment','comment.result',['review-context','experiment','approve-bounds']);comment.dependency=true;
   const context=action('review-context','review.wait','review.wait.result',['review-boundary','experiment','approve-bounds']);context.minutes=15;
   const boundary=action('review-boundary','review.boundary','review.boundary.result',['experiment','approve-bounds']);boundary.minutes=15;

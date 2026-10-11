@@ -66,7 +66,7 @@ export function prepareEncounter(c:Campaign,task:Task,base:TaskTemplate,problem:
  const family=cause?.family??(grade>=3?'delegation':grade>=2?'dependency':grade===1?'artifact':'investigation');
  task.sceneFamily=family;
  task.encounter={triggerId:cause?.id,triggerDay:cause?.day,causeKey:cause?.key,previousDecisionId:cause?.decisionId,version:story.version,grade,previousTaskId:cause?.previousTaskId,originTaskId:cause?.previousTaskId,previousActorId:cause?.actorId,contextKeys:cause?['story.past',...cause.contextKeys]:[]};
- if(family!=='investigation')task.scene=storyScene(base,family,grade,problem);
+ if(family!=='investigation')task.scene=storyScene(base,family,grade,problem,task.encounter);
  if(cause&&task.scene){task.scene.descriptionKey=cause.key;task.scene.steps[0].bodyKey=cause.key;}
 
 }
