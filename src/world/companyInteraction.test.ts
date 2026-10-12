@@ -1,3 +1,4 @@
+import {deskPulse} from './deskPulse';
 import {colleagueWorkMemory} from './colleagueWorkMemory';
 import {morningBriefing} from './morningBriefing';
 import {describe,it,expect,vi} from 'vitest';
@@ -190,4 +191,11 @@ it.each(['limited','shared'])('colleague memory retains the actual %s result wit
  expect(memory.some(m=>m.factKey===task.outcome!.followupKey)).toBe(false);expect(colleagueWorkMemory(c,'unrelated-person')).toEqual([]);
  const before=JSON.stringify(c);expect(colleagueWorkMemory(reload(c),owner)).toEqual(memory);expect(JSON.stringify(c)).toBe(before);
  c.activeCharacterId='other-hero';expect(colleagueWorkMemory(c,owner)).toEqual([]);
+});
+
+it('desk pulse follows the campaign owner request from active waiting through pause, reply and actual inspection',()=>{
+ let c=assign(launch());c=act(c,'inspect');c=act(c,'trace');expect(deskPulse(c)).toMatchObject({awaiting:1,ready:0,currentReply:true});
+ const id=activeTask(c)!.id;c=transition(c,{type:'pause-task'}).campaign;c=reload(c);expect(deskPulse(c)).toMatchObject({saved:1,awaiting:1});
+ c=transition(c,{type:'wait-for-reply',id}).campaign;expect(deskPulse(c)).toMatchObject({ready:1,awaiting:0});
+ c=transition(c,{type:'resume-task',id}).campaign;c=act(c,'campaign-reply');expect(deskPulse(c)).toMatchObject({ready:0,awaiting:0,currentReply:false});
 });

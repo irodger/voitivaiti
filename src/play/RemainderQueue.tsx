@@ -14,7 +14,7 @@ import type {WorkKind} from '../world/lifeTypes';
 export function RemainderQueue(){
  const w=useWorld(),ch=activeCharacter(w),{t}=useI18n(),[chosen,setChosen]=useState<WorkKind|null>(null),level=autonomy(ch),queue=w.life!.queue;
  const selected=queue.find(q=>q.status==='selected'&&!q.delegatedTo);
- return <><DelegationResults/><div className="remainder-queue">{queue.filter(q=>q.status!=='done'&&(!!q.delegatedTo||availableWork(ch).includes(q.id))).map(q=>{
+ return <><DelegationResults/><div className="remainder-queue">{queue.filter(q=>q.status!=='done'&&(!!q.delegatedTo||availableWork(ch).includes(q.id))&&(!!q.delegatedTo||!w.tasks.some(task=>task.paused&&!task.rewarded&&task.characterId===ch.id&&task.workKind===q.id))).map(q=>{
   const npc=w.characters.find(n=>n.id===workOwner[q.id]),delegated=!!q.delegatedTo;
   const canTake=availableWork(ch).includes(q.id)&&(!selected||selected.id===q.id);
   const takeReason=w.life!.reviewDue?'review':w.time>=gameConfig.clock.lastTaskStart?'late':null;
