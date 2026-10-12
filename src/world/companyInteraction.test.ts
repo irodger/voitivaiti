@@ -59,3 +59,36 @@ describe('one complete department interaction',()=>{
  });
 
 });
+
+ describe('campaign route regression with reload while waiting',()=>{
+  it.each(['limited','shared'])('%s route preserves ownership, boundaries, handoff and consumed causes',style=>{
+   let c=assign(launch());const initial=activeTask(c)!,trigger=initial.encounter!.triggerId!,route=campaignTeams(c)!;
+   c=act(c,'inspect');c=act(c,'trace');
+   const waiting=state(c).progress.dependency!;expect(waiting.ready).toBe(false);
+   const actor=waiting.npcId;expect(actor).toBe(c.company!.structure!.teams.find(t=>t.id===route.owner.id)!.contactId);
+   c=transition(c,{type:'pause-task'}).campaign;c=reload(c);
+   expect(c.activeTaskId).toBeNull();expect(c.tasks.find(t=>t.id===initial.id)!.paused).toBe(true);
+   for(let guard=0;guard<5&&!c.tasks.find(t=>t.id===initial.id)!.progress[initial.currentStepId].dependency!.ready;guard++){
+    const before=c.time;c=transition(c,{type:'wait-for-reply',id:initial.id}).campaign;expect(c.time).toBeGreaterThan(before);c=reload(c);
+   }
+   const restored=c.tasks.find(t=>t.id===initial.id)!.progress[initial.currentStepId].dependency!;
+   expect(restored).toMatchObject({ready:true,npcId:actor});
+   expect(c.company!.mail!.messages.find(m=>m.subjectKey==='mail.result')).toMatchObject({senderCharacterId:actor,senderTeamId:route.owner.id});
+   c=transition(c,{type:'resume-task',id:initial.id}).campaign;c=act(c,'campaign-reply');
+   c=finishPlaytestTask(c,style);const done=activeTask(c)!;
+   expect(done.outcome!.summaryKey).toBe(style==='limited'?'org.campaign.bounded':'org.campaign.proper');
+   expect(c.company!.structure!.campaign.result!.coverageMultiplier).toBe(style==='limited'?2:3);
+   c=reload(c);expect(c.company!.structure!.campaign.result!.coverageMultiplier).toBe(style==='limited'?2:3);
+   expect(c.tasks.filter(t=>t.encounter?.triggerId===trigger)).toHaveLength(1);
+   const pending=problem(c).consequences!.find(e=>e.id===done.id+':outcome')!;
+   while(c.life!.calendarDay<pending.dueDay)advanceCalendar(c);
+   const next=causalContext(c,problem(c))!;expect(next.family).toBe(style==='limited'?'recurrence':'review');
+   c=assign(reload(c));const continuation=activeTask(c)!;expect(continuation.encounter!.triggerId).toBe(next.id);
+   if(style==='shared')expect(resolveTaskTemplate(continuation).author).toBe(c.company!.structure!.teams.find(t=>t.id===route.consumer.id)!.contactId);
+   const taskCount=c.tasks.length;c=transition(c,{type:'take-task'}).campaign;expect(c.tasks).toHaveLength(taskCount);
+   c=finishPlaytestTask(c);c=reload(c);
+   expect(causalContext(c,problem(c))?.id).not.toBe(next.id);
+   expect(c.tasks.filter(t=>t.encounter?.triggerId===next.id)).toHaveLength(1);
+   expect(problem(c).history.filter(e=>e.kind==='company-team-result')).toHaveLength(1);
+  });
+ });
