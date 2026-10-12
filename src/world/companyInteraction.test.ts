@@ -154,3 +154,13 @@ it.each(['finding','bounded'])('Product review %s preserves the prior fix and it
  expect(followup.outcome.followupKey).toBe('org.campaign.productReview.'+route+'.next');
  expect(causalContext(reload(c),problem(c))!).toMatchObject({key:'org.campaign.productReview.'+route,previousTaskId:completed.id,family:route==='bounded'?'coordination':'artifact'});
 });
+
+it.each(['limited','shared'])('end-of-day report retains the %s handoff without revealing the future encounter',style=>{
+ let c=finishPlaytestTask(assign(launch()),style);const task=activeTask(c)!,xp=activeCharacter(c).stats.xp;
+ c=transition(c,{type:'reward-close'}).campaign;c=transition(c,{type:'end-day'}).campaign;
+ const report=c.life!.dayReport!,record=report.tasks.find(r=>r.id===task.id)!;
+ expect(record).toMatchObject({state:'delivered',summaryKey:style==='limited'?'org.campaign.bounded':'org.campaign.proper',temporary:style==='limited',recipientTeamId:c.company!.structure!.campaign.targetTeamId});
+ expect(JSON.stringify(report)).not.toContain(task.outcome!.followupKey);
+ const loaded=reload(c);expect(loaded.life!.dayReport).toEqual(report);expect(activeCharacter(loaded).stats.xp).toBe(xp);
+ expect(transition(loaded,{type:'end-day'}).campaign.life!.dayReport).toEqual(report);
+});

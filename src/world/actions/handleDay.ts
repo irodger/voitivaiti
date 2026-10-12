@@ -1,3 +1,4 @@
+import {captureDayReport} from '../dayReport';
 import { gameConfig } from '../../config/game';
 import { currentWalk } from '../walk';
 import { carryQueue, finishOfficeHours } from '../workLoop';
@@ -45,6 +46,7 @@ export function handleDay(ctx: ActionContext, action: Action): TransitionResult 
             emit('salary_paid', { amount: pay, characterId: ch.id, day: c.company.currentDay });
         }
         closeWorkDay(c);
+        c.life!.dayReport=captureDayReport(c);
         history(c, 'day', 'ui.rest');
         emit('day_completed', { day: c.company.currentDay });
     }
