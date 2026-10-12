@@ -1,3 +1,4 @@
+import {colleagueWorkMemory} from './colleagueWorkMemory';
 import {morningBriefing} from './morningBriefing';
 import {describe,it,expect,vi} from 'vitest';
 vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
@@ -174,4 +175,19 @@ it.each(['limited','shared'])('morning briefing connects the %s result to an arr
  const before=JSON.stringify(c),brief=morningBriefing(c)!;
  expect(brief.calendarDay).toBe(report.calendarDay);expect(brief.items).toContainEqual(expect.objectContaining({taskId:task.id,kind:'returned',factKey:style==='limited'?'org.campaign.returned':'org.campaign.review'}));
  expect(JSON.stringify(c)).toBe(before);expect(morningBriefing(reload(c))).toEqual(brief);
+});
+
+it('colleague memory cannot reveal a ready reply before its artifact was inspected',()=>{
+ let c=assign(launch());for(const id of ['inspect','trace','campaign-local'])c=act(c,id);
+ const owner=campaignTeams(c)!.owner.contactId!;expect(colleagueWorkMemory(c,owner)).toEqual([]);
+ c=act(c,'campaign-reply');const before=JSON.stringify(c),xp=activeCharacter(c).stats.xp;
+ expect(colleagueWorkMemory(c,owner)).toEqual([expect.objectContaining({kind:'reply',factKey:'org.campaign.reply.result',taskId:activeTask(c)!.id})]);
+ expect(JSON.stringify(c)).toBe(before);expect(activeCharacter(c).stats.xp).toBe(xp);expect(colleagueWorkMemory(reload(c),owner)).toEqual(colleagueWorkMemory(c,owner));
+});
+it.each(['limited','shared'])('colleague memory retains the actual %s result without future facts or other heroes',style=>{
+ const c=finishPlaytestTask(assign(launch()),style),task=activeTask(c)!,owner=campaignTeams(c)!.owner.contactId!;
+ const memory=colleagueWorkMemory(c,owner);expect(memory[0]).toMatchObject({kind:'result',factKey:task.outcome!.summaryKey,temporary:style==='limited'});
+ expect(memory.some(m=>m.factKey===task.outcome!.followupKey)).toBe(false);expect(colleagueWorkMemory(c,'unrelated-person')).toEqual([]);
+ const before=JSON.stringify(c);expect(colleagueWorkMemory(reload(c),owner)).toEqual(memory);expect(JSON.stringify(c)).toBe(before);
+ c.activeCharacterId='other-hero';expect(colleagueWorkMemory(c,owner)).toEqual([]);
 });
