@@ -41,6 +41,27 @@ export function encounterTeam(c:Campaign,teamId:string,create:(id:string,name:st
 function campaignOutcomes(scene:TaskTemplate,teamContext:CompanyInteractionContext){
  for(const action of scene.steps.flatMap(s=>s.actionFlow?.actions??[]))if(action.outcome){const changed=action.outcome.systemChanged!==false;action.outcome.teamContext={...teamContext};action.outcome.summaryKey=action.outcome.kind==='temporary'?'org.campaign.bounded':changed?'org.campaign.proper':'org.campaign.evidence';action.outcome.followupKey=action.outcome.kind==='temporary'?'org.campaign.returned':changed?'org.campaign.review':'org.campaign.evidenceNext';}
 }
+/** Presentation only: keep the saved graph, timings, effects and outcomes intact. */
+function campaignChoiceCopy(scene:TaskTemplate){
+ const scope=scene.steps.find(s=>s.actionFlow?.actions.some(a=>a.id==='limited')&&s.actionFlow.actions.some(a=>a.id==='shared'));
+ if(!scope)return;
+ const changesSystem=scope.actionFlow!.actions.find(a=>a.id==='verify-shared')?.outcome?.systemChanged!==false;
+ scope.titleKey='org.campaign.scope';scope.bodyKey='org.campaign.scope.body'+(changesSystem?'':'Evidence');
+ for(const action of scope.actionFlow!.actions){
+  if(['limited','shared','verify-limited','verify-shared'].includes(action.id)){
+   action.labelKey='org.campaign.'+action.id+'.label';
+   action.observationKey='org.campaign.'+action.id+'.observation';
+   if(!changesSystem&&['limited','shared'].includes(action.id))action.labelKey+='Evidence';
+   if(!changesSystem&&action.id==='verify-shared')action.observationKey+='Evidence';
+  }
+ }
+ const handoff=scene.steps.flatMap(s=>s.actionFlow?.actions??[]).find(a=>a.id==='handoff');
+ if(handoff)handoff.observationByOutcome={temporary:'org.campaign.bounded',durable:changesSystem?'org.campaign.proper':'org.campaign.evidence'};
+}
+export function refreshCampaignChoiceCopy(c:Campaign){
+ const campaign=c.company?.structure?.campaign;if(!campaign)return;
+ for(const task of c.tasks)if(task.problemId===campaign.problemId&&task.encounter?.triggerId===campaign.id+':risk'&&task.scene)campaignChoiceCopy(task.scene);
+}
 export function prepareCampaignWork(c:Campaign,task:Task,base:TaskTemplate,problem:Problem,create:(id:string,name:string,avatar:string,profession:string)=>Character){
  if(problem.id!==c.company?.structure?.campaign.problemId)return;
  if(task.encounter?.triggerId!==c.company.structure.campaign.id+':risk'){
@@ -62,6 +83,7 @@ export function prepareCampaignWork(c:Campaign,task:Task,base:TaskTemplate,probl
  if(trace){trace.effects=undefined;trace.labelKey='org.campaign.trace';trace.observationKey='org.campaign.trace.result';trace.artifact=undefined;trace.completes=false;trace.dependency=true;trace.dependencyTeamId=problem.ownerTeamId;trace.dependencyResponseKey='org.campaign.reply.result';trace.next=['campaign-local','campaign-reply'];}
  scene.steps[0].actionFlow?.actions.push({id:'campaign-local',labelKey:'org.campaign.local',observationKey:'org.campaign.local.result',minutes:30,next:['campaign-reply']},{id:'campaign-reply',labelKey:'org.campaign.reply',observationKey:'org.campaign.reply.result',minutes:0,effects:replyEffects,requiresReply:true,completes:true,artifact:{kind:'metrics',titleKey:'org.campaign.reply',promptKey:'artifact.hint',rows:[{id:'tested',labelKey:'org.campaign.capacity',detailKey:'org.campaign.tested'},{id:'gap',labelKey:'org.campaign.plannedTraffic',detailKey:'org.campaign.gap'}]}});
  campaignOutcomes(scene,teamContext);
+ campaignChoiceCopy(scene);
 
  const handoff=scene.steps.flatMap(s=>s.actionFlow?.actions??[]).find(a=>a.id==='handoff');if(handoff)handoff.labelKey='org.campaign.handoff';
  task.scene=scene;

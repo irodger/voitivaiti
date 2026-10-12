@@ -10,7 +10,7 @@ import {finishPlaytestTask} from './playtestHelpers';
 import {migrateLegacy} from './store';
 import {causalContext} from './causalRouting';
 import type {Campaign} from './types';
-function start(seed=1427){const c=transition(emptyCampaign(),{type:'new',name:'Interaction',avatarId:'1',professionId:'frontend',seed}).campaign;delete activeCharacter(c).firstDay;activeCharacter(c).completedWork=['one','two'];return c;}
+function start(seed=1427,profession='frontend'){const c=transition(emptyCampaign(),{type:'new',name:'Interaction',avatarId:'1',professionId:profession,seed}).campaign;delete activeCharacter(c).firstDay;activeCharacter(c).completedWork=['one','two'];return c;}
 const reload=(c:Campaign)=>migrateLegacy(JSON.parse(JSON.stringify(c)));
 function launch(c=start()){while(c.life!.calendarDay<c.company!.structure!.campaign.plannedDay)advanceCalendar(c);return c;}
 function assign(c:Campaign){c.activeTaskId=null;c.phase='office';c.time=540;c.schedule=makeSchedule(c);c.schedule[0].status='completed';const q=c.life!.queue.find(q=>q.id==='bug')!;q.status='selected';q.explained=true;q.projectId=c.company!.projects[0].id;q.problemId=c.company!.projects[0].problems.find(p=>p.category==='interface')!.id;return transition(c,{type:'take-task'}).campaign;}
@@ -92,3 +92,49 @@ describe('one complete department interaction',()=>{
    expect(problem(c).history.filter(e=>e.kind==='company-team-result')).toHaveLength(1);
   });
  });
+
+import {translate} from '../content/localization';
+
+ describe('campaign choice copy matches committed boundaries',()=>{
+  it.each(['limited','shared'])('%s uses campaign conditions without changing the saved action graph',style=>{
+   let c=assign(launch());for(const id of ['inspect','trace','campaign-local','campaign-reply'])c=act(c,id);
+   c=transition(c,{type:'advance'}).campaign;
+   const task=activeTask(c)!,scene=resolveTaskTemplate(task),scope=scene.steps.find(s=>s.id===task.currentStepId)!;
+   const mechanical=()=>scene.steps.map(s=>({id:s.id,app:s.app,type:s.type,initial:s.actionFlow?.initial,actions:s.actionFlow?.actions.map(({labelKey,observationKey,observationByOutcome,...rest})=>rest)}));
+   const before=structuredClone(mechanical());
+   scope.bodyKey='lens.frontend.performance.scope';
+   for(const a of scope.actionFlow!.actions){a.labelKey='old.generic.label';a.observationKey='old.generic.observation';}
+   c=reload(c);const restored=resolveTaskTemplate(activeTask(c)!);
+   expect(restored.steps.map(s=>({id:s.id,app:s.app,type:s.type,initial:s.actionFlow?.initial,actions:s.actionFlow?.actions.map(({labelKey,observationKey,observationByOutcome,...rest})=>rest)}))).toEqual(before);
+   const actions=restored.steps.find(s=>s.id===activeTask(c)!.currentStepId)!.actionFlow!.actions;
+   for(const locale of ['ru','en'] as const){
+    const text=(key:string)=>translate(key,{},locale,'clean');
+    expect(text(restored.steps[1].bodyKey)).toContain(locale==='ru'?'2×':'double');
+    expect(text(restored.steps[1].bodyKey)).toContain(locale==='ru'?'3×':'triple');
+    for(const id of ['limited','shared','verify-limited','verify-shared'])expect(actions.find(a=>a.id===id)!.labelKey).toBe('org.campaign.'+id+'.label');
+    expect(text(actions.find(a=>a.id==='verify-limited')!.labelKey)).toContain(locale==='ru'?'2×':'double');
+    expect(text(actions.find(a=>a.id==='verify-shared')!.labelKey)).toContain(locale==='ru'?'3×':'triple');
+    expect(text(actions.find(a=>a.id==='verify-shared')!.labelKey)).not.toContain('neighboring screen');
+   }
+   c=act(c,style);c=act(c,'verify-'+style);
+   const progress=state(c).progress;
+   expect(progress.observations!['verify-'+style]).toBe('org.campaign.verify-'+style+'.observation');
+   c=finishPlaytestTask(c,style);const completed=activeTask(c)!;
+   expect(completed.outcome!.summaryKey).toBe(style==='limited'?'org.campaign.bounded':'org.campaign.proper');
+   expect(c.company!.structure!.campaign.result!.coverageMultiplier).toBe(style==='limited'?2:3);
+   const due=problem(c).consequences!.find(e=>e.id===completed.id+':outcome')!.dueDay;
+   while(c.life!.calendarDay<due)advanceCalendar(c);
+   expect(causalContext(reload(c),problem(c))!.key).toBe(style==='limited'?'org.campaign.returned':'org.campaign.review');
+  });
+ });
+
+it('campaign copy preserves evidence-only ownership and does not rewrite unrelated scenes',()=>{
+ let c=assign(launch(start(1427,'qa')));for(const id of ['inspect','trace','campaign-local','campaign-reply'])c=act(c,id);
+ c=transition(c,{type:'advance'}).campaign;const task=activeTask(c)!,scene=resolveTaskTemplate(task),scope=scene.steps[1];
+ expect(scope.bodyKey).toBe('org.campaign.scope.bodyEvidence');
+ expect(scope.actionFlow!.actions.find(a=>a.id==='shared')!.labelKey).toBe('org.campaign.shared.labelEvidence');
+ expect(scope.actionFlow!.actions.find(a=>a.id==='verify-shared')!.outcome!.systemChanged).toBe(false);
+ const unrelated=structuredClone(task);unrelated.id='other-scene';unrelated.problemId='other-problem';unrelated.scene!.steps[1].bodyKey='original.other.copy';c.tasks.push(unrelated);
+ c=reload(c);expect(c.tasks.find(t=>t.id==='other-scene')!.scene!.steps[1].bodyKey).toBe('original.other.copy');
+ c=finishPlaytestTask(c);expect(activeTask(c)!.outcome!.summaryKey).toBe('org.campaign.evidence');
+});
