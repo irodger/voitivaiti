@@ -1,0 +1,10 @@
+import {ArrowRight,Compass} from 'lucide-react';
+import type {Step} from '../world/types';
+import {useI18n,text} from '../content/localization';
+import './laptopReturn.css';
+text('laptopReturn.current','Текущая работа · {app}','Current work · {app}');
+text('laptopReturn.back','К работе','Back to work');
+export function LaptopReturn({step,onReturn}:{step:Step;onReturn:()=>void}){
+ const {t}=useI18n();
+ return <aside className="laptop-return"><Compass size={19} aria-hidden="true"/><div><small>{t('laptopReturn.current',{app:t('ui.'+step.app)})}</small><b>{t(step.titleKey)}</b></div><button onClick={onReturn}>{t('laptopReturn.back')}<ArrowRight size={16}/></button></aside>;
+}

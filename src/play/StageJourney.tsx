@@ -12,8 +12,9 @@ function Journey({items,label}:{items:Stage[];label:string}){
 }
 export function TaskJourney({task,steps,selectedId,onSelect,compact=false}:{task:Task;steps:Step[];selectedId:string;onSelect:(step:Step)=>void;compact?:boolean}){
  const {t}=useI18n(),done=steps.filter(s=>task.progress[s.id]?.status==='completed').length;
+ const current=steps.find(s=>s.id===task.currentStepId);
  const journey=<Journey label={t('premiumStage.path')} items={steps.map(s=>({id:s.id,title:t(s.titleKey),state:task.progress[s.id]?.status==='completed'?'done':s.id===task.currentStepId?'current':task.progress[s.id]?.status==='locked'?'locked':'next',Icon:appIcons[s.app as AppId],selected:s.id===selectedId,onClick:()=>onSelect(s)}))}/>;
- return compact?<details className="task-journey-fold"><summary><Route size={17} aria-hidden="true"/><span>{t('premiumStage.path')}</span><b>{t('premiumStage.progress',{done,total:steps.length})}</b></summary>{journey}</details>:journey;
+ return compact?<details className="task-journey-fold"><summary><Route size={17} aria-hidden="true"/><span>{t('premiumStage.path')}{current&&<small className="journey-current-title">{t(current.titleKey)}</small>}</span><b>{t('premiumStage.progress',{done,total:steps.length})}</b></summary>{journey}</details>:journey;
 }
 export function WorkdayJourney({events,onOffice}:{events:DayEvent[];onOffice?:()=>void}){
  const {t}=useI18n(),current=events.find(e=>e.status==='pending')?.id;
