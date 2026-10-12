@@ -10,7 +10,7 @@ import './spaces.css';
 
 export function OfficeStatus({openLaptop}:{openLaptop:()=>void}){
  const w=useWorld(),{t}=useI18n(),task=activeTask(w),current=task&&!task.rewarded?resolveTaskTemplate(task):undefined,ch=activeCharacter(w),queue=deskAvailability(w).eligible.length;
- return <div className="space-status office-status"><div className="space-status-heading"><span className="space-status-icon"><Laptop2 size={23}/></span><div><small>{t('spaces.office')}</small><h3>{t(current?current.titleKey:'desk.tasks')}</h3></div><button onClick={openLaptop} aria-label={t('ui.openLaptop')}><ArrowUpRight size={20}/></button></div><div className="space-status-facts"><span><Layers size={15}/><b>{queue}</b>{t('spaces.queue')}</span><span><Users size={15}/><b>{w.characters.filter(c=>c.employed&&c.id!==ch.id).length}</b>{t('spaces.people')}</span></div></div>;
+ return <div className="space-status office-status"><div className="space-status-heading"><span className="space-status-icon"><Laptop2 size={23}/></span><div><small>{t('spaces.office')}</small><h3>{t(current?current.titleKey:'desk.tasks')}</h3></div><button onClick={openLaptop} aria-label={t('ui.openLaptop')}><span className="office-mobile-open">{t('ui.openLaptop')}</span><ArrowUpRight size={20}/></button></div><div className="space-status-facts"><span><Layers size={15}/><b>{queue}</b>{t('spaces.queue')}</span><span><Users size={15}/><b>{w.characters.filter(c=>c.employed&&c.id!==ch.id).length}</b>{t('spaces.people')}</span></div></div>;
 }
 export function HomeStatus(){
  const ch=useWorld(w=>activeCharacter(w)),{t}=useI18n(),rest=recovery(ch);
