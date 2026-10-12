@@ -58,9 +58,34 @@ function campaignChoiceCopy(scene:TaskTemplate){
  const handoff=scene.steps.flatMap(s=>s.actionFlow?.actions??[]).find(a=>a.id==='handoff');
  if(handoff)handoff.observationByOutcome={temporary:'org.campaign.bounded',durable:changesSystem?'org.campaign.proper':'org.campaign.evidence'};
 }
+function campaignReviewCopy(scene:TaskTemplate,context:CompanyInteractionContext){
+ const step=scene.steps.find(s=>s.actionFlow?.actions.some(a=>a.id==='inspect-review'));if(!step)return;
+ step.titleKey='org.campaign.productReview';step.bodyKey='org.campaign.productReview.body';
+ const actions=step.actionFlow!.actions;
+ const inspect=actions.find(a=>a.id==='inspect-review')!;
+ inspect.labelKey='org.campaign.productReview.inspect';inspect.observationKey='org.campaign.productReview.seen';
+ if(inspect.artifact)for(const row of inspect.artifact.rows){
+  if(row.id==='original'){row.labelKey='org.campaign.productReview.normal';row.detailKey='org.campaign.productReview.normal.data';}
+  if(row.id==='neighbor'){row.labelKey='org.campaign.productReview.triple';row.detailKey='org.campaign.productReview.triple.data';}
+ }
+ const comment=actions.find(a=>a.id==='comment');if(comment){comment.labelKey='org.campaign.productReview.request';comment.dependencyTeamId=context.ownerTeamId;comment.dependencyResponseKey='org.campaign.productReview.reply';}
+ const experiment=actions.find(a=>a.id==='experiment');if(experiment){
+  experiment.labelKey='org.campaign.productReview.readReply';experiment.observationKey='org.campaign.productReview.reply';
+  if(experiment.artifact)for(const row of experiment.artifact.rows){
+   if(row.id==='original'){row.labelKey='org.campaign.productReview.normal';row.detailKey='org.campaign.productReview.reply.normal';}
+   if(row.id==='neighbor'){row.labelKey='org.campaign.productReview.triple';row.detailKey='org.campaign.productReview.reply.triple';}
+  }
+ }
+ for(const [id,key] of [['bounded-result','bounded'],['verified-result','finding']] as const){
+  const action=actions.find(a=>a.id===id);if(!action)continue;
+  action.labelKey='org.campaign.productReview.'+key+'.label';action.observationKey='org.campaign.productReview.'+key;
+  if(action.outcome){action.outcome.summaryKey=action.observationKey;action.outcome.followupKey=action.observationKey+'.next';}
+ }
+}
 export function refreshCampaignChoiceCopy(c:Campaign){
  const campaign=c.company?.structure?.campaign;if(!campaign)return;
  for(const task of c.tasks)if(task.problemId===campaign.problemId&&task.encounter?.triggerId===campaign.id+':risk'&&task.scene)campaignChoiceCopy(task.scene);
+ for(const task of c.tasks)if(task.problemId===campaign.problemId&&task.sceneFamily==='review'&&task.encounter?.causeKey==='org.campaign.review'&&task.encounter.teamContext&&task.scene)campaignReviewCopy(task.scene,task.encounter.teamContext);
 }
 export function prepareCampaignWork(c:Campaign,task:Task,base:TaskTemplate,problem:Problem,create:(id:string,name:string,avatar:string,profession:string)=>Character){
  if(problem.id!==c.company?.structure?.campaign.problemId)return;
@@ -70,6 +95,7 @@ export function prepareCampaignWork(c:Campaign,task:Task,base:TaskTemplate,probl
   if(['investigation','recurrence','artifact'].includes(task.sceneFamily??''))campaignOutcomes(scene,context);
   if(task.sceneFamily==='review'){
    const contact=encounterTeam(c,context.consumerTeamId,create);if(contact){scene.author=contact.id;scene.steps[0].speaker=contact.id;}
+   if(task.encounter?.causeKey==='org.campaign.review')campaignReviewCopy(scene,context);
   }
   task.scene=scene;return;
  }

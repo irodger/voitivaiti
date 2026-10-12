@@ -138,3 +138,19 @@ it('campaign copy preserves evidence-only ownership and does not rewrite unrelat
  c=reload(c);expect(c.tasks.find(t=>t.id==='other-scene')!.scene!.steps[1].bodyKey).toBe('original.other.copy');
  c=finishPlaytestTask(c);expect(activeTask(c)!.outcome!.summaryKey).toBe('org.campaign.evidence');
 });
+
+it.each(['finding','bounded'])('Product review %s preserves the prior fix and its actual ownership',route=>{
+ let c=finishPlaytestTask(assign(launch()));const fixed=activeTask(c)!,prior=structuredClone(c.company!.structure!.campaign.result);
+ const due=problem(c).consequences!.find(e=>e.id===fixed.id+':outcome')!.dueDay;while(c.life!.calendarDay<due)advanceCalendar(c);
+ c=assign(c);const review=activeTask(c)!,owner=campaignTeams(c)!.owner;
+ expect(review.sceneFamily).toBe('review');expect(state(c).step.bodyKey).toBe('org.campaign.productReview.body');
+ c=act(c,'inspect-review');expect(state(c).progress.observations!['inspect-review']).toBe('org.campaign.productReview.seen');
+ if(route==='finding'){c=act(c,'comment');expect(state(c).progress.dependency!.npcId).toBe(owner.contactId);
+ c=reload(c);c=act(c,'review-context');c=act(c,'review-boundary');c=act(c,'experiment');
+ expect(state(c).progress.observations!.experiment).toBe('org.campaign.productReview.reply');}else{c=act(c,'approve-bounds');c=reload(c);}
+ c=finishPlaytestTask(c);expect(activeTask(c)!.outcome).toMatchObject({systemChanged:false,summaryKey:'org.campaign.productReview.'+route});
+ expect(c.company!.structure!.campaign.result).toEqual(prior);expect(c.tasks.find(t=>t.id===fixed.id)!.outcome!.summaryKey).toBe('org.campaign.proper');
+ const completed=activeTask(c)!,followup=problem(c).consequences!.find(e=>e.id===completed.id+':outcome')!;while(c.life!.calendarDay<followup.dueDay)advanceCalendar(c);
+ expect(followup.outcome.followupKey).toBe('org.campaign.productReview.'+route+'.next');
+ expect(causalContext(reload(c),problem(c))!).toMatchObject({key:'org.campaign.productReview.'+route,previousTaskId:completed.id,family:route==='bounded'?'coordination':'artifact'});
+});
