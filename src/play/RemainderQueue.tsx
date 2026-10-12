@@ -1,3 +1,4 @@
+import {PriorityImpact} from './PriorityImpact';
 import {gameConfig} from '../config/game';
 import {WorkItemContext} from './WorkItemContext';
 import {WorkKindIcon} from './WorkKindIcon';
@@ -29,7 +30,7 @@ export function RemainderQueue(){
     {!helpReason&&level>=3&&npc&&npc.employed&&npc.id!==ch.id&&!queue.some(item=>item.delegatedTo===npc.id)&&<button onClick={()=>w.dispatch({type:'delegate-work',id:q.id,npcId:npc.id})}>{t('queue.delegate',{name:characterName(npc,t)})}</button>}
    </div>}
    {!delegated&&((canTake&&takeReason)||helpReason)&&<small className="queue-unavailable">{t('queue.reason.'+(canTake&&takeReason?takeReason:helpReason))}</small>}
-   {chosen===q.id&&!selected&&canTake&&!takeReason&&<div className="queue-agreement"><p>{t('queue.agree')}</p><div className="remainder-actions"><button onClick={()=>choose(true)}>{t('life.explain')}</button><button onClick={()=>choose(false)}>{t('life.dismiss')}</button></div></div>}
+   {chosen===q.id&&!selected&&canTake&&!takeReason&&<div className="queue-agreement"><PriorityImpact chosen={q.id}/><p>{t('queue.agree')}</p><div className="remainder-actions"><button onClick={()=>choose(true)}>{t('life.explain')}</button><button onClick={()=>choose(false)}>{t('life.dismiss')}</button></div></div>}
   </article>;
  })}</div></>;
 }
