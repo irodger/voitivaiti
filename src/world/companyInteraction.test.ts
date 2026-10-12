@@ -1,3 +1,4 @@
+import {morningBriefing} from './morningBriefing';
 import {describe,it,expect,vi} from 'vitest';
 vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
 import {transition} from './engine';
@@ -163,4 +164,14 @@ it.each(['limited','shared'])('end-of-day report retains the %s handoff without 
  expect(JSON.stringify(report)).not.toContain(task.outcome!.followupKey);
  const loaded=reload(c);expect(loaded.life!.dayReport).toEqual(report);expect(activeCharacter(loaded).stats.xp).toBe(xp);
  expect(transition(loaded,{type:'end-day'}).campaign.life!.dayReport).toEqual(report);
+});
+
+it.each(['limited','shared'])('morning briefing connects the %s result to an arrived cause, never its scheduled future text',style=>{
+ let c=finishPlaytestTask(assign(launch()),style);const task=activeTask(c)!;
+ c=transition(c,{type:'reward-close'}).campaign;c=transition(c,{type:'end-day'}).campaign;
+ const report=c.life!.dayReport!,due=problem(c).consequences!.find(e=>e.id===task.id+':outcome')!.dueDay;
+ expect(morningBriefing(c)).toBeUndefined();while(c.life!.calendarDay<due)advanceCalendar(c);c.phase='office';
+ const before=JSON.stringify(c),brief=morningBriefing(c)!;
+ expect(brief.calendarDay).toBe(report.calendarDay);expect(brief.items).toContainEqual(expect.objectContaining({taskId:task.id,kind:'returned',factKey:style==='limited'?'org.campaign.returned':'org.campaign.review'}));
+ expect(JSON.stringify(c)).toBe(before);expect(morningBriefing(reload(c))).toEqual(brief);
 });
