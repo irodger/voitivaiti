@@ -10,3 +10,7 @@
 .conversation-work .expectation-actions button{display:flex;gap:10px;align-items:center;justify-content:space-between}.conversation-work .expectation-actions button small{white-space:nowrap;opacity:.7;font-size:10px}
 
 .conversation-work .expectation-card summary{position:relative;list-style:none}.conversation-work .expectation-card summary::after{display:none}.conversation-work .expectation-card summary::-webkit-details-marker{display:none}.team-conversation .conversation-work .expectation-meta{margin:8px 0 0;font-size:11px}.conversation-work .expectation-card{padding:16px}
+
+/* Every conversation panel must shrink within a phone, including work commitments. */
+.conversation-layout>*,.conversation-work,.conversation-work .work-expectations{min-width:0}.conversation-work .expectation-card{overflow-wrap:anywhere}
+@media(max-width:650px){.team-conversation .conversation-layout{grid-template-columns:minmax(0,1fr)}.team-conversation .conversation-sidebar{min-width:0}.conversation-work .expectation-actions button{flex-wrap:wrap;min-width:0}.conversation-work .expectation-card h4{font-size:15px;line-height:1.5}}
