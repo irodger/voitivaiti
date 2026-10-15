@@ -123,13 +123,14 @@ for (const role of selected) {
 
       // Switching apps must not spend game time or change the active task.
       const appNav = role.device === 'PacBook' ? '.laptop-launcher' : '.laptop-taskbar';
-      for (const name of ['Chat', 'IDE', 'Browser', 'Console']) {
+      for (const app of ['chat', 'ide', 'browser', 'console']) {
+        const name=role.apps[app];
         if (role.device === 'PacBook') await clickText(page, name, appNav);
         else await page.locator(`${appNav} button[aria-label="${name}"]`).click();
-        await page.waitForFunction(app => document.querySelector('.laptop-display')?.dataset.app === app, {}, name.toLowerCase());
+        await page.waitForFunction(app => document.querySelector('.laptop-display')?.dataset.app === app, {}, app);
         const currentApp=await page.$eval('.app-work-header',el=>el.dataset.current);
         if(currentApp==='false'){
-          await page.waitForSelector('.app-context.context-'+name.toLowerCase());
+          await page.waitForSelector('.app-context.context-'+app);
           const empty=await page.$('.context-empty-reference');
           if(empty) assert.equal(await page.$$('.studio-app-context button,.context-empty-reference button').then(nodes=>nodes.length),1,'Empty app has one return');
         }

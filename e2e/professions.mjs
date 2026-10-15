@@ -1,3 +1,11 @@
+// UI labels are explicit test expectations, independent of the production tool registry.
+const roleTools={
+ designer:['Figma','Checks','Prototype'], 'ux-research':['Research','Findings'],
+ analyst:['Data & models','Checks'], 'business-analyst':['Data & models','Checks'], 'data-analyst':['Data & models','Checks'],
+ product:['Product plan','Metrics'], project:['Project plan','Dependencies'],delivery:['Project plan','Dependencies'],
+ support:['Cases','Diagnostics'],qa:['Test cases','Test runs'],
+ architect:['System design','Checks'],'solution-architect':['System design','Checks']
+};
 // Explicit expectations: changing production device routing cannot silently change the test oracle.
 export const professions = [
   ['frontend', 'PacBook', 'FE-1427'], ['mobile', 'PacBook', 'mobile-offline'],
@@ -12,4 +20,4 @@ export const professions = [
   ['security', 'TankPad', 'security-permissions'], ['data-engineer', 'TankPad', 'data-pipeline'],
   ['dba', 'TankPad', 'dba-query'], ['solution-architect', 'TankPad', 'solution-boundaries'],
   ['architect', 'TankPad', 'architecture-map'],
-].map(([id, device, firstTask]) => ({ id, device, firstTask }));
+].map(([id, device, firstTask]) => ({ id, device, firstTask, apps:{ide:roleTools[id]?.[0]??'IDE',console:roleTools[id]?.[1]??'Console',browser:roleTools[id]?.[2]??'Browser',chat:'Chat'} }));

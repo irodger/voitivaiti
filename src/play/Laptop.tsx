@@ -1,3 +1,5 @@
+import {useLaptopTools} from '../hooks/useLaptopTools';
+import './laptopToolProfiles.css';
 import {useRef} from 'react';
 import {motion,useIsPresent} from 'framer-motion';
 import {X} from 'lucide-react';
@@ -19,7 +21,7 @@ import './laptopDevices.css';
 
 /** Device frame and modal lifecycle; navigation and app content have separate owners. */
 export function Laptop({onClose}:{onClose:()=>void}){
- const present=useIsPresent(),w=useLaptopWorkspace(),{t}=useI18n(),ref=useRef<HTMLDivElement>(null);
+ const present=useIsPresent(),w=useLaptopWorkspace(),tools=useLaptopTools(),{t}=useI18n(),ref=useRef<HTMLDivElement>(null);
  const device=laptopFamily(w.world.characters.find(ch=>ch.id===w.world.activeCharacterId)?.profession??'');
  useModalInteraction(ref,onClose);
  return <motion.div className="laptop-backdrop" style={{pointerEvents:present?'auto':'none'}}
@@ -27,7 +29,7 @@ export function Laptop({onClose}:{onClose:()=>void}){
   onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
   <motion.div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={t('ui.laptop')} className="laptop-shell" data-device={device} layoutId="player-laptop" transition={{type:'spring',stiffness:280,damping:32}}>
    <div className="laptop-bezel"><i className="camera"/><span>almost.ready</span><button onClick={onClose} aria-label={t('ui.close')}><X size={18}/></button></div>
-   <div className="laptop-display" data-app={w.board?'browser':w.selectedApp} data-workdesk={w.board?'true':'false'}>
+   <div className="laptop-display" data-editor-kind={tools.editorKind} data-app={w.board?'browser':w.selectedApp} data-workdesk={w.board?'true':'false'}>
     <LaptopNavigation unreadMail={unreadCompanyMail(w.world)} day={w.world.company!.currentDay} time={w.world.time} board={w.board} selectedApp={w.selectedApp} step={w.step} onDesk={w.openDesk} onApp={w.openApp}/>
     {!w.board&&w.step&&w.task&&!w.task.rewarded&&(w.view||w.app==='mail')&&<LaptopReturn step={w.step} onReturn={w.returnCurrent}/>}
     <div className="laptop-body"><ActionPanel className="laptop-workspace"><div className="laptop-content" ref={w.contentRef}><LaptopContent workspace={w} onClose={onClose}/></div></ActionPanel></div>
