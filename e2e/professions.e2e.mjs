@@ -3,22 +3,44 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { preview } from 'vite';
 import puppeteer from 'puppeteer';
+import { createWriteStream } from 'node:fs';
 import { professions } from './professions.mjs';
 
-let server, browser, baseUrl;
+let server, browser, baseUrl, browserLog;
+const diagnostics = 'e2e-artifacts/diagnostics';
 const filter = process.env.E2E_ROLES?.split(',').filter(Boolean);
 const selected = professions.filter(role => !filter || filter.includes(role.id));
 assert.ok(selected.length, 'E2E_ROLES must select at least one known profession');
 if (filter) assert.ok(filter.every(id => professions.some(role => role.id === id)), 'Unknown E2E_ROLES profession');
 
 before(async () => {
-  // Production bundle, random local port, no dependency on a running development server.
-  server = await preview({ preview: { host: '127.0.0.1', port: 0, strictPort: true, open: false } });
-  baseUrl = `http://127.0.0.1:${server.httpServer.address().port}/voitivaiti/`;
-  browser = await puppeteer.launch({ headless: process.env.E2E_HEADFUL !== '1', executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined });
+  await mkdir(diagnostics, { recursive: true });
+  const stages = [];
+  const stage = async name => {
+    stages.push({ name, time: new Date().toISOString() });
+    console.log(`[e2e setup] ${name}`);
+    await writeFile(`${diagnostics}/setup.json`, JSON.stringify(stages, null, 2));
+  };
+  try {
+    // Production bundle, random local port, no dependency on a running development server.
+    await stage('starting preview');
+    server = await preview({ preview: { host: '127.0.0.1', port: 0, strictPort: true, open: false } });
+    baseUrl = `http://127.0.0.1:${server.httpServer.address().port}/voitivaiti/`;
+    const response = await fetch(baseUrl, { signal: AbortSignal.timeout(5000) });
+    assert.equal(response.status, 200, `Preview is not ready at ${baseUrl}`);
+    await stage('preview ready; launching Chromium');
+    browser = await puppeteer.launch({ headless: process.env.E2E_HEADFUL !== '1', executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined, dumpio: true });
+    browserLog = createWriteStream(`${diagnostics}/chromium.log`);
+    browser.process()?.stderr?.pipe(browserLog);
+    await stage(`Chromium ready: ${await browser.version()}`);
+  } catch (error) {
+    await writeFile(`${diagnostics}/setup-error.txt`, String(error.stack));
+    throw error;
+  }
 });
 after(async () => {
   await browser?.close();
+  if (browserLog) await new Promise(resolve => browserLog.end(resolve));
   if (server) await new Promise((resolve, reject) => server.httpServer.close(error => error ? reject(error) : resolve()));
 });
 
@@ -89,6 +111,9 @@ for (const role of selected) {
   test(`${role.id}: onboarding, work, device, reload`, { timeout: 60000 }, async () => {
     const context = await browser.createBrowserContext();
     const page = await context.newPage();
+    const artifactPath = `e2e-artifacts/${role.id}`;
+    await mkdir(artifactPath, { recursive: true });
+    await page.tracing.start({ path: `${artifactPath}/trace.json`, screenshots: true });
     const errors = [];
     page.on('pageerror', error => errors.push(String(error)));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
@@ -187,12 +212,17 @@ for (const role of selected) {
       }))).catch(() => null);
       await writeFile(`${path}/errors.json`, JSON.stringify({ error: String(error.stack), browserErrors: errors, layout, campaign: await campaign(page).catch(() => null) }, null, 2));
       throw error;
-    } finally { await context.close(); }
+    } finally {
+      await page.tracing.stop().catch(() => {});
+      await context.close();
+    }
   });
 }
 
 if (selected.some(role => role.id === 'frontend')) test('frontend: glossary Escape closes the term before the laptop', { timeout: 60000 }, async () => {
   const context = await browser.createBrowserContext(), page = await context.newPage();
+  await mkdir('e2e-artifacts/glossary', { recursive: true });
+  await page.tracing.start({ path: 'e2e-artifacts/glossary/trace.json', screenshots: true });
   await page.setViewport({ width: 1366, height: 900 });
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   await page.evaluateOnNewDocument(() => localStorage.setItem('voiti-vaiti-preferences', JSON.stringify({ state: { locale: 'en', contentMode: 'clean', soundEnabled: false }, version: 0 })));
@@ -227,6 +257,10 @@ if (selected.some(role => role.id === 'frontend')) test('frontend: glossary Esca
   } catch (error) {
     await mkdir('e2e-artifacts/glossary', { recursive: true });
     await page.screenshot({ path: 'e2e-artifacts/glossary/failure.png', fullPage: true }).catch(() => {});
+    await writeFile('e2e-artifacts/glossary/error.txt', String(error.stack));
     throw error;
-  } finally { await context.close(); }
+  } finally {
+    await page.tracing.stop().catch(() => {});
+    await context.close();
+  }
 });
