@@ -5,6 +5,7 @@ import { preview } from 'vite';
 import puppeteer from 'puppeteer';
 import { createWriteStream } from 'node:fs';
 import { professions } from './professions.mjs';
+import { startTrace } from './trace-artifacts.mjs';
 
 let server, browser, baseUrl, browserLog;
 const diagnostics = 'e2e-artifacts/diagnostics';
@@ -113,7 +114,8 @@ for (const role of selected) {
     const page = await context.newPage();
     const artifactPath = `e2e-artifacts/${role.id}`;
     await mkdir(artifactPath, { recursive: true });
-    await page.tracing.start({ path: `${artifactPath}/trace.json`, screenshots: true });
+    const finishTrace = await startTrace(page, artifactPath);
+    let failed = true;
     const errors = [];
     page.on('pageerror', error => errors.push(String(error)));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
@@ -202,6 +204,7 @@ for (const role of selected) {
         }
       }
       assert.deepEqual(errors, [], 'Browser errors');
+      failed = false;
     } catch (error) {
       const path = `e2e-artifacts/${role.id}`;
       await mkdir(path, { recursive: true });
@@ -213,7 +216,7 @@ for (const role of selected) {
       await writeFile(`${path}/errors.json`, JSON.stringify({ error: String(error.stack), browserErrors: errors, layout, campaign: await campaign(page).catch(() => null) }, null, 2));
       throw error;
     } finally {
-      await page.tracing.stop().catch(() => {});
+      await finishTrace(failed);
       await context.close();
     }
   });
@@ -222,7 +225,8 @@ for (const role of selected) {
 if (selected.some(role => role.id === 'frontend')) test('frontend: glossary Escape closes the term before the laptop', { timeout: 60000 }, async () => {
   const context = await browser.createBrowserContext(), page = await context.newPage();
   await mkdir('e2e-artifacts/glossary', { recursive: true });
-  await page.tracing.start({ path: 'e2e-artifacts/glossary/trace.json', screenshots: true });
+  const finishTrace = await startTrace(page, 'e2e-artifacts/glossary');
+  let failed = true;
   await page.setViewport({ width: 1366, height: 900 });
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   await page.evaluateOnNewDocument(() => localStorage.setItem('voiti-vaiti-preferences', JSON.stringify({ state: { locale: 'en', contentMode: 'clean', soundEnabled: false }, version: 0 })));
@@ -254,13 +258,14 @@ if (selected.some(role => role.id === 'frontend')) test('frontend: glossary Esca
     assert.ok(await page.$('.laptop-shell'), 'Closing a glossary term must keep the laptop open');
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.querySelector('.laptop-shell'));
+    failed = false;
   } catch (error) {
     await mkdir('e2e-artifacts/glossary', { recursive: true });
     await page.screenshot({ path: 'e2e-artifacts/glossary/failure.png', fullPage: true }).catch(() => {});
     await writeFile('e2e-artifacts/glossary/error.txt', String(error.stack));
     throw error;
   } finally {
-    await page.tracing.stop().catch(() => {});
+    await finishTrace(failed);
     await context.close();
   }
 });
