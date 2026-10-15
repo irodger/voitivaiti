@@ -1,64 +1,39 @@
-import {LaptopReturn} from './LaptopReturn';
-import type {CompanyMailMessage} from '../world/companyMailTypes';
-import {mailWorkTarget} from './mailWorkTarget';
-import {MailInbox} from './MailInbox';
-import type {LaptopAppId} from './laptopAppIds';
+import {useRef} from 'react';
+import {motion,useIsPresent} from 'framer-motion';
+import {X} from 'lucide-react';
+import {useLaptopWorkspace} from '../hooks/useLaptopWorkspace';
+import {useModalInteraction} from '../hooks/useModalInteraction';
+import {useI18n} from '../content/localization';
 import {unreadCompanyMail} from '../world/companyMail';
-import {appHasEvidence} from './appEvidence';
-import {WorkClock} from './WorkClock';
-import {FirstRunGuide} from './FirstRunGuide';
-import {TaskJourney} from './StageJourney';
-import { LaptopNavigation } from './LaptopNavigation';
-import { useModalInteraction } from '../hooks/useModalInteraction';
-import { useWorkspaceScroll } from '../hooks/useWorkspaceScroll';
-import { LaptopAppHeader } from './LaptopAppHeader';
-import { WorkDesk } from './WorkDesk';
-import { ActionPanel } from './ActionDock';
+import {LaptopNavigation} from './LaptopNavigation';
+import {LaptopReturn} from './LaptopReturn';
+import {LaptopContent} from './LaptopContent';
+import {LaptopTaskbar} from './LaptopTaskbar';
+import {ActionPanel} from './ActionDock';
+import {laptopFamily} from './laptopDevices';
 import '../content/workspaceUx';
 import './workspaceUx.css';
 import './laptopApps.css';
 import './laptopShell.css';
 import './laptopDevices.css';
-import { laptopFamily } from './laptopDevices';
-import { LaptopTaskbar } from './LaptopTaskbar';
-import { AppContext } from './AppContext';
-import { resolveTaskTemplate } from '../content/scenarios';
-import { TaskResult } from './TaskResult';
-import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useIsPresent } from 'framer-motion';
-import { X, LockKeyhole } from 'lucide-react';
-import { useWorld } from '../world/store';
-import { activeTask } from '../world/simulation';
-import { useI18n } from '../content/localization';
-import type { Step } from '../world/types';
-import { StepRenderer } from './Mechanic';
-import { Button } from './shared';
-export function Laptop({ onClose }: {
-    onClose: () => void;
-}) {
-    const present = useIsPresent(), world = useWorld(), { t } = useI18n(), task = activeTask(world), template = task ? resolveTaskTemplate(task) : undefined, step = template?.steps.find(s => s.id === task?.currentStepId), [app, setApp] = useState<LaptopAppId>(step?.app ?? 'ide'), [view, setView] = useState<Step | null>(null), [board, setBoard] = useState(!task || task.rewarded && world.phase !== 'reward'), ref = useRef<HTMLDivElement>(null), contentRef = useRef<HTMLDivElement>(null);
-    const device = laptopFamily(world.characters.find(ch => ch.id === world.activeCharacterId)?.profession ?? '');
-    const openDesk = () => { setBoard(true); setView(null); };
-    const openMailWork=(mail:CompanyMailMessage)=>{
- const route=mailWorkTarget(world,mail),target=route.related;
- if(target&&route?.canOpen){
-  if(target.paused)world.dispatch({type:'resume-task',id:target.id});
-  const current=resolveTaskTemplate(target).steps.find(s=>s.id===target.currentStepId);setBoard(false);setView(null);if(current)setApp(current.app);
- }else openDesk();
- };
- const openApp = (id: LaptopAppId) => { setBoard(false); setApp(id); setView(null); };
-    useModalInteraction(ref, onClose);
-    useEffect(() => { if (step && !task?.rewarded) {
-        setView(null);
-        setBoard(false);
-        setApp(step.app);
-    }
-    else if (task?.rewarded) {
-        setView(null);
-        setBoard(true);
-    } }, [step?.id, task?.id, task?.rewarded]);
-    useWorkspaceScroll(contentRef, [step?.id, task?.id, app, view?.id, board].join(':'), !board && !view && !task?.rewarded && world.phase !== 'reward' && app === step?.app ? step?.id : undefined);
-    return <motion.div className="laptop-backdrop" style={{ pointerEvents: present ? 'auto' : 'none' }} initial={{ backgroundColor: '#17231d00', backdropFilter: 'blur(0px)' }} animate={{ backgroundColor: '#17231d99', backdropFilter: 'blur(8px)' }} exit={{ backgroundColor: '#17231d00', backdropFilter: 'blur(0px)' }} onClick={e => { if (e.target === e.currentTarget)
-        onClose(); }}><motion.div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={t('ui.laptop')} className="laptop-shell" data-device={device} layoutId="player-laptop" transition={{ type: 'spring', stiffness: 280, damping: 32 }}><div className="laptop-bezel"><i className="camera"/><span>almost.ready</span><button onClick={onClose} aria-label={t('ui.close')}><X size={18}/></button></div><div className="laptop-display" data-app={board ? 'browser' : view?.app ?? app} data-workdesk={board ? "true" : "false"}><LaptopNavigation unreadMail={unreadCompanyMail(world)} day={world.company!.currentDay} time={world.time} board={board} selectedApp={view?.app ?? app} step={step} onDesk={openDesk} onApp={openApp}/>{!board&&step&&task&&!task.rewarded&&(view||app==='mail')&&<LaptopReturn step={step} onReturn={()=>{setView(null);setApp(step.app);}}/>}<div className="laptop-body"><ActionPanel className="laptop-workspace"><div className="laptop-content" ref={contentRef}><WorkClock onFinish={onClose}/><FirstRunGuide compact/>{!board&&app!=='mail'&&task&&template&&world.phase!=='reward'&&<TaskJourney compact task={task} steps={template.steps} selectedId={view?.id??step?.id??''} onSelect={selected=>{if(selected.id===step?.id){setView(null);setApp(selected.app);}else setView(selected);}}/>}{!board && app!=='mail' && task && world.phase !== 'reward' && template && <LaptopAppHeader emptyReference={!view&&app!==step?.app&&!appHasEvidence(task,app)} onCurrent={()=>{setView(null);if(step)setApp(step.app);}} app={view?.app ?? app} task={task} steps={template.steps} view={view} onDesk={() => { setBoard(true); setView(null); }}/>}<AnimatePresence mode="wait"><motion.div key={board ? 'desk' : view?.id ?? `${task?.currentStepId}-${app}`} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: .15 }}>{!board&&app==='mail'?<MailInbox onWork={openMailWork}/>:world.phase === 'reward' && task?.rewarded ? <TaskResult closeLabel="desk.back" onClose={() => { world.dispatch({ type: 'reward-close' }); setBoard(true); setView(null); }}/> : board ? <WorkDesk onInbox={()=>openApp('mail')} onOffice={onClose} onResume={() => { setBoard(false); setView(null); if (step)
-        setApp(step.app); }}/> : !task ? <div className="empty-app"><h2>{t('ui.' + app)}</h2><p>{t('appPurpose.' + app)}</p><Button onClick={() => setBoard(true)}>{t('desk.back')}</Button></div> : task.rewarded && !view ? <AppContext app={app as Exclude<LaptopAppId,'mail'>} task={task} onContinue={() => setBoard(true)}/> : task.status === 'blocked' ? <div className="empty-app"><LockKeyhole size={40}/><p>{t('ui.taskBlocked')}</p><Button onClick={() => setBoard(true)}>{t('desk.back')}</Button></div> : view ? <><div className="laptop-history-notice"><p className="read-only-notice">{t('ui.readOnly')}</p></div><StepRenderer step={view} readOnly viewProgress={task.progress[view.id]}/></> : step && app === step.app ? <StepRenderer step={step}/> : <AppContext app={app as Exclude<LaptopAppId,'mail'>} task={task} onContinue={() => setApp(step!.app)}/>}</motion.div></AnimatePresence></div></ActionPanel></div>{device !== 'PacBook' && <LaptopTaskbar board={board} selectedApp={view?.app ?? app} time={world.time} onDesk={openDesk} onApp={openApp}/>}</div><div className="laptop-chin"><span>{device}</span></div><div className="laptop-base"><i /></div></motion.div></motion.div>;
+
+/** Device frame and modal lifecycle; navigation and app content have separate owners. */
+export function Laptop({onClose}:{onClose:()=>void}){
+ const present=useIsPresent(),w=useLaptopWorkspace(),{t}=useI18n(),ref=useRef<HTMLDivElement>(null);
+ const device=laptopFamily(w.world.characters.find(ch=>ch.id===w.world.activeCharacterId)?.profession??'');
+ useModalInteraction(ref,onClose);
+ return <motion.div className="laptop-backdrop" style={{pointerEvents:present?'auto':'none'}}
+  initial={{backgroundColor:'#17231d00',backdropFilter:'blur(0px)'}} animate={{backgroundColor:'#17231d99',backdropFilter:'blur(8px)'}} exit={{backgroundColor:'#17231d00',backdropFilter:'blur(0px)'}}
+  onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+  <motion.div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={t('ui.laptop')} className="laptop-shell" data-device={device} layoutId="player-laptop" transition={{type:'spring',stiffness:280,damping:32}}>
+   <div className="laptop-bezel"><i className="camera"/><span>almost.ready</span><button onClick={onClose} aria-label={t('ui.close')}><X size={18}/></button></div>
+   <div className="laptop-display" data-app={w.board?'browser':w.selectedApp} data-workdesk={w.board?'true':'false'}>
+    <LaptopNavigation unreadMail={unreadCompanyMail(w.world)} day={w.world.company!.currentDay} time={w.world.time} board={w.board} selectedApp={w.selectedApp} step={w.step} onDesk={w.openDesk} onApp={w.openApp}/>
+    {!w.board&&w.step&&w.task&&!w.task.rewarded&&(w.view||w.app==='mail')&&<LaptopReturn step={w.step} onReturn={w.returnCurrent}/>}
+    <div className="laptop-body"><ActionPanel className="laptop-workspace"><div className="laptop-content" ref={w.contentRef}><LaptopContent workspace={w} onClose={onClose}/></div></ActionPanel></div>
+    {device!=='PacBook'&&<LaptopTaskbar board={w.board} selectedApp={w.selectedApp} time={w.world.time} onDesk={w.openDesk} onApp={w.openApp}/>}
+   </div>
+   <div className="laptop-chin"><span>{device}</span></div><div className="laptop-base"><i/></div>
+  </motion.div>
+ </motion.div>;
 }

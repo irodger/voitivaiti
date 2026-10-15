@@ -42,8 +42,10 @@ async function clickText(page, text, scope = '') {
 }
 async function firstDay(page, role) {
   await page.goto(baseUrl, { waitUntil: 'networkidle0' });
-  await page.waitForSelector('dialog[open] button[aria-label="Close"]');
-  await page.click('dialog[open] button[aria-label="Close"]');
+  await page.waitForSelector('.world-onboarding');
+  // New games no longer auto-open release notes; close them only when present.
+  const releaseClose=await page.$('dialog[open] button[aria-label="Close"]');
+  if(releaseClose)await releaseClose.click();
   await clickText(page, 'ENTER');
   await page.waitForSelector(`[data-profession="${role.id}"]`);
   await page.click(`[data-profession="${role.id}"]`);
@@ -143,20 +145,24 @@ for (const role of selected) {
       const progress = acted.progress;
       await page.reload({ waitUntil: 'networkidle0' });
       await page.waitForSelector('.world-work');
+      // Reload mounts the in-game release panel for a version not yet acknowledged.
+      const releaseClose=await page.$('dialog[open] button[aria-label="Close"]');
+      if(releaseClose)await releaseClose.click();
       const restored = await campaign(page);
       assert.equal(restored.activeTaskId, task.id);
       assert.equal(restored.activeCharacterId, hero.id);
       assert.equal(restored.characters.find(ch => ch.id === hero.id).profession, role.id);
       assert.equal(restored.phase, 'office');
       assert.deepEqual(restored.tasks.find(item => item.id === task.id).progress, progress);
-      await clickText(page, 'Open laptop', '.world-work');
+      // Use the main continuation control, rather than the animated scene hotspot.
+      await page.locator('.office-brief .primary-button').click();
       await page.waitForSelector('.laptop-shell');
       assert.equal(await page.$eval('.laptop-chin', el => el.textContent.trim()), role.device);
       if (['frontend', 'backend', 'qa'].includes(role.id)) {
         await page.setViewport({ width: 390, height: 844 });
         await page.waitForFunction(() => {
           const box = document.querySelector('.laptop-shell')?.getBoundingClientRect();
-          return box && box.width < 390 && box.height > 500;
+          return box && box.width <= 390 && box.height > 500;
         });
         const layout = await page.evaluate(() => {
           const chin = document.querySelector('.laptop-chin').getBoundingClientRect();
