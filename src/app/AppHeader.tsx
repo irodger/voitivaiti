@@ -1,3 +1,4 @@
+import { ProfessionIcon } from '../components/ProfessionIcon';
 import { Clock3, Settings2 } from 'lucide-react';
 import { useWorld } from '../world/store';
 import { activeCharacter } from '../world/selectors';
@@ -36,6 +37,7 @@ export function AppHeader({ onboarding, onToggleMode: toggleMode, onSettings }: 
     <b>{ch.name}</b>
     <small>{t(professionById[ch.profession].careers.find(n=>n.id===ch.careerNodeId)!.titleKey)}</small>
     </div>
+    <span className="header-profession-icon"><ProfessionIcon profession={ch.profession} size={32}/></span>
     <CharacterAvatar id={ch.avatarId} size={38}/>
     </div>
     </>:<span className="header-caption">{t('ui.introNote')}</span>}<div className="header-actions">

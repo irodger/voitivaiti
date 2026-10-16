@@ -7,5 +7,6 @@ import './app/desktop.css';
 import './play/game.css';
 import './play/premium.css';
 import './play/mobileGame.css';
+import './app/motion.css';
 startPwa();
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
