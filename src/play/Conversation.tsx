@@ -1,15 +1,14 @@
-import {useConversation} from '../hooks/useConversation';
-import {useI18n} from '../content/localization';
-import {Modal} from './shared';
-import {ConversationSidebar} from './ConversationSidebar';
-import {ConversationSpecialStage} from './ConversationSpecialStage';
-import {ConversationTopicStage} from './ConversationTopicStage';
-import '../content/workMemory';
+import { useConversation } from './useConversation';
+
 import '../content/teamChat';
+import '../content/workMemory';
 import './conversation.css';
+import { ConversationSidebar } from './ConversationSidebar';
+import { ConversationSpecialStage } from './ConversationSpecialStage';
+import { ConversationTopicStage } from './ConversationTopicStage';
+import { Modal } from './shared';
 export function Conversation({npcId,onClose,initialTopicId,onWork}:{npcId:string;onClose:()=>void;initialTopicId?:string;onWork?:()=>void}){
- const {t}=useI18n(),session=useConversation(npcId,initialTopicId,!!onWork);
- const dialogue=!session.showMemory&&!session.showCommitments&&!!session.topic;
+ const session=useConversation(npcId,initialTopicId,!!onWork),{t,dialogue}=session;
  return <Modal title={t('teamChat.title')} onClose={onClose} className="team-conversation">
   <div className="conversation-layout"><ConversationSidebar session={session}/>
    <main className="conversation-stage">{dialogue?<ConversationTopicStage session={session}/>:<ConversationSpecialStage session={session} onClose={onClose} onWork={onWork}/>}</main>

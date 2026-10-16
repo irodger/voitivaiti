@@ -21,3 +21,9 @@
 Operational details and environment diagnosis: [docs/qa-workflow.md](docs/qa-workflow.md).
 
 CLI QA browser access is provided by the local v2 plugin in .opencode/plugins/qa-browser; see docs/qa-browser-plugin.md. Prefer its seven qa_browser tools over Desktop attachment or an arbitrary shell adapter. The fixed preview must be running at http://127.0.0.1:4173/voitivaiti/. QA source editing remains denied. For a requested infrastructure smoke make one model attempt only and stop on 429, without invoking reserves just to validate infrastructure; normal audit fallback remains separately authorized.
+
+## Component structure
+
+- One component owns one controller hook: put its subscriptions, state, effects, data preparation and multi-step handlers in `useComponentName.ts` beside the component. Compose reusable hooks inside that controller. Keep JSX, visual markup and adapters from UI events to controller arguments in the component.
+- Components that only render props or use a single presentation hook (for example useI18n) do not need an empty controller wrapper. Keep component-specific controllers next to their views; only hooks reused across owners or application-wide mechanisms belong in shared hooks/.
+- Controller hooks return data and actions, not JSX. Preserve hook invocation order, initializers, early-return guards, effect dependencies and cleanup while extracting logic. Do not change gameplay, persistence or callback sequencing as part of this refactor.

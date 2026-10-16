@@ -1,15 +1,10 @@
-import {useEveningActivities} from '../hooks/useEveningActivities';
-import {TechArt} from './TechArt';
-import './marketplace.css';
-import {BookOpen, Check, CookingPot, DoorOpen, Gamepad2, Moon, Package, ShoppingBag, Sun} from 'lucide-react';
-import {homeUpgrades} from '../content/home';
-import {marketItems} from '../content/marketplace';
-import {useI18n} from '../content/localization';
-import {homeState} from '../world/economy';
-import {activeCharacter} from '../world/simulation';
-import {useWorld} from '../world/store';
-import {dayPhase} from '../world/workLoop';
+import { BookOpen,Check,CookingPot,DoorOpen,Gamepad2,Moon,Package,ShoppingBag,Sun } from 'lucide-react';
+import { homeUpgrades } from '../content/home';
+import { marketItems } from '../content/marketplace';
+import { TechArt } from './TechArt';
 import './apartment.css';
+import './marketplace.css';
+import { useApartmentScene } from './useApartmentScene';
 
 const activities = [
   {id:'walk', icon:DoorOpen}, {id:'cook', icon:CookingPot},
@@ -17,10 +12,8 @@ const activities = [
 ] as const;
 
 export function ApartmentScene({onShop,onMarket}:{onShop:()=>void;onMarket:()=>void}) {
-  const w=useWorld(), ch=activeCharacter(w), {t}=useI18n(), owned=homeState(ch).owned;
-  const phase=dayPhase(w.time), atHome=w.phase==='home';
-  const {done,available,act,hasActivity,minutes:eveningActivities}=useEveningActivities();
-  const parcels=(ch.orders??[]).filter(o=>!o.received && o.deliveryDay<=w.life!.calendarDay);
+ const {w,t,owned,phase,atHome,done,available,act,hasActivity,eveningActivities,parcels}=useApartmentScene();
+
 
   return <div className={`home-room apartment-scene phase-${phase}`}>
     <div className="apartment-frame">

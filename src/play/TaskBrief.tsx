@@ -1,18 +1,15 @@
-import {Bug,CreditCard,Gauge,ShieldCheck,PackageCheck,Clock3,History,Target,Activity,CheckCircle2} from 'lucide-react';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {useI18n} from '../content/localization';
-import {activeCharacter} from '../world/simulation';
-import {useWorld} from '../world/store';
-import {characterName} from './shared';
-import {TermText} from './TermText';
-import type {Task} from '../world/types';
+import { Activity,CheckCircle2,Clock3,History,Target } from 'lucide-react';
 import '../content/taskScenes';
+import type { Task } from '../world/types';
+import { characterName } from './shared';
 import './taskScenes.css';
+import { TermText } from './TermText';
+import { useTaskBrief } from './useTaskBrief';
 
-const icons={interface:Bug,payment:CreditCard,performance:Gauge,access:ShieldCheck,delivery:PackageCheck};
+
 export function TaskBrief({task}:{task:Task}){
- const {t}=useI18n(),world=useWorld(),characters=world.characters,first=activeCharacter(world).firstDay,template=resolveTaskTemplate(task),Icon=icons[template.category],author=characters.find(ch=>ch.id===(task.legacyActorId??template.author));
- const guided=!!first&&!first.onboardingCompleted,current=task.progress[task.currentStepId],done=template.steps.filter(step=>task.progress[step.id]?.status==='completed').length;
+const {t,template,Icon,author,guided,current,done}=useTaskBrief({task});
+
  return <header className="task-scene-brief" data-category={template.category}>
   <span className="task-scene-emblem" aria-hidden="true"><Icon size={29}/></span>
   <div><small>{t('taskScene.situation')}</small><h3>{t(template.titleKey)}</h3><p>{author?characterName(author,t):t('ui.team')}<span>·</span><Clock3 size={12}/>{t('ui.min',{value:template.estimate})}</p></div>

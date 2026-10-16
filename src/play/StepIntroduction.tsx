@@ -1,15 +1,13 @@
-import {Search} from 'lucide-react';
-import type {Step,Task,TaskTemplate} from '../world/types';
-import {useI18n} from '../content/localization';
-import {useWorld} from '../world/store';
-import {TaskBrief} from './TaskBrief';
-import {ProblemHistory} from './ProblemHistory';
-import {TermText} from './TermText';
-import {uniqueStepContext} from './stepContext';
+import { Search } from 'lucide-react';
+import type { Step,Task,TaskTemplate } from '../world/types';
+import { ProblemHistory } from './ProblemHistory';
+import { TaskBrief } from './TaskBrief';
+import { TermText } from './TermText';
+import { uniqueStepContext } from './stepContext';
+import { useStepIntroduction } from './useStepIntroduction';
 export function StepIntroduction({task,step,template}:{task:Task;step:Step;template:TaskTemplate}){
- const {t}=useI18n(),company=useWorld(s=>s.company),first=template.steps[0].id===step.id;
- const priorOutcome=task.templateId.startsWith('lens.')&&first?company?.projects.find(project=>project.id===task.projectId)?.problems.find(problem=>problem.id===task.problemId)?.latestOutcomeKey:undefined;
- const bodyKey=step.type==='review'?'fix.ready':step.bodyKey;
+const {t,first,priorOutcome,bodyKey}=useStepIntroduction({task,step,template});
+
  return <>
   <TaskBrief task={task}/>
   <div className="step-label">{t('ui.step',{step:template.steps.indexOf(step)+1,total:template.steps.length})}<span>{t('ui.min',{value:task.taskElapsedMinutes})}</span></div>

@@ -1,23 +1,17 @@
-import {useEffect} from 'react';
-import {ArrowLeft,Check,Clock3,Footprints,Leaf,MapPin,Waves,House} from 'lucide-react';
+import { ArrowLeft,Check,Clock3,Footprints,House,Leaf,MapPin,Waves } from 'lucide-react';
+import { CharacterAvatar } from '../components/CharacterAvatar';
 import '../content/walk';
-import {useI18n} from '../content/localization';
-import {activeCharacter} from '../world/simulation';
-import {useWorld} from '../world/store';
-import {availableWalkRoutes,currentWalk,walkRoutes} from '../world/walk';
-import {dayPhase} from '../world/workLoop';
-import {CharacterAvatar} from '../components/CharacterAvatar';
-import {Button} from './shared';
+import { walkRoutes } from '../world/walk';
+import { dayPhase } from '../world/workLoop';
+import { Button } from './shared';
+import { useWalk } from './useWalk';
 import './walk.css';
 
 const icons={courtyard:Footprints,park:Leaf,river:Waves};
 const paths={courtyard:'M 27 47 Q 29 56 27 65',park:'M 27 47 Q 34 56 44 59 T 53 72 Q 63 77 66 62',river:'M 27 47 Q 34 56 44 59 Q 52 58 58 48 T 72 43 Q 76 38 83 36'};
 export function Walk(){
- const w=useWorld(),ch=activeCharacter(w),{t}=useI18n(),outing=currentWalk(ch,w.company!.currentDay)!;
- const available=availableWalkRoutes(ch,w.company!.currentDay,w.time),route=walkRoutes.find(r=>r.id===outing.routeId),finished=outing.status==='finished';
- useEffect(()=>{const onKey=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!document.querySelector('[role="dialog"]'))w.dispatch({type:'end-walk'});};addEventListener('keydown',onKey);return()=>removeEventListener('keydown',onKey);},[w.dispatch]);
- const choose=(id:string)=>w.dispatch({type:'walk-route',id});
- const returnHome=()=>w.dispatch({type:'end-walk'});
+ const {w,ch,t,outing,available,route,finished,choose,returnHome}=useWalk();
+
  return <div className="world-work walk-world">
   <section className={`walk-scene phase-${dayPhase(w.time)}`} aria-label={t('walk.neighborhood')}>
    <div className="walk-frame">

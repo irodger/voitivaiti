@@ -1,18 +1,11 @@
-import { useRef } from 'react';
 import { ProfessionIcon } from '../components/ProfessionIcon';
-import { useViewEntrance } from '../hooks/useViewEntrance';
-import { useI18n } from '../content/localization';
-import { professionById } from '../content/professions';
 import { professionDilemma } from '../content/professionExperience';
-import { templateById } from '../content/scenarios';
 import './professionPreview.css';
+import { useProfessionPreview } from './useProfessionPreview';
 
 export function ProfessionPreview({ role }: { role: string }) {
-  const { t } = useI18n();
-  const profession = professionById[role];
-  const ref = useRef<HTMLElement>(null);
-  useViewEntrance(ref, role);
-  const first = templateById[profession.scenarioIds[0]];
+ const {t,profession,ref,first}=useProfessionPreview(role);
+
   return <section ref={ref} className="profession-preview" aria-label={t('roleExperience.title')} aria-live="polite">
     <div className="profession-preview-heading"><ProfessionIcon profession={role} size={54}/><div>
       <small>{t('roleExperience.title')}</small>

@@ -1,23 +1,16 @@
-import { ProfessionIcon } from '../components/ProfessionIcon';
-import { Clock3, Settings2 } from 'lucide-react';
-import { useWorld } from '../world/store';
-import { activeCharacter } from '../world/selectors';
-import { useI18n } from '../content/localization';
-import { professionById } from '../content/professions';
+import { Clock3,Settings2 } from 'lucide-react';
 import { CharacterAvatar } from '../components/CharacterAvatar';
+import { ProfessionIcon } from '../components/ProfessionIcon';
+import { professionById } from '../content/professions';
 import { VersionPanel } from '../play/VersionPanel';
-import { formatCalendarDate, formatTime } from '../utils/format';
+import { formatCalendarDate,formatTime } from '../utils/format';
+import { useAppHeader,type AppHeaderProps } from './useAppHeader';
 
-type AppHeaderProps = {
-  onboarding: boolean;
-  onToggleMode: () => void;
-  onSettings: () => void;
-};
+
 
 export function AppHeader({ onboarding, onToggleMode: toggleMode, onSettings }: AppHeaderProps) {
-  const w = useWorld();
-  const { t, locale, contentMode } = useI18n();
-  const ch = w.company ? activeCharacter(w) : undefined;
+ const {w,t,locale,contentMode,ch}=useAppHeader();
+
   return <header className="app-header">
     <div className="header-brand-group">
     <div className="brand">

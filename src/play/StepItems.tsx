@@ -1,23 +1,13 @@
-import {Check,ArrowRight,GripVertical} from 'lucide-react';
-import {isOrderedPlan,planOrder} from '../world/planOrder';
-import {useWorld} from '../world/store';
-import {useI18n} from '../content/localization';
-import type {Step,StepProgress} from '../world/types';
-import {ActionDock} from './ActionDock';
-import {Button} from './shared';
+import { ArrowRight,Check,GripVertical } from 'lucide-react';
+import { ActionDock } from './ActionDock';
+import { Button } from './shared';
+import { useStepItems,type Props } from './useStepItems';
 
-type Props={step:Step;progress:StepProgress;disabled:boolean;consequential:boolean};
+
 /** Checklist, ordered plan and resource allocation share the same item layout. */
 export function StepItems({step,progress,disabled,consequential}:Props){
- const dispatch=useWorld(s=>s.dispatch),{t}=useI18n();
- const done=progress.status==='completed',ordered=isOrderedPlan(step),allocation=step.type==='resource-allocation';
- const displayOrder=ordered&&!done?planOrder(step,progress.draft):progress.draft;
- const items=ordered&&displayOrder.length
-  ?[...displayOrder.map(id=>step.items!.find(item=>item.id===id)!),...step.items!.filter(item=>!displayOrder.includes(item.id))]
-  :step.items;
- if(!items)return null;
- const graph=['dependency-map','architecture-diagram'].includes(step.type);
- const instruction=allocation?'ui.allocationHelp':ordered?'plan.reorderHelp':consequential?'fix.observations':'ui.selectHelp';
+const model=useStepItems({step,progress,consequential});if(!model)return null;const {dispatch,t,ordered,allocation,displayOrder,items,graph,instruction}=model;
+
  return <>
   <p className="mechanic-instruction">{t(instruction,{budget:step.budget??0})}</p>
   <div className={`evidence-grid ${graph?'dependency-nodes':''} ${step.type==='visual-compare'?'visual-options':''}`}>

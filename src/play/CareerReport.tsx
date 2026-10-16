@@ -1,11 +1,11 @@
 import '../content/careerReport';
-import {useI18n} from '../content/localization';
-import {useWorld} from '../world/store';
-import type {CareerReport as Report,ReportLine} from '../world/careerReport';
+import type { CareerReport as Report,ReportLine } from '../world/careerReport';
 import './careerReport.css';
+import { useCareerReport } from './useCareerReport';
 
 export function CareerReport({report,characterId}:{report:Report;characterId:string}){
- const {t}=useI18n(),w=useWorld();
+const {t,w}=useCareerReport();
+
  const render=(line:ReportLine,index:number)=><article className="career-report-entry" data-evidence-count={line.sources.length} key={line.sources.join(':')+index}>
   {line.titleKey&&<strong>{t(line.titleKey)}</strong>}
   {line.person&&<strong>{line.person.startsWith('roster.')?t(line.person):line.person}</strong>}

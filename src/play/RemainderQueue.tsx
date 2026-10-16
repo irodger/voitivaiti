@@ -1,19 +1,15 @@
-import {PriorityImpact} from './PriorityImpact';
-import {gameConfig} from '../config/game';
-import {WorkItemContext} from './WorkItemContext';
-import {WorkKindIcon} from './WorkKindIcon';
-import {DelegationResults} from './DelegationResults';
-import {useState} from 'react';
-import {useWorld} from '../world/store';
-import {activeCharacter} from '../world/simulation';
-import {autonomy,availableWork,workOwner} from '../world/workLoop';
-import {useI18n} from '../content/localization';
-import {characterName} from './shared';
-import type {WorkKind} from '../world/lifeTypes';
+import { gameConfig } from '../config/game';
+import { availableWork,workOwner } from '../world/workLoop';
+import { DelegationResults } from './DelegationResults';
+import { PriorityImpact } from './PriorityImpact';
+import { characterName } from './shared';
+import { useRemainderQueue } from './useRemainderQueue';
+import { WorkItemContext } from './WorkItemContext';
+import { WorkKindIcon } from './WorkKindIcon';
 
 export function RemainderQueue(){
- const w=useWorld(),ch=activeCharacter(w),{t}=useI18n(),[chosen,setChosen]=useState<WorkKind|null>(null),level=autonomy(ch),queue=w.life!.queue;
- const selected=queue.find(q=>q.status==='selected'&&!q.delegatedTo);
+ const {w,ch,t,chosen,setChosen,level,queue,selected}=useRemainderQueue();
+
  return <><DelegationResults/><div className="remainder-queue">{queue.filter(q=>q.status!=='done'&&(!!q.delegatedTo||availableWork(ch).includes(q.id))&&(!!q.delegatedTo||!w.tasks.some(task=>task.paused&&!task.rewarded&&task.characterId===ch.id&&task.workKind===q.id))).map(q=>{
   const npc=w.characters.find(n=>n.id===workOwner[q.id]),delegated=!!q.delegatedTo;
   const canTake=availableWork(ch).includes(q.id)&&(!selected||selected.id===q.id);

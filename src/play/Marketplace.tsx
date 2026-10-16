@@ -1,15 +1,13 @@
-import {Check,Package,Truck} from 'lucide-react';
+import { Check,Package,Truck } from 'lucide-react';
 import { marketItems } from '../content/marketplace';
-import { useWorld } from '../world/store';
-import { activeCharacter } from '../world/simulation';
 import { homeState } from '../world/economy';
-import { useI18n } from '../content/localization';
-import {TechArt} from './TechArt';
+import { TechArt } from './TechArt';
 import './marketplace.css';
+import { useMarketplace } from './useMarketplace';
 
 export function Marketplace(){
- const w=useWorld(),ch=activeCharacter(w),{t,locale}=useI18n(),orders=ch.orders??[],pending=orders.filter(o=>!o.received);
- const money=(n:number)=>n.toLocaleString(locale);
+const {w,ch,t,orders,pending,money}=useMarketplace();
+
  return <div className="marketplace">
   <div className="market-brand"><Package size={28}/><div><h1>{t('market.title')}</h1><small>{t('market.tagline')}</small></div></div>
   <p className="market-delivery-note"><Truck size={17}/>{t('market.delivery')}</p>

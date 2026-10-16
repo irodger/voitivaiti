@@ -1,21 +1,20 @@
-import {Clock3,Check,ArrowUpRight,Coffee} from 'lucide-react';
-import './workQueueCards.css';
-import '../content/workQueueCards';
-import {PriorityImpact} from './PriorityImpact';
-import {gameConfig} from '../config/game';
-import {WorkItemContext} from './WorkItemContext';
-import {WorkKindIcon} from './WorkKindIcon';
-import {ActionDock} from './ActionDock';
+import { ArrowUpRight,Check,Clock3,Coffee } from 'lucide-react';
+import '../content/corrections';
+import { roleSides } from '../content/life';
 import '../content/mastery';
 import '../content/recovery';
-import '../content/corrections';
-import {availableWork,autonomy} from '../world/workLoop';
-import {useState} from 'react';
-import {useWorld} from '../world/store';
-import {activeCharacter} from '../world/simulation';
-import {roleSides} from '../content/life';
-import {useI18n} from '../content/localization';
-import {Button} from './shared';
-import type {WorkKind} from '../world/lifeTypes';
+import '../content/workQueueCards';
+import { autonomy,availableWork } from '../world/workLoop';
+import { ActionDock } from './ActionDock';
+import { PriorityImpact } from './PriorityImpact';
+import { Button } from './shared';
+import { useWorkQueue } from './useWorkQueue';
+import { WorkItemContext } from './WorkItemContext';
+import { WorkKindIcon } from './WorkKindIcon';
+import './workQueueCards.css';
 
-export function WorkQueue({compact=false}:{compact?:boolean}){const w=useWorld(),{t}=useI18n(),ch=activeCharacter(w),[chosen,setChosen]=useState<WorkKind|null>(null),l=w.life;if(!l)return null;if(l.reviewDue||w.time>=gameConfig.clock.lastTaskStart||w.schedule.some(e=>e.type==='sync'&&e.status==='pending'))return null;const selected=l.queue.find(q=>q.status==='selected'&&!q.delegatedTo);return <div className="priority-queue">{!compact&&<><p className="eyebrow">{t('life.side.'+(roleSides[ch.profession]??'development'))}</p><p>{t('life.side.'+(roleSides[ch.profession]??'development')+'.body')}</p></>}{selected?<div className="selected-priority"><b>{t('life.selected')}: {t('life.work.'+selected.id)}</b><WorkItemContext item={selected}/><p>{t('life.work.'+selected.id+'.body')}</p></div>:<>{!compact&&<><h2>{t('life.queue')}</h2><p>{t('loop.autonomy'+autonomy(ch))}</p></>}<p className="queue-office-note"><Coffee size={15}/>{t('queueCards.joke')}</p><p className="queue-pick-hint">{t(chosen?'queue.confirmHint':'queue.pickHint')}</p><div className="queue-items">{l.queue.filter(q=>q.status==='waiting'&&!q.delegatedTo&&availableWork(ch).includes(q.id)&&!w.tasks.some(task=>task.paused&&!task.rewarded&&task.characterId===ch.id&&task.workKind===q.id)).map(q=><button key={q.id} data-kind={q.id} aria-pressed={chosen===q.id} onClick={()=>setChosen(q.id)}><span className="queue-card-heading"><WorkKindIcon kind={q.id}/><b>{t('life.work.'+q.id)}</b><span className="queue-duration"><Clock3 size={13}/>{t('queueCards.minutes',{minutes:q.minutes})}</span></span><WorkItemContext item={q}/><span className="queue-card-brief">{t('life.work.'+q.id+'.body')}</span><span className="queue-card-footer"><small>{t('queueCards.urgency',{value:q.urgency})} · {t('loop.age',{days:q.age??0})}</small><span className="queue-pick-action">{chosen===q.id?<Check size={13}/>:<ArrowUpRight size={13}/>} {t(chosen===q.id?'queue.chosen':'queue.choose')}</span></span></button>)}</div>{chosen&&<><div className="queue-choice-preview"><p className="eyebrow">{t('queueCards.preview')}</p><h3>{t('life.work.'+chosen)}</h3><PriorityImpact chosen={chosen}/></div><ActionDock><p className="dock-choice-context">{t('life.work.'+chosen)}</p><Button disabled={l.reviewDue} onClick={()=>w.dispatch({type:'priority',id:chosen,explained:true})}>{t('life.explain')}</Button><Button secondary disabled={l.reviewDue} onClick={()=>w.dispatch({type:'priority',id:chosen,explained:false})}>{t('life.dismiss')}</Button></ActionDock></>}</>}</div>}
+export function WorkQueue({compact=false}:{compact?:boolean}){
+ const model=useWorkQueue();
+ if(!model)return null;
+ const {w,t,ch,chosen,setChosen,l,selected}=model;
+return <div className="priority-queue">{!compact&&<><p className="eyebrow">{t('life.side.'+(roleSides[ch.profession]??'development'))}</p><p>{t('life.side.'+(roleSides[ch.profession]??'development')+'.body')}</p></>}{selected?<div className="selected-priority"><b>{t('life.selected')}: {t('life.work.'+selected.id)}</b><WorkItemContext item={selected}/><p>{t('life.work.'+selected.id+'.body')}</p></div>:<>{!compact&&<><h2>{t('life.queue')}</h2><p>{t('loop.autonomy'+autonomy(ch))}</p></>}<p className="queue-office-note"><Coffee size={15}/>{t('queueCards.joke')}</p><p className="queue-pick-hint">{t(chosen?'queue.confirmHint':'queue.pickHint')}</p><div className="queue-items">{l.queue.filter(q=>q.status==='waiting'&&!q.delegatedTo&&availableWork(ch).includes(q.id)&&!w.tasks.some(task=>task.paused&&!task.rewarded&&task.characterId===ch.id&&task.workKind===q.id)).map(q=><button key={q.id} data-kind={q.id} aria-pressed={chosen===q.id} onClick={()=>setChosen(q.id)}><span className="queue-card-heading"><WorkKindIcon kind={q.id}/><b>{t('life.work.'+q.id)}</b><span className="queue-duration"><Clock3 size={13}/>{t('queueCards.minutes',{minutes:q.minutes})}</span></span><WorkItemContext item={q}/><span className="queue-card-brief">{t('life.work.'+q.id+'.body')}</span><span className="queue-card-footer"><small>{t('queueCards.urgency',{value:q.urgency})} · {t('loop.age',{days:q.age??0})}</small><span className="queue-pick-action">{chosen===q.id?<Check size={13}/>:<ArrowUpRight size={13}/>} {t(chosen===q.id?'queue.chosen':'queue.choose')}</span></span></button>)}</div>{chosen&&<><div className="queue-choice-preview"><p className="eyebrow">{t('queueCards.preview')}</p><h3>{t('life.work.'+chosen)}</h3><PriorityImpact chosen={chosen}/></div><ActionDock><p className="dock-choice-context">{t('life.work.'+chosen)}</p><Button disabled={l.reviewDue} onClick={()=>w.dispatch({type:'priority',id:chosen,explained:true})}>{t('life.explain')}</Button><Button secondary disabled={l.reviewDue} onClick={()=>w.dispatch({type:'priority',id:chosen,explained:false})}>{t('life.dismiss')}</Button></ActionDock></>}</>}</div>}

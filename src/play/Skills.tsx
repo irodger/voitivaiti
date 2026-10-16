@@ -1,14 +1,11 @@
-import {useWorld} from '../world/store';
-import {activeCharacter} from '../world/simulation';
-import {glossary} from '../content/world';
-import {text,useI18n} from '../content/localization';
-import {professionById} from '../content/professions';
-import {PromotionRequirements} from './PromotionRequirements';
+import { ArrowRight,BookOpen,Bug,Compass,GraduationCap,Hammer,MessagesSquare,Route } from 'lucide-react';
+import { text } from '../content/localization';
 import '../content/mastery';
 import '../content/promotion';
-import {Hammer,Bug,MessagesSquare,Compass,BookOpen,Route,ArrowRight,GraduationCap} from 'lucide-react';
-import type {Skill} from '../world/types';
+import type { Skill } from '../world/types';
+import { PromotionRequirements } from './PromotionRequirements';
 import './skills.css';
+import { useSkills } from './useSkills';
 const axes=[{id:'craft',Icon:Hammer,ru:'Создавай и проверяй результат своей работы.',en:'Build and check the result of your work.'},{id:'debugging',Icon:Bug,ru:'Сопоставляй наблюдения и проверяй причины сбоя.',en:'Compare observations and investigate causes.'},{id:'communication',Icon:MessagesSquare,ru:'Уточняй ожидания, проси помощь и передавай результат.',en:'Clarify expectations, ask for help and hand off results.'},{id:'leadership',Icon:Compass,ru:'Выбирай приоритеты, делегируй и отвечай за последствия.',en:'Prioritize, delegate and own consequences.'}] as const;
 axes.forEach(a=>text('skillMap.'+a.id,a.ru,a.en));
 [['relative','Длина полос показывает соотношение твоих навыков, а не предел уровня.','Bar lengths show your relative strengths, not a maximum level.'],['intro','Опыт складывается из того, что ты делаешь, проверяешь и обсуждаешь.','Experience grows through what you do, check and discuss.'],['profile','Твой рабочий профиль','Your work profile'],['practice','Как развивать','How to develop'],['road','Ближайшая ступень','Next milestone'],['roadHelp','Для роста важны реальные рабочие ситуации, а не только числа навыков.','Growth depends on real work experience, not just skill numbers.'],['done','Подтверждено','Confirmed'],['plan','В план развития','Development plan'],['loop','Как работа превращается в опыт','How work becomes experience'],['see','Наблюдай','Observe'],['try','Действуй','Act'],['check','Проверяй','Verify'],['share','Обсуждай','Discuss'],['knowledge','Словарь из твоих историй','Terms from your stories'],['noNext','Ты на вершине этой ветки. Продолжай развивать команду и накапливать опыт.','You reached the top of this branch. Keep developing the team and gaining experience.']].forEach(([id,ru,en])=>text('skillMap.'+id,ru,en));
@@ -17,8 +14,8 @@ text('skillMap.jumpProfile','Профиль','Profile');
 text('skillMap.jumpRoad','План роста','Growth plan');
 text('skillMap.jumpTerms','Словарь','Glossary');
 export function Skills({onWork}:{onWork?:()=>void}={}){
- const ch=useWorld(activeCharacter),{t}=useI18n(),role=professionById[ch.profession],node=role.careers.find(n=>n.id===ch.careerNodeId)!,scale=Math.max(1,...Object.values(ch.skills)),terms=glossary.filter(term=>ch.discoveredTerms.includes(term.id));
- const jump=(id:string)=>{const target=document.getElementById(id);target?.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});target?.focus({preventScroll:true});};
+const {ch,t,role,node,scale,terms,jump}=useSkills();
+
  return <section className="collection-view world-collection skill-map"><header className="skill-map-heading"><span className="skill-map-emblem"><GraduationCap size={30}/></span><div><p className="eyebrow">{t(role.titleKey)}</p><h1>{t('ui.skills')}</h1><p>{t('skillMap.intro')}</p></div></header><nav className="skill-section-nav" aria-label={t('skillMap.sections')}>{[{id:'skill-profile',Icon:Hammer,key:'jumpProfile'},{id:'skill-road',Icon:Route,key:'jumpRoad'},{id:'skill-terms',Icon:BookOpen,key:'jumpTerms'}].map(({id,Icon,key})=><button key={id} onClick={()=>jump(id)}><Icon size={16}/>{t('skillMap.'+key)}</button>)}</nav>
  <div className="skill-map-overview" id="skill-profile" tabIndex={-1}><article className="skill-profile"><h2>{t('skillMap.profile')}</h2><p>{t(node.titleKey)}</p><div className="skill-bars">{axes.map(({id,Icon})=><div key={id}><Icon size={19}/><span>{t('ui.'+id)}</span><b>{ch.skills[id]}</b><div className="skill-bar"><i style={{width:`${ch.skills[id]/scale*100}%`}}/></div></div>)}</div><small>{t('skillMap.relative')}</small></article><div className="skill-practice-grid">{axes.map(({id,Icon})=><article key={id} className={'skill-practice skill-'+id}><span className="skill-icon"><Icon size={24}/></span><div><small>{t('ui.level',{value:ch.skills[id as Skill]})}</small><h2>{t('ui.'+id)}</h2><p>{t('skillMap.'+id)}</p></div></article>)}</div></div>
  <section className="skill-work-cycle"><h2>{t('skillMap.loop')}</h2><ol>{['see','try','check','share'].map((id,i)=><li key={id}><span>{i+1}</span><b>{t('skillMap.'+id)}</b>{i<3&&<ArrowRight size={18}/>}</li>)}</ol></section>

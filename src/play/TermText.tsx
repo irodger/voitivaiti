@@ -1,12 +1,12 @@
-import { usePopoverDismissal } from '../hooks/usePopoverDismissal';
-import { popoverPosition } from '../utils/popoverPosition';
-import { useState,useRef,useLayoutEffect,useId } from 'react';
-import { glossary } from '../content/world';
-import { useI18n } from '../content/localization';
-import { useWorld } from '../world/store';
-const aliases:Record<string,string[]>={mr:['Merge Request','MR'],review:['Code Review','review','ревью'],daily:['Daily','daily','дейлик','дейли'],qa:['QA'],frontend:['Frontend'],bug:['Bug','bug','баг'],variable:['CSS variable'],null:['null'],lead:['Lead'],backend:['Backend'],idempotency:['идемпотентность','идемпотентности','idempotency']};
-export function TermText({children}:{children:string}){const {t}=useI18n();const candidates=glossary.flatMap(g=>(aliases[g.id]??[t(g.titleKey)]).map(word=>({word,id:g.id}))).sort((a,b)=>b.word.length-a.word.length);const escaped=candidates.map(c=>c.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));const pattern=new RegExp('(?<![\\p{L}\\p{N}_])('+escaped.join('|')+')(?![\\p{L}\\p{N}_])','giu');return <>{children.split(pattern).map((part,i)=>{const hit=candidates.find(c=>c.word.toLowerCase()===part.toLowerCase());return hit?<InlineTerm key={i} id={hit.id} label={part} context={children}/>:part;})}</>}
-function InlineTerm({id,label,context}:{id:string;label:string;context:string}){const w=useWorld(),{t}=useI18n(),[open,setOpen]=useState(false),anchor=useRef<HTMLButtonElement>(null),popup=useRef<HTMLSpanElement>(null),tooltipId=useId(),term=glossary.find(g=>g.id===id)!,known=w.characters.find(c=>c.id===w.activeCharacterId)?.discoveredTerms.includes(id);
- useLayoutEffect(()=>{if(!open||!popup.current||!anchor.current)return;const node=popup.current;node.showPopover();const rect=anchor.current.getBoundingClientRect(),height=node.getBoundingClientRect().height;const position=popoverPosition(rect,{width:node.offsetWidth,height},{width:innerWidth,height:innerHeight});node.style.left=position.left+'px';node.style.top=position.top+'px';return()=>{if(node.matches(':popover-open'))node.hidePopover();};},[open]);
- usePopoverDismissal({open,setOpen,anchor,popup});
- return <span className="inline-term"><button ref={anchor} type="button" className={known?'known':''} aria-expanded={open} aria-describedby={open?tooltipId:undefined} onClick={()=>{if(!open)w.dispatch({type:'discover-term',id,context});setOpen(!open);}}>{label}</button>{open&&<span ref={popup} id={tooltipId} popover="manual" className="inline-definition term-overlay" role="tooltip"><strong>{t(term.titleKey)}</strong><span>{t(term.explanationKey)}</span><button aria-label={t('ui.close')} onClick={()=>setOpen(false)}>×</button></span>}</span>}
+import { useInlineTerm } from './useInlineTerm';
+import { useTermText } from './useTermText';
+
+export function TermText({children}:{children:string}){
+ const {segments}=useTermText(children);
+return <>{segments.map(({id,label},i)=>id?<InlineTerm key={i} id={id} label={label} context={children}/>:label)}</>
+}
+
+function InlineTerm({id,label,context}:{id:string;label:string;context:string}){
+ const {toggle,close,t,open,anchor,popup,tooltipId,term,known}=useInlineTerm(id,context);
+
+ return <span className="inline-term"><button ref={anchor} type="button" className={known?'known':''} aria-expanded={open} aria-describedby={open?tooltipId:undefined} onClick={toggle}>{label}</button>{open&&<span ref={popup} id={tooltipId} popover="manual" className="inline-definition term-overlay" role="tooltip"><strong>{t(term.titleKey)}</strong><span>{t(term.explanationKey)}</span><button aria-label={t('ui.close')} onClick={close}>×</button></span>}</span>}

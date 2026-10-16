@@ -1,18 +1,18 @@
-import {useTeamDirectory} from '../hooks/useTeamDirectory';
-import {useI18n} from '../content/localization';
-import {Conversation} from './Conversation';
-import {TeamBanner} from './TeamBanner';
-import {TeamHighlights} from './TeamHighlights';
-import {TeamFilters} from './TeamFilters';
-import {TeamMemberCard} from './TeamMemberCard';
-import './spaces.css';
-import './team.css';
+import { useTeam } from './useTeam';
+
 import '../content/expectations';
 import '../content/teamChat';
-import '../content/workspaceUx';
 import '../content/teamView';
+import '../content/workspaceUx';
+import { Conversation } from './Conversation';
+import { TeamBanner } from './TeamBanner';
+import { TeamFilters } from './TeamFilters';
+import { TeamHighlights } from './TeamHighlights';
+import { TeamMemberCard } from './TeamMemberCard';
+import './spaces.css';
+import './team.css';
 export function Team({onWork}:{onWork?:()=>void}={}){
- const {t}=useI18n(),directory=useTeamDirectory();
+ const directory=useTeam(),{t}=directory;
  return <section className="collection-view world-collection team-view">
   <TeamBanner directory={directory}/><TeamHighlights directory={directory} onWork={onWork} onTalk={directory.open}/>
   {!directory.people.length&&<p>{t('teamView.empty')}</p>}

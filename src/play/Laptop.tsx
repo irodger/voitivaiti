@@ -1,29 +1,23 @@
-import {useLaptopTools} from '../hooks/useLaptopTools';
-import './laptopToolProfiles.css';
-import {useRef} from 'react';
-import {motion,useIsPresent} from 'framer-motion';
-import {X} from 'lucide-react';
-import {useLaptopWorkspace} from '../hooks/useLaptopWorkspace';
-import {useModalInteraction} from '../hooks/useModalInteraction';
-import {useI18n} from '../content/localization';
-import {unreadCompanyMail} from '../world/companyMail';
-import {LaptopNavigation} from './LaptopNavigation';
-import {LaptopReturn} from './LaptopReturn';
-import {LaptopContent} from './LaptopContent';
-import {LaptopTaskbar} from './LaptopTaskbar';
-import {ActionPanel} from './ActionDock';
-import {laptopFamily} from './laptopDevices';
+import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 import '../content/workspaceUx';
-import './workspaceUx.css';
+import { unreadCompanyMail } from '../world/companyMail';
+import { ActionPanel } from './ActionDock';
 import './laptopApps.css';
-import './laptopShell.css';
+import { LaptopContent } from './LaptopContent';
 import './laptopDevices.css';
+import { LaptopNavigation } from './LaptopNavigation';
+import { LaptopReturn } from './LaptopReturn';
+import './laptopShell.css';
+import { LaptopTaskbar } from './LaptopTaskbar';
+import './laptopToolProfiles.css';
+import { useLaptop } from './useLaptop';
+import './workspaceUx.css';
 
 /** Device frame and modal lifecycle; navigation and app content have separate owners. */
 export function Laptop({onClose}:{onClose:()=>void}){
- const present=useIsPresent(),w=useLaptopWorkspace(),tools=useLaptopTools(),{t}=useI18n(),ref=useRef<HTMLDivElement>(null);
- const device=laptopFamily(w.world.characters.find(ch=>ch.id===w.world.activeCharacterId)?.profession??'');
- useModalInteraction(ref,onClose);
+ const {present,w,tools,t,ref,device}=useLaptop(onClose);
+
  return <motion.div className="laptop-backdrop" style={{pointerEvents:present?'auto':'none'}}
   initial={{backgroundColor:'#17231d00',backdropFilter:'blur(0px)'}} animate={{backgroundColor:'#17231d99',backdropFilter:'blur(8px)'}} exit={{backgroundColor:'#17231d00',backdropFilter:'blur(0px)'}}
   onClick={e=>{if(e.target===e.currentTarget)onClose();}}>

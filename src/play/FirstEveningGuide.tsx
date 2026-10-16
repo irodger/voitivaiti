@@ -1,10 +1,8 @@
-import {CheckCircle2,House,Moon,Sunrise,Wallet,BriefcaseBusiness,ArrowRight} from 'lucide-react';
-import {text,useI18n} from '../content/localization';
-import {useWorld} from '../world/store';
-import {activeCharacter} from '../world/simulation';
-import {homeState,recovery} from '../world/economy';
-import {formatNumber} from '../utils/format';
+import { ArrowRight,BriefcaseBusiness,CheckCircle2,House,Moon,Sunrise,Wallet } from 'lucide-react';
+import { text } from '../content/localization';
+import { formatNumber } from '../utils/format';
 import './firstEveningGuide.css';
+import { useFirstEveningGuide } from './useFirstEveningGuide';
 const copy:Record<string,[string,string]>={
  title:['Первый день пройден','Your first day is complete'],
  body:['Теперь ты дома. Отдых — на твой выбор: прогуляйся, приготовь ужин или сразу ложись спать. Покупать улучшения для продолжения не нужно.','You are home. Rest your way: walk, cook dinner or go straight to sleep. You do not need to buy upgrades to continue.'],
@@ -20,9 +18,8 @@ const copy:Record<string,[string,string]>={
 };
 Object.entries(copy).forEach(([key,[ru,en]])=>text('firstEvening.'+key,ru,en));
 export function FirstEveningGuide(){
- const w=useWorld(),ch=activeCharacter(w),{t,locale}=useI18n();
- if(w.phase!=='home'||!ch.firstDay?.onboardingCompleted||w.life?.characterPlayedDays!==1)return null;
- const home=homeState(ch),rest=recovery(ch);
+const model=useFirstEveningGuide();if(!model)return null;const {w,ch,t,locale,home,rest}=model;
+
  return <section className="first-evening-guide" aria-label={t('firstEvening.title')}>
   <header><span className="first-evening-emblem"><House size={25}/></span><div><small>{t('firstEvening.home')}</small><h2>{t('firstEvening.title')}</h2></div><CheckCircle2 className="first-evening-check" size={25}/></header>
   <p>{t('firstEvening.body')}</p>

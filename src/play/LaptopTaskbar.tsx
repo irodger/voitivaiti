@@ -1,9 +1,8 @@
-import {useLaptopTools} from '../hooks/useLaptopTools';
-import {laptopAppOrder} from '../content/laptopTools';
-import type {LaptopAppId} from './laptopAppIds';
-import { Grid2X2, ListTodo, Wifi, BatteryFull } from 'lucide-react';
-import { useI18n } from '../content/localization';
+import { BatteryFull,Grid2X2,ListTodo,Wifi } from 'lucide-react';
+import { laptopAppOrder } from '../content/laptopTools';
+import type { LaptopAppId } from './laptopAppIds';
 import { formatTime } from './shared';
+import { useLaptopTaskbar } from './useLaptopTaskbar';
 
 
 
@@ -11,7 +10,8 @@ import { formatTime } from './shared';
 export function LaptopTaskbar({ board, selectedApp, time, onDesk, onApp }: {
     board: boolean; selectedApp: LaptopAppId; time: number; onDesk: () => void; onApp: (id: LaptopAppId) => void;
 }) {
-    const { t } = useI18n(),tools=useLaptopTools();
+const {t,tools}=useLaptopTaskbar();
+
     return <footer className="laptop-taskbar">
         <nav aria-label={t('ui.workspace')}>
             <button className={board ? 'active' : ''} aria-pressed={board} aria-label={t('desk.tasks')} title={t('desk.tasks')} onClick={onDesk}><Grid2X2 size={17}/><ListTodo size={16}/></button>

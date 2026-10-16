@@ -1,9 +1,9 @@
-import {MessageCircle,Check,ArrowRight,HeartHandshake,CalendarCheck,MessagesSquare} from 'lucide-react';
-import type {ConversationSession} from '../hooks/useConversation';
-import {useI18n} from '../content/localization';
-import {formatCalendarDate} from '../utils/format';
-import {characterName} from '../utils/characterName';
-import {Speech} from './shared';
+import { ArrowRight,CalendarCheck,Check,HeartHandshake,MessageCircle,MessagesSquare } from 'lucide-react';
+import { useI18n } from '../content/localization';
+import { characterName } from '../utils/characterName';
+import { formatCalendarDate } from '../utils/format';
+import { Speech } from './shared';
+import type { ConversationSession } from './useConversation';
 
 function ConversationReplyDock({session}:{session:ConversationSession}){
  const {t,locale}=useI18n(),{topic,choice,changed,trustDelta,skillDelta,due,setTopic,next,reply}=session;

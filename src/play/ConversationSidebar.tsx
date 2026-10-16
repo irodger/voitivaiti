@@ -1,8 +1,8 @@
-import {Briefcase,Heart,Sun,Check,ArrowRight,HeartHandshake,CalendarCheck} from 'lucide-react';
-import type {ConversationSession} from '../hooks/useConversation';
-import {useI18n} from '../content/localization';
-import {CharacterAvatar} from '../components/CharacterAvatar';
-import {characterName} from '../utils/characterName';
+import { ArrowRight,Briefcase,CalendarCheck,Check,Heart,HeartHandshake,Sun } from 'lucide-react';
+import { CharacterAvatar } from '../components/CharacterAvatar';
+import { useI18n } from '../content/localization';
+import { characterName } from '../utils/characterName';
+import type { ConversationSession } from './useConversation';
 const groupIcons={work:Briefcase,personal:Heart,small:Sun,history:Check};
 export function ConversationSidebar({session}:{session:ConversationSession}){
  const {t}=useI18n(),{npc,role,trust,memories,commitments,topicId,ch,setTopic,showMemory,showCommitments,npcId}=session;

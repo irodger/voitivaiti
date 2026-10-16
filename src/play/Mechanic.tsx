@@ -1,27 +1,20 @@
-import {StepIntroduction} from './StepIntroduction';
-import {ActionDock} from './ActionDock';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {decisionFeedback} from './decisionFeedback';
-import {TechnicalScene} from './TechnicalScene';
-import '../content/corrections';
-import {DecisionHelp} from './DecisionHelp';
-import { isConsequential } from '../world/decisions';
-import {useStepExecution} from '../hooks/useStepExecution';
-import {StepItems} from './StepItems';
-import {StepOptions} from './StepOptions';
 import { Check,Terminal } from 'lucide-react';
-import { useI18n } from '../content/localization';
-import { useWorld } from '../world/store';
-import { activeTask } from '../world/simulation';
-import { Button,Code,Speech } from './shared';
+import '../content/corrections';
 import type { Step,StepProgress } from '../world/types';
-import { VisualPreview,MetricChart,DependencyGraph } from './VisualMechanics';
-export function StepRenderer({step,readOnly=false,viewProgress}:{step:Step;readOnly?:boolean;viewProgress?:StepProgress}){const world=useWorld(),{t}=useI18n(),task=activeTask(world)!,p=viewProgress??task?.progress[step.id],done=p?.status==='completed',disabled=readOnly||done;
- useStepExecution(task?.id,step,p?.run,readOnly);
- if(!task||!p)return null;
- const template=resolveTaskTemplate(task);
- const consequential=isConsequential(step);
- const response=p.responseKey==='decision.committed'?decisionFeedback(step,p,t):t(p.responseKey??'ui.success');
+import { ActionDock } from './ActionDock';
+import { DecisionHelp } from './DecisionHelp';
+import { Button,Code,Speech } from './shared';
+import { StepIntroduction } from './StepIntroduction';
+import { StepItems } from './StepItems';
+import { StepOptions } from './StepOptions';
+import { TechnicalScene } from './TechnicalScene';
+import { useStepRenderer } from './useStepRenderer';
+import { DependencyGraph,MetricChart,VisualPreview } from './VisualMechanics';
+export function StepRenderer({step,readOnly=false,viewProgress}:{step:Step;readOnly?:boolean;viewProgress?:StepProgress}){
+ const model=useStepRenderer(step,readOnly,viewProgress);
+ if(!model)return null;
+ const {world,t,task,p,done,disabled,template,consequential,response}=model;
+
 
  return <section data-step-id={step.id} className={`mechanic mechanic-${step.type}`}><StepIntroduction task={task} step={step} template={template}/>
  {consequential&&!disabled&&p.run!=='running'&&step.type!=='review'&&((step.options?.length??0)>1||(step.items?.length??0)>1)&&<DecisionHelp/>}

@@ -1,18 +1,13 @@
-import {FileCode2,ArrowLeftRight,ChartNoAxesCombined,ClipboardList,Palette,Monitor,Layers,FileText} from 'lucide-react';
-import {ActionDock} from './ActionDock';
-import '../content/workspaceUx';
-import {ArtifactData} from './ArtifactData';
-import {useI18n} from '../content/localization';
-import {useWorld} from '../world/store';
-import type {StepProgress,TechnicalAction} from '../world/types';
 import '../content/workArtifacts';
+import '../content/workspaceUx';
+import type { StepProgress,TechnicalAction } from '../world/types';
+import { ActionDock } from './ActionDock';
+import { ArtifactData } from './ArtifactData';
+import { useWorkArtifact } from './useWorkArtifact';
 import './workArtifact.css';
 export function WorkArtifact({action,progress,readOnly=false}:{action:TechnicalAction;progress:StepProgress;readOnly?:boolean}){
- const {t}=useI18n(),dispatch=useWorld(s=>s.dispatch),artifact=action.artifact!,seen=progress.artifactReadings?.[action.id]??[];
- const ArtifactIcon=({code:FileCode2,network:ArrowLeftRight,metrics:ChartNoAxesCombined,task:ClipboardList,design:Palette,environment:Monitor,component:Layers} as Record<string,typeof FileText>)[artifact.kind]??FileText;
- const required=artifact.rows.filter(row=>!row.optional),inspected=required.filter(row=>seen.includes(row.id)).length,complete=inspected===required.length;
- const conditions=artifact.rows.filter(row=>!row.optional),selected=progress.artifactConditions?.[action.id]??conditions[0]?.id;
- const current=conditions.find(row=>row.id===selected)??conditions[0];
+const {t,dispatch,artifact,seen,ArtifactIcon,required,inspected,complete,conditions,current}=useWorkArtifact({action,progress});
+
  return <section className={'work-artifact artifact-'+artifact.kind} aria-label={t(artifact.titleKey)}>
  <header><span className="artifact-emblem" aria-hidden="true"><ArtifactIcon size={22}/></span><div><small>{t('artifact.open')}</small><h3>{t(artifact.titleKey)}</h3><p>{t(artifact.promptKey)}</p></div></header>
  {!readOnly&&<div className="artifact-progress" role="status"><progress value={inspected} max={Math.max(1,required.length)} aria-label={t('workspace.records',{done:inspected,total:required.length})}/><span>{t('workspace.records',{done:inspected,total:required.length})}</span></div>}

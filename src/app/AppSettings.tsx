@@ -1,25 +1,15 @@
-import { useWorld } from '../world/store';
-import { useI18n, usePreferences } from '../content/localization';
-import { ProfileName } from '../play/ProfileName';
-import { ThemeSettings } from '../play/ThemeSettings';
 import { AudioSettings } from '../play/AudioSettings';
+import { ProfileName } from '../play/ProfileName';
 import { PwaSettings } from '../play/PwaSettings';
-import { Button, Modal } from '../play/shared';
-import { readAnalytics } from '../world/analytics';
+import { Button,Modal } from '../play/shared';
+import { ThemeSettings } from '../play/ThemeSettings';
+import { useAppSettings,type AppSettingsProps } from './useAppSettings';
 
-type AppSettingsProps = {
-  confirm: boolean;
-  setConfirm: (confirm: boolean) => void;
-  onClose: () => void;
-  onReset: () => void;
-  onToggleMode: () => void;
-};
+
 
 export function AppSettings({ confirm, setConfirm, onClose, onReset, onToggleMode: toggleMode }: AppSettingsProps) {
-  const hasCharacter = useWorld(w => !!w.company && !!w.characters.find(c => c.id === w.activeCharacterId));
-  const { t, locale, contentMode } = useI18n();
-  const prefs = usePreferences();
-const exportEvents=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(readAnalytics(),null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='voiti-vaiti-events.json';a.click();URL.revokeObjectURL(url);};
+ const {hasCharacter,t,locale,contentMode,prefs,exportEvents}=useAppSettings();
+
   return <Modal title={t(confirm?'ui.resetTitle':'ui.settings')} onClose={onClose}>{confirm?<>
     <p>{t('ui.resetBody')}</p>
     <div className="modal-actions">

@@ -1,8 +1,7 @@
-import {Compass,Check,UserRound,UsersRound,MessagesSquare,ClipboardList,Laptop,House,ArrowRight} from 'lucide-react';
-import {useI18n,text} from '../content/localization';
-import {activeCharacter,activeTask} from '../world/simulation';
-import {useWorld} from '../world/store';
+import { ArrowRight,Check,Compass } from 'lucide-react';
+import { text } from '../content/localization';
 import './firstRunGuide.css';
+import { useFirstRunGuide } from './useFirstRunGuide';
 const copy:Record<string,[string,string]>={
  title:['Первый рабочий день','Your first workday'],
  progress:['Пройдено {done} из {total}','{done} of {total} complete'],
@@ -28,12 +27,8 @@ const copy:Record<string,[string,string]>={
 };
 Object.entries(copy).forEach(([key,[ru,en]])=>text('firstGuide.'+key,ru,en));
 export function FirstRunGuide({compact=false}:{compact?:boolean}={}){
- const w=useWorld(),{t}=useI18n(),first=activeCharacter(w).firstDay;
- if(!first||first.onboardingCompleted)return null;
- const stage=w.phase==='reward'?'result':first.currentOnboardingStep;
- if(stage==='work'&&!activeTask(w))return null;
- const current=['arrival','order','project','team'].includes(stage)?(stage==='arrival'?0:1):stage==='meeting'?2:stage==='brief'?3:stage==='work'||stage==='result'?4:5;
- const nodes=[{label:'introLabel',Icon:UserRound},{label:'contextLabel',Icon:UsersRound},{label:'meetingLabel',Icon:MessagesSquare},{label:'briefLabel',Icon:ClipboardList},{label:'workLabel',Icon:Laptop},{label:'homeLabel',Icon:House}];
+const model=useFirstRunGuide();if(!model)return null;const {t,stage,current,nodes}=model;
+
  if(compact&&stage==='work')return <aside className="first-run-guide first-guide-compact" aria-label={t('firstGuide.title')}><details><summary><Compass size={18} aria-hidden="true"/><span><b>{t('firstGuide.next')}</b><span>{t('firstGuide.workShort')}</span></span></summary><p>{t('firstGuide.work')}</p></details></aside>;
  return <aside className="first-run-guide" aria-label={t('firstGuide.title')}>
   <header className="first-guide-heading"><span className="first-guide-emblem"><Compass size={24} aria-hidden="true"/></span><div><small>{t('firstGuide.map')}</small><b>{t('firstGuide.title')}</b></div><span className="first-guide-count">{t('firstGuide.progress',{done:current,total:nodes.length})}</span></header>

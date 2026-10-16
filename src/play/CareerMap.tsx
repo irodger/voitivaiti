@@ -1,21 +1,16 @@
-import {useState} from 'react';
-import {Sprout,Compass,ShieldCheck,Users,Crown,Network,Check,ArrowUpRight} from 'lucide-react';
+import { ArrowUpRight,Check,Compass,Crown,Network,ShieldCheck,Sprout,Users } from 'lucide-react';
+import { CharacterAvatar } from '../components/CharacterAvatar';
 import '../content/careerMap';
-import '../content/promotion';
 import '../content/mastery';
-import {useI18n} from '../content/localization';
-import {useWorld} from '../world/store';
-import {activeCharacter} from '../world/simulation';
-import {professionById} from '../content/professions';
-import {PromotionRequirements} from './PromotionRequirements';
-import {CharacterAvatar} from '../components/CharacterAvatar';
-import {Modal} from './shared';
-import {careerLayout} from './careerLayout';
+import '../content/promotion';
 import './careerMap.css';
+import { PromotionRequirements } from './PromotionRequirements';
+import { Modal } from './shared';
+import { useCareerMap } from './useCareerMap';
 const icons=[Sprout,Compass,ShieldCheck,Users,Crown,Network];
 export function CareerMap({onWork}:{onWork?:()=>void}={}){
- const w=useWorld(),ch=activeCharacter(w),role=professionById[ch.profession],{t}=useI18n(),[selected,setSelected]=useState<string|null>(null),{columns,points}=careerLayout(role.careers,ch.careerNodeId),chosen=points.find(p=>p.node.id===selected);
- const edges=points.flatMap(p=>p.node.next.map(id=>({from:p,to:points.find(v=>v.node.id===id)!}))).filter(e=>e.to);
+ const {ch,role,t,setSelected,columns,points,chosen,edges}=useCareerMap();
+
  return <section className="career-map" aria-label={t('careerMap.title')}><header><div><h2>{t('careerMap.title')}</h2><p>{t('careerMap.hint')}</p></div><span>{t(role.titleKey)}</span></header><div className="career-map-board" style={{'--career-columns':columns} as React.CSSProperties}>
  <svg className="career-map-lines wide" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{edges.map(e=><path key={e.from.node.id+e.to.node.id} className={['current','passed'].includes(e.to.state)?'travelled':''} d={'M '+e.from.x+' '+e.from.y+' C '+(e.from.x+8)+' '+e.from.y+' '+(e.to.x-8)+' '+e.to.y+' '+e.to.x+' '+e.to.y}/>)}</svg>
  <svg className="career-map-lines tall" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{edges.map(e=><path key={e.from.node.id+e.to.node.id} className={['current','passed'].includes(e.to.state)?'travelled':''} d={'M '+e.from.y+' '+e.from.x+' C '+e.from.y+' '+(e.from.x+8)+' '+e.to.y+' '+(e.to.x-8)+' '+e.to.y+' '+e.to.x}/>)}</svg>

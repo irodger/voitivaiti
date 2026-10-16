@@ -1,13 +1,14 @@
-import {FileCode2,FolderOpen,Terminal,Globe,MessageSquare,Search} from 'lucide-react';
-import type {AppId} from '../world/types';
-import type {AppEvidenceModel} from '../hooks/useAppEvidence';
-import type {EditorKind} from '../content/laptopTools';
-import {useLaptopTools} from '../hooks/useLaptopTools';
-import {useI18n} from '../content/localization';
-import {ArtifactData} from './ArtifactData';
-import {TermText} from './TermText';
-import {Code} from './shared';
-import {AppIllustration} from './AppIllustration';
+import { FileCode2,FolderOpen,Globe,MessageSquare,Search,Terminal } from 'lucide-react';
+import type { EditorKind } from '../content/laptopTools';
+import { useI18n } from '../content/localization';
+import type { AppId } from '../world/types';
+import { AppIllustration } from './AppIllustration';
+import { ArtifactData } from './ArtifactData';
+import { TermText } from './TermText';
+import { Code } from './shared';
+import type { AppEvidenceModel } from './useAppEvidence';
+import { useEvidenceConsole } from './useEvidenceConsole';
+import { useEvidenceEditor } from './useEvidenceEditor';
 
 export function EvidenceRecords({model}:{model:AppEvidenceModel}){
  const {t}=useI18n();
@@ -22,7 +23,8 @@ export function EvidenceEmpty({app,titleKey,hintKey,editorKind='code'}:{app:AppI
  return <div className="context-empty"><AppIllustration app={app} editorKind={editorKind}/><h3>{t(titleKey)}</h3><p>{t(hintKey)}</p></div>;
 }
 export function EvidenceEditor({model:m}:{model:AppEvidenceModel}){
- const {t}=useI18n(),tools=useLaptopTools(),tool=tools.get('ide'),Icon=tool.Icon,code=tools.editorKind==='code';
+const {t,tool,Icon,code}=useEvidenceEditor();
+
  return <div className={'context-editor'+(code?'':' context-material-editor')}>
   <aside><h3>{code?<FolderOpen size={16}/>:<Icon size={16}/>} {t(code?'appContext.structure':'tool.structure')}</h3>
    {m.relevant.map(s=><div key={s.id} className={s.id===m.step.id?'selected':''}>{code?<FileCode2 size={15}/>:<Icon size={15}/>}<span>{t(s.titleKey)}</span></div>)}
@@ -37,7 +39,8 @@ export function EvidenceEditor({model:m}:{model:AppEvidenceModel}){
  </div>;
 }
 export function EvidenceConsole({model:m}:{model:AppEvidenceModel}){
- const {t}=useI18n(),tools=useLaptopTools(),tool=tools.get('console'),Icon=tool.Icon,code=tools.editorKind==='code';
+const {t,tools,tool,Icon,code}=useEvidenceConsole();
+
  return <div className={code?'context-terminal':'context-insights'}>
   <div className="context-toolbar">{code?<Terminal size={17}/>:<Icon size={17}/>} {code?t('appContext.journal'):tool.name}<span>{m.notes.length+m.records.length}</span></div>
   <div className="context-terminal-title">{t(m.template.titleKey)}</div>

@@ -1,10 +1,10 @@
-import {Briefcase,CalendarCheck,ArrowRight,MessagesSquare} from 'lucide-react';
-import type {ConversationSession} from '../hooks/useConversation';
-import {useI18n} from '../content/localization';
-import {CharacterAvatar} from '../components/CharacterAvatar';
-import {characterName} from '../utils/characterName';
-import {ColleagueWorkMemory} from './ColleagueWorkMemory';
-import {WorkExpectations} from './WorkExpectations';
+import { ArrowRight,Briefcase,CalendarCheck,MessagesSquare } from 'lucide-react';
+import { CharacterAvatar } from '../components/CharacterAvatar';
+import { useI18n } from '../content/localization';
+import { characterName } from '../utils/characterName';
+import { ColleagueWorkMemory } from './ColleagueWorkMemory';
+import type { ConversationSession } from './useConversation';
+import { WorkExpectations } from './WorkExpectations';
 
 type Props={session:ConversationSession;onClose:()=>void;onWork?:()=>void};
 export function ConversationSpecialStage({session,onClose,onWork}:Props){

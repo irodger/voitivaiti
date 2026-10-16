@@ -1,32 +1,21 @@
-import '../content/workClock';
-import {Trophy,ShieldAlert,FileCheck2,Clock3,Flag,CheckCheck,Coffee} from 'lucide-react';
-import {ResultMaterials} from './ResultMaterials';
-import '../content/resultReceipt';
-import './resultReceipt.css';
-import '../content/premiumStages';
-import './stageJourney.css';
-import {ActionDock} from './ActionDock';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {PerspectivePanel} from './PerspectivePanel';
+import { CheckCheck,Clock3,Coffee,Flag } from 'lucide-react';
 import '../content/corrections';
-import {useWorld} from '../world/store';
-import {activeTask} from '../world/simulation';
-import {useI18n} from '../content/localization';
-import {decisionFeedback} from './decisionFeedback';
-import {TermText} from './TermText';
-import {Button} from './shared';
+import '../content/premiumStages';
+import '../content/resultReceipt';
+import '../content/workClock';
+import { ActionDock } from './ActionDock';
+import { decisionFeedback } from './decisionFeedback';
+import { PerspectivePanel } from './PerspectivePanel';
+import { ResultMaterials } from './ResultMaterials';
+import './resultReceipt.css';
+import { Button } from './shared';
+import './stageJourney.css';
+import { TermText } from './TermText';
+import { useTaskResult } from './useTaskResult';
 
 export function TaskResult({onClose,closeLabel='result.close'}:{onClose:()=>void;closeLabel?:string}){
- const w=useWorld(),task=activeTask(w),{t}=useI18n();
- if(!task)return null;
- const template=resolveTaskTemplate(task);
- const choiceStep=template.steps.find(step=>step.type!=='review'&&step.options?.some(option=>option.id===task.progress[step.id]?.choiceId));
- const choice=choiceStep?.options?.find(option=>option.id===task.progress[choiceStep.id].choiceId);
- const evidence=template.steps.find(step=>step.items&&step.resolution==='consequential');
- const resultKind=task.outcome?.kind==='temporary'?'temporary':task.outcome?.systemChanged===true?'system':task.outcome?'evidence':'finished';
- const ResultIcon=resultKind==='temporary'?ShieldAlert:resultKind==='evidence'?FileCheck2:Trophy;
- const completed=template.steps.filter(s=>task.progress[s.id]?.status==='completed').length;
- const delta=task.taskElapsedMinutes-template.estimate;
+const model=useTaskResult();if(!model)return null;const {w,task,t,template,choiceStep,choice,evidence,resultKind,ResultIcon,completed,delta}=model;
+
  if(w.perspective)return <section className="task-result"><small>{t('mastery.episodeTitle')}</small><h2>{t(template.titleKey)}</h2><PerspectivePanel/></section>;
  return <section className="task-result">
   <header className="premium-result-hero result-receipt-hero" data-result={resultKind}><ResultIcon size={34}/><div><small><CheckCheck size={14}/>{t('premiumStage.delivered')}</small><h2>{t(template.titleKey)}</h2><p>{t(task.outcome?.kind==='temporary'?'premiumStage.temporary':task.outcome?.systemChanged===true?'premiumStage.system':'premiumStage.evidence')}</p></div></header>

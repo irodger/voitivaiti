@@ -1,25 +1,21 @@
-import {Search,ArrowUpRight} from 'lucide-react';
-import {useI18n} from '../content/localization';
-import {useAppEvidence} from '../hooks/useAppEvidence';
-import {useLaptopTools} from '../hooks/useLaptopTools';
-import {Button} from './shared';
-import {AppIllustration} from './AppIllustration';
-import {EvidenceEditor,EvidenceConsole,EvidenceBrowser,EvidenceChat} from './AppEvidencePanels';
-import type {AppId,Task} from '../world/types';
+import { ArrowUpRight,Search } from 'lucide-react';
 import '../content/evidenceShelf';
 import '../content/workArtifacts';
 import '../content/workspaceUx';
-import './evidenceShelf.css';
-import './workArtifact.css';
+import type { AppId,Task } from '../world/types';
 import './appContext.css';
+import { AppIllustration } from './AppIllustration';
+import './evidenceShelf.css';
+import { Button } from './shared';
+import { useAppContext } from './useAppContext';
+import './workArtifact.css';
 
-const panels={ide:EvidenceEditor,console:EvidenceConsole,browser:EvidenceBrowser,chat:EvidenceChat};
+
 const emptyLabels={ide:['noSource','noSourceHint'],console:['noLogs','noLogsHint'],browser:['noPreview','noPreviewHint'],chat:['noMessages','noMessagesHint']};
 /** Shared evidence shell; each application owns its own presentation. */
 export function AppContext({app,task,onContinue}:{app:AppId;task:Task;onContinue:()=>void}){
- const {t}=useI18n(),tools=useLaptopTools(),model=useAppEvidence(task,app,tools.editorKind),Panel=panels[app];
- const workApp=tools.name(model.step.app),materialEditor=app==='ide'&&tools.editorKind!=='code';
- const returnLabel=t(task.rewarded?'desk.back':'ui.goApp',{app:workApp});
+const {t,tools,model,Panel,workApp,materialEditor,returnLabel}=useAppContext({app,task});
+
  if(!model.hasEvidence){
   const material=tools.editorKind!=='code'&&(app==='ide'||app==='console');
   const [title,hint]=emptyLabels[app];

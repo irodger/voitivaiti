@@ -1,22 +1,23 @@
-import {useLaptopTools} from '../hooks/useLaptopTools';
-import {AnimatePresence,motion} from 'framer-motion';
-import {LockKeyhole} from 'lucide-react';
-import type {LaptopWorkspace} from '../hooks/useLaptopWorkspace';
-import {useI18n} from '../content/localization';
-import {appHasEvidence} from './appEvidence';
-import {MailInbox} from './MailInbox';
-import {WorkClock} from './WorkClock';
-import {FirstRunGuide} from './FirstRunGuide';
-import {TaskJourney} from './StageJourney';
-import {LaptopAppHeader} from './LaptopAppHeader';
-import {WorkDesk} from './WorkDesk';
-import {TaskResult} from './TaskResult';
-import {AppContext} from './AppContext';
-import {StepRenderer} from './Mechanic';
-import {Button} from './shared';
+import { AnimatePresence,motion } from 'framer-motion';
+import { LockKeyhole } from 'lucide-react';
+import { useLaptopTools } from '../hooks/useLaptopTools';
+import { AppContext } from './AppContext';
+import { appHasEvidence } from './appEvidence';
+import { FirstRunGuide } from './FirstRunGuide';
+import { LaptopAppHeader } from './LaptopAppHeader';
+import { MailInbox } from './MailInbox';
+import { StepRenderer } from './Mechanic';
+import { Button } from './shared';
+import { TaskJourney } from './StageJourney';
+import { TaskResult } from './TaskResult';
+import { useLaptopScreen } from './useLaptopScreen';
+import type { LaptopWorkspace } from './useLaptopWorkspace';
+import { WorkClock } from './WorkClock';
+import { WorkDesk } from './WorkDesk';
 
 function LaptopScreen({workspace:w,onClose}:{workspace:LaptopWorkspace;onClose:()=>void}){
- const {t}=useI18n(),tools=useLaptopTools(),{task,step,app,view}=w;
+const {t,tools,task,step,app,view}=useLaptopScreen({workspace:w});
+
  switch(w.contentKind){
   case 'mail':return <MailInbox onWork={w.openMailWork}/>;
   case 'reward':return <TaskResult closeLabel="desk.back" onClose={w.closeReward}/>;

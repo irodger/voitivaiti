@@ -1,15 +1,15 @@
+import { CheckCircle2,Clock3 } from 'lucide-react';
+import { CharacterAvatar } from '../components/CharacterAvatar';
+import { resolveTaskTemplate } from '../content/scenarios';
 import '../content/waitingWork';
+import { formatCalendarDate,formatTime } from '../utils/format';
+import { waitingTask } from '../world/waitingTask';
+import { Button,characterName } from './shared';
+import { useWaitingWork } from './useWaitingWork';
 import './waitingWork.css';
-import {Clock3,CheckCircle2} from 'lucide-react';
-import {CharacterAvatar} from '../components/CharacterAvatar';
-import {formatCalendarDate,formatTime} from '../utils/format';
-import {waitingTask} from '../world/waitingTask';
-import {useWorld} from '../world/store';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {useI18n} from '../content/localization';
-import {Button,characterName} from './shared';
 export function WaitingWork(){
- const w=useWorld(),{t,locale}=useI18n();
+const {w,t,locale}=useWaitingWork();
+
  return <>{w.tasks.filter(task=>task.paused&&!task.rewarded&&task.characterId===w.activeCharacterId).map(task=>{
   const state=waitingTask(w,task),npc=w.characters.find(ch=>ch.id===state.dependency?.npcId),Icon=state.ready?CheckCircle2:Clock3;
   return <article className="waiting-work-card" data-ready={state.ready||undefined} key={task.id}>

@@ -1,8 +1,8 @@
-import {Search,Sparkles} from 'lucide-react';
-import type {TeamDirectoryController} from '../hooks/useTeamDirectory';
-import {professionById} from '../content/professions';
-import {useI18n} from '../content/localization';
+import { Search,Sparkles } from 'lucide-react';
+import { useI18n } from '../content/localization';
+import { professionById } from '../content/professions';
 import '../content/teamView';
+import type { TeamDirectoryController } from './useTeam';
 export function TeamFilters({directory}:{directory:TeamDirectoryController}){
  const {t}=useI18n(),{query,setQuery,profession,setProfession,people,onlyNew,toggleNew,topics,visible,reset}=directory;
  return <>
