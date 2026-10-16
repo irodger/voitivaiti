@@ -53,12 +53,14 @@ export function collectAppEvidence(task: Task, app: AppId, editorKind: EditorKin
   return { template, step, relevant, notes, sources, records, completed };
 }
 
+export type AppEvidence = ReturnType<typeof collectAppEvidence>;
+export function appEvidenceAvailability(
+  e: Pick<AppEvidence, 'notes' | 'records' | 'sources' | 'completed'>,
+  app: AppId,
+) {
+  const empty = e.notes.length === 0 && e.records.length === 0 && e.sources.length === 0;
+  return { empty, hasEvidence: !empty || (app === 'chat' && e.completed.length > 0) };
+}
 export function appHasEvidence(task: Task, app: AppId, editorKind: EditorKind = 'code') {
-  const e = collectAppEvidence(task, app, editorKind);
-  return !!(
-    e.notes.length ||
-    e.records.length ||
-    e.sources.length ||
-    (app === 'chat' && e.completed.length)
-  );
+  return appEvidenceAvailability(collectAppEvidence(task, app, editorKind), app).hasEvidence;
 }

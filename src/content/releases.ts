@@ -1,6 +1,15 @@
 import { text } from './localization';
-export const GAME_VERSION = '0.63.2';
+export const GAME_VERSION = '0.63.3';
 export const releases = [
+  {
+    version: '0.63.3',
+    items: [
+      [
+        'Экран ноутбука отделён от оболочки, общая команда закрытия убрана из цепочек пропсов, фильтрация материалов вынесена в чистую модель',
+        'Laptop screen separated from its shell, shared close command removed from prop chains, evidence filtering extracted into a pure model',
+      ],
+    ],
+  },
   {
     version: '0.63.2',
     items: [

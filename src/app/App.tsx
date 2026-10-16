@@ -46,7 +46,6 @@ export default function App() {
     firstScene,
     onboarding,
     pageRef,
-    closeLaptop,
   } = useApp();
 
   return (
@@ -117,7 +116,7 @@ export default function App() {
               </nav>
             </>
           )}
-          <AnimatePresence>{laptop && <Laptop onClose={closeLaptop} />}</AnimatePresence>
+          <AnimatePresence>{laptop && <Laptop />}</AnimatePresence>
           <div className="floating-feedback" aria-live="polite">
             <AnimatePresence>
               {feedback.map((f) => (

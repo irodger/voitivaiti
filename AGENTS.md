@@ -38,4 +38,4 @@ CLI QA browser access is provided by the local v2 plugin in .opencode/plugins/qa
 
 ## Releases and push
 
-- Before every requested push, increment GAME_VERSION in src/content/releases.ts and prepend a matching bilingual release entry. Use a patch bump for maintenance/refactoring. This version drives PWA update/version UI; package.json is not the source of the game version. Include the bump in the pushed changes and validate the resulting build.
+- Before every requested push, increment GAME_VERSION in src/content/releases.ts and prepend a matching bilingual release entry. Use a patch bump for maintenance/refactoring. This version drives PWA update/version UI; package.json is not the source of the game version. Update CHANGELOG.md with the same release summary; keep historical notes out of README.md. Include the bump in the pushed changes and validate the resulting build.

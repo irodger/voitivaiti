@@ -15,8 +15,8 @@ import { useLaptop } from './useLaptop';
 import './workspaceUx.css';
 
 /** Device frame and modal lifecycle; navigation and app content have separate owners. */
-export function Laptop({ onClose }: { onClose: () => void }) {
-  const { present, w, tools, t, ref, device } = useLaptop(onClose);
+export function Laptop() {
+  const { onClose, present, w, tools, t, ref, device } = useLaptop();
 
   return (
     <motion.div
@@ -69,7 +69,7 @@ export function Laptop({ onClose }: { onClose: () => void }) {
           <div className="laptop-body">
             <ActionPanel className="laptop-workspace">
               <div className="laptop-content" ref={w.contentRef}>
-                <LaptopContent workspace={w} onClose={onClose} />
+                <LaptopContent workspace={w} />
               </div>
             </ActionPanel>
           </div>

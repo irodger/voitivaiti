@@ -1,12 +1,11 @@
 import { Clock3, Moon, TriangleAlert } from 'lucide-react';
 import '../content/workClock';
-import { useWorld } from '../world/store';
 import { useWorkClock } from './useWorkClock';
 import './workClock.css';
 export function WorkClock({ onFinish }: { onFinish: () => void }) {
-  const model = useWorkClock();
+  const model = useWorkClock(onFinish);
   if (!model) return null;
-  const { w, t, clock } = model;
+  const { t, clock, finish } = model;
 
   return (
     <section
@@ -30,13 +29,7 @@ export function WorkClock({ onFinish }: { onFinish: () => void }) {
             {t(clock.canFinish ? 'workClock.note' : 'workClock.first')}
           </p>
           {clock.canFinish && (
-            <button
-              className="world-secondary"
-              onClick={() => {
-                w.dispatch({ type: 'end-day' });
-                if (useWorld.getState().phase === 'home') onFinish();
-              }}
-            >
+            <button className="world-secondary" onClick={finish}>
               <Moon size={16} />
               {t('workClock.finish')}
             </button>

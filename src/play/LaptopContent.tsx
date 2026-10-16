@@ -1,92 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { LockKeyhole } from 'lucide-react';
-import { useLaptopTools } from '../hooks/useLaptopTools';
-import { AppContext } from './AppContext';
-import { appHasEvidence } from './appEvidence';
 import { FirstRunGuide } from './FirstRunGuide';
 import { LaptopAppHeader } from './LaptopAppHeader';
-import { MailInbox } from './MailInbox';
-import { StepRenderer } from './Mechanic';
-import { Button } from './shared';
+import { LaptopScreen } from './LaptopScreen';
 import { TaskJourney } from './StageJourney';
-import { TaskResult } from './TaskResult';
-import { useLaptopScreen } from './useLaptopScreen';
-import type { LaptopWorkspace } from './useLaptopWorkspace';
 import { WorkClock } from './WorkClock';
-import { WorkDesk } from './WorkDesk';
-
-function LaptopScreen({
-  workspace: w,
-  onClose,
-}: {
-  workspace: LaptopWorkspace;
-  onClose: () => void;
-}) {
-  const { t, tools, task, step, app, view } = useLaptopScreen({ workspace: w });
-
-  switch (w.contentKind) {
-    case 'mail':
-      return <MailInbox onWork={w.openMailWork} />;
-    case 'reward':
-      return <TaskResult closeLabel="desk.back" onClose={w.closeReward} />;
-    case 'desk':
-      return <WorkDesk onInbox={() => w.openApp('mail')} onOffice={onClose} onResume={w.resume} />;
-    case 'empty':
-      return (
-        <div className="empty-app">
-          <h2>{tools.name(app)}</h2>
-          <p>{tools.get(app).purpose}</p>
-          <Button onClick={w.openDesk}>{t('desk.back')}</Button>
-        </div>
-      );
-    case 'blocked':
-      return (
-        <div className="empty-app">
-          <LockKeyhole size={40} />
-          <p>{t('ui.taskBlocked')}</p>
-          <Button onClick={w.openDesk}>{t('desk.back')}</Button>
-        </div>
-      );
-    case 'history':
-      return (
-        <>
-          <div className="laptop-history-notice">
-            <p className="read-only-notice">{t('ui.readOnly')}</p>
-          </div>
-          <StepRenderer step={view!} readOnly viewProgress={task!.progress[view!.id]} />
-        </>
-      );
-    case 'step':
-      return <StepRenderer step={step!} />;
-    case 'finished':
-      return (
-        <AppContext app={app as Exclude<typeof app, 'mail'>} task={task!} onContinue={w.openDesk} />
-      );
-    case 'reference':
-      return (
-        <AppContext
-          app={app as Exclude<typeof app, 'mail'>}
-          task={task!}
-          onContinue={w.returnCurrent}
-        />
-      );
-  }
-}
-export function LaptopContent({
-  workspace: w,
-  onClose,
-}: {
-  workspace: LaptopWorkspace;
-  onClose: () => void;
-}) {
-  const tools = useLaptopTools();
-  const context =
-    !w.board && w.app !== 'mail' && w.task && w.template && w.world.phase !== 'reward'
-      ? { task: w.task, template: w.template, app: w.app }
-      : null;
+import { useLaptopContent } from './useLaptopContent';
+import type { LaptopWorkspace } from './useLaptopWorkspace';
+export function LaptopContent({ workspace: w }: { workspace: LaptopWorkspace }) {
+  const { context, emptyReference, closeLaptop } = useLaptopContent(w);
   return (
     <>
-      <WorkClock onFinish={onClose} />
+      <WorkClock onFinish={closeLaptop} />
       <FirstRunGuide compact />
       {context && (
         <TaskJourney
@@ -99,11 +23,7 @@ export function LaptopContent({
       )}
       {context && (
         <LaptopAppHeader
-          emptyReference={
-            !w.view &&
-            context.app !== w.step?.app &&
-            !appHasEvidence(context.task, context.app, tools.editorKind)
-          }
+          emptyReference={emptyReference}
           onCurrent={w.returnCurrent}
           app={w.view?.app ?? context.app}
           task={context.task}
@@ -120,7 +40,7 @@ export function LaptopContent({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
         >
-          <LaptopScreen workspace={w} onClose={onClose} />
+          <LaptopScreen workspace={w} />
         </motion.div>
       </AnimatePresence>
     </>

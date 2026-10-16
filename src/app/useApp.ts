@@ -34,7 +34,7 @@ export function useApp() {
   const { tab, settings, laptop, toast } = useAppUI(
     useShallow((s) => ({ tab: s.tab, settings: s.settings, laptop: s.laptop, toast: s.toast })),
   );
-  const { setTab, setLaptop, setToast, closeLaptop, openFocus } = useAppActions();
+  const { setTab, setLaptop, setToast, openFocus } = useAppActions();
   const firstDay = !!ch?.firstDay && !ch.firstDay.onboardingCompleted;
   const firstScene = firstDay && ch!.firstDay!.currentOnboardingStep !== 'work';
   const onboarding = w.phase === 'start' || w.phase === 'create';
@@ -118,6 +118,5 @@ export function useApp() {
     firstScene,
     onboarding,
     pageRef,
-    closeLaptop,
   };
 }
