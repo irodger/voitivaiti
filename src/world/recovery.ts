@@ -1,2 +1,26 @@
-import type {Campaign} from './types';
-export function loadStress(c:Campaign){const l=c.life!,today=l.decisionHistory.filter(d=>d.day===l.calendarDay);const pressure=Math.min(8,today.reduce((sum,d)=>sum+(['deadlineFailures','communicationFailures','repeatedMistakes','riskyDeploys'].includes(d.kind)?2:0),0));const broken=l.queue.filter(q=>q.status!=='done'&&!q.delegatedTo&&q.promisedDay!==undefined&&q.promisedDay<=l.calendarDay).length;return pressure+Math.min(6,broken*3);}
+import type { Campaign } from './types';
+export function loadStress(c: Campaign) {
+  const l = c.life!,
+    today = l.decisionHistory.filter((d) => d.day === l.calendarDay);
+  const pressure = Math.min(
+    8,
+    today.reduce(
+      (sum, d) =>
+        sum +
+        (['deadlineFailures', 'communicationFailures', 'repeatedMistakes', 'riskyDeploys'].includes(
+          d.kind,
+        )
+          ? 2
+          : 0),
+      0,
+    ),
+  );
+  const broken = l.queue.filter(
+    (q) =>
+      q.status !== 'done' &&
+      !q.delegatedTo &&
+      q.promisedDay !== undefined &&
+      q.promisedDay <= l.calendarDay,
+  ).length;
+  return pressure + Math.min(6, broken * 3);
+}

@@ -5,7 +5,12 @@ import { activeCharacter, activeTask, findActiveCharacter } from './selectors';
 describe('campaign selection', () => {
   it('supports startup and a missing character without selecting a different actor', () => {
     expect(findActiveCharacter({ characters: [], activeCharacterId: '' })).toBeUndefined();
-    expect(findActiveCharacter({ characters: [{ id: 'other' } as Character], activeCharacterId: 'missing' })).toBeUndefined();
+    expect(
+      findActiveCharacter({
+        characters: [{ id: 'other' } as Character],
+        activeCharacterId: 'missing',
+      }),
+    ).toBeUndefined();
   });
 
   it('follows the selected character and returns the existing object for mutations', () => {
@@ -14,7 +19,7 @@ describe('campaign selection', () => {
     expect(activeCharacter(campaign)).toBe(characters[1]);
     campaign.activeCharacterId = 'first';
     expect(activeCharacter(campaign)).toBe(characters[0]);
-    expect(characters.map(character => character.id)).toEqual(['first', 'second']);
+    expect(characters.map((character) => character.id)).toEqual(['first', 'second']);
   });
 
   it('distinguishes a selected task, a stale ID and no task', () => {

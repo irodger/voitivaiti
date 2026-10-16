@@ -10,12 +10,23 @@ type Options = {
 };
 
 /** Shared event lifecycle; individual overlays retain their own markup and sizing. */
-export function usePopoverDismissal({ open, setOpen, anchor, popup, closeOnScroll = false, stopImmediateEscape = false }: Options) {
+export function usePopoverDismissal({
+  open,
+  setOpen,
+  anchor,
+  popup,
+  closeOnScroll = false,
+  stopImmediateEscape = false,
+}: Options) {
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
     const outside = (event: PointerEvent) => {
-      if (!anchor.current?.contains(event.target as Node) && !popup.current?.contains(event.target as Node)) close();
+      if (
+        !anchor.current?.contains(event.target as Node) &&
+        !popup.current?.contains(event.target as Node)
+      )
+        close();
     };
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;

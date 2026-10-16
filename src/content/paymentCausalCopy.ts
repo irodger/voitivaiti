@@ -1,31 +1,132 @@
-import {text} from './localization';
-const rows=[
- ['whyEvidence','После переданного ограничения QA закончила проверку восстановления оплаты и прислала новый случай. Прежний результат остался в истории; нужно сопоставить его с этим обращением.','After the delivered limitation, QA completed recovery checks and sent a new case. The previous result remains in history; compare it with this report.'],
- ['whyContract','Backend выпустил ранее обсуждённую ревизию контракта. После выпуска QA сообщила, что часть незавершённых оплат перестала восстанавливаться. Это новое условие для уже проверенной работы.','Backend released the previously discussed contract revision. QA then reported that some unfinished payments no longer recover. This is a new condition for previously verified work.'],
- ['whyReview','После передачи исправления коллега прислал связанное изменение на проверку. Теперь нужен результат review конкретной версии, а не повтор исходного расследования.','After the fix handoff, a colleague submitted a related change for review. This needs a review of that version, not another original investigation.'],
- ['whyIncident','После выпуска с принятым ограничением QA зарегистрировала сбой в непроверенном состоянии оплаты. Обращение связано с тем решением о выпуске.','After the release with an accepted limitation, QA reported a failure in the unverified payment state. This report is linked to that release decision.'],
- ['whyScope','Product ответил на переданное ограничение и сузил объём выпуска. Нужно проверить предложенную версию в этих границах.','Product responded to the delivered limitation and narrowed release scope. Review the proposed version within those boundaries.'],
- ['backendPendingReply','Backend подтвердил: исходная операция существует. При pending нужно проверить её статус; при новом контракте адрес берётся из statusUrl. Гипотеза только о кнопке не объясняет незавершённую оплату.','Backend confirmed: the original operation exists. Pending requires checking its status; the new contract provides statusUrl. A button-only hypothesis cannot explain unfinished payment.'],
- ['contractRule','Backend подтвердил границу: completed возвращает заказ, pending требует проверить исходную операцию с тем же ключом. Новый ключ не нужен.','Backend confirmed the boundary: completed returns the order; pending requires checking the original operation with the same key. No new key is needed.'],
- ['repairBuilt','Обработчик изменён, но это ещё не проверенный результат. Теперь сравни поведение новой версии в обоих состояниях.','The handler was changed, but the result is not verified yet. Compare the new build in both states.'],
- ['statusVerified','Новая версия читает statusUrl из ответа, сохраняет исходный ключ и возвращает один заказ. Старый адрес больше не используется.','The new build reads statusUrl from the response, retains the original key and returns one order. The old endpoint is no longer used.'],
- ['delegateBusy','Backend уже ведёт другую работу. Новый владелец не назначен: отправлен запрос данных, ответственность пока остаётся у тебя.','Backend is already working on another assignment. No new owner was assigned: evidence was requested, and you retain responsibility.'],
- ['backendReply','Backend прислал ответ: запрос обработан корректно; для восстановления после потери ответа нужен прежний ключ. Поиск ошибки кнопки больше не объясняет второй заказ.','Backend replied: the request was processed correctly; recovery after a lost reply needs the original key. A button bug no longer explains the second order.'],
- ['contractChanged','Backend изменил адрес проверки: pending теперь содержит statusUrl. Прежний обработчик обращается к старому адресу и получает 404; правильный ключ сам по себе этого не исправляет.','Backend changed status polling: pending now includes statusUrl. The old handler polls the previous endpoint and receives 404; keeping the correct key alone does not fix this.'],
- ['reviewDue','Коллега принёс изменение оплаты. Нужно проверить границу восстановления, а не снова собирать исходный баг.','A colleague submitted a payment change. Review its recovery boundary instead of gathering the original bug again.'],
- ['reviewOld','Предложение коллеги: после timeout создать новый operationKey. Это может повторно списать деньги.','Colleague proposal: create a new operationKey after timeout. This can charge twice.'],
- ['reviewComment','Коллеге отправлено замечание с воспроизведением. Он меняет обработчик повтора; результат ещё не готов.','A reproducible review comment was sent. The colleague is changing retry handling; the result is not ready yet.'],
- ['reviewNew','Коллега изменил работу: timeout сохраняет ключ, pending не создаёт новый заказ. Проверь именно новый вариант.','The colleague reworked it: timeout retains the key; pending creates no new order. Verify this new version.'],
- ['reviewApproved','Изменённая работа коллеги проверена: повтор использует прежнюю операцию. Договорились наблюдать новый контракт Backend.','The colleague’s changed work was verified: retry reuses the operation. The team will watch the new Backend contract.'],
- ['risk','Принята ограниченная проверка: pending не проверен. Коллега продолжает выпуск; риск восстановления остаётся.','A bounded review was accepted: pending is untested. The colleague proceeds with the release; recovery risk remains.'],
- ['incident','QA воспроизвела принятый риск: после pending повтор создаёт новый заказ. Теперь надо ограничить воздействие и посмотреть результат.','QA reproduced the accepted risk: retry after pending creates another order. Contain the impact, then observe the result.'],
- ['mitigated','Повтор для pending временно выключен. Дубли должны прекратиться, но часть пользователей не может завершить оплату. Нужно посмотреть реальные запросы.','Retry for pending is temporarily disabled. Duplicates should stop, but some users cannot finish payment. Inspect actual requests.'],
- ['effect','После ограничения: новых дублей 0; pending оплат 7. Ущерб ограничен частично: завершение платежа всё ещё заблокировано.','After mitigation: 0 new duplicates; 7 pending payments. Impact is partially contained; completing payment is still blocked.'],
- ['proper','Изменён обработчик pending: сохраняется ключ, проверяется статус исходной операции. Оба состояния дают один заказ.','Pending handling was changed: retain the key and check the original operation. Both states yield one order.'],
- ['deferred','Контракт и невыполненная проверка переданы с ограничением. Система не исправлена; QA продолжит воспроизведение.','The contract and missing check were handed over with a limitation. The system is unchanged; QA will reproduce it again.'],
- ['qaEvidence','QA принесла данные по восстановлению: один ключ, два состояния — completed и pending. Нужно проверить оба, а не менять ключ вслепую.','QA brought recovery evidence: one key, two states — completed and pending. Check both rather than blindly change the key.'],
- ['scope','Product сузил выпуск: состояние pending пока исключено. Ограничение принято явно; оно не считается исправлением.','Product narrowed the release: pending is excluded for now. The explicit limit is accepted, not counted as a repair.'],
+import { text } from './localization';
+const rows = [
+  [
+    'whyEvidence',
+    'После переданного ограничения QA закончила проверку восстановления оплаты и прислала новый случай. Прежний результат остался в истории; нужно сопоставить его с этим обращением.',
+    'After the delivered limitation, QA completed recovery checks and sent a new case. The previous result remains in history; compare it with this report.',
+  ],
+  [
+    'whyContract',
+    'Backend выпустил ранее обсуждённую ревизию контракта. После выпуска QA сообщила, что часть незавершённых оплат перестала восстанавливаться. Это новое условие для уже проверенной работы.',
+    'Backend released the previously discussed contract revision. QA then reported that some unfinished payments no longer recover. This is a new condition for previously verified work.',
+  ],
+  [
+    'whyReview',
+    'После передачи исправления коллега прислал связанное изменение на проверку. Теперь нужен результат review конкретной версии, а не повтор исходного расследования.',
+    'After the fix handoff, a colleague submitted a related change for review. This needs a review of that version, not another original investigation.',
+  ],
+  [
+    'whyIncident',
+    'После выпуска с принятым ограничением QA зарегистрировала сбой в непроверенном состоянии оплаты. Обращение связано с тем решением о выпуске.',
+    'After the release with an accepted limitation, QA reported a failure in the unverified payment state. This report is linked to that release decision.',
+  ],
+  [
+    'whyScope',
+    'Product ответил на переданное ограничение и сузил объём выпуска. Нужно проверить предложенную версию в этих границах.',
+    'Product responded to the delivered limitation and narrowed release scope. Review the proposed version within those boundaries.',
+  ],
+  [
+    'backendPendingReply',
+    'Backend подтвердил: исходная операция существует. При pending нужно проверить её статус; при новом контракте адрес берётся из statusUrl. Гипотеза только о кнопке не объясняет незавершённую оплату.',
+    'Backend confirmed: the original operation exists. Pending requires checking its status; the new contract provides statusUrl. A button-only hypothesis cannot explain unfinished payment.',
+  ],
+  [
+    'contractRule',
+    'Backend подтвердил границу: completed возвращает заказ, pending требует проверить исходную операцию с тем же ключом. Новый ключ не нужен.',
+    'Backend confirmed the boundary: completed returns the order; pending requires checking the original operation with the same key. No new key is needed.',
+  ],
+  [
+    'repairBuilt',
+    'Обработчик изменён, но это ещё не проверенный результат. Теперь сравни поведение новой версии в обоих состояниях.',
+    'The handler was changed, but the result is not verified yet. Compare the new build in both states.',
+  ],
+  [
+    'statusVerified',
+    'Новая версия читает statusUrl из ответа, сохраняет исходный ключ и возвращает один заказ. Старый адрес больше не используется.',
+    'The new build reads statusUrl from the response, retains the original key and returns one order. The old endpoint is no longer used.',
+  ],
+  [
+    'delegateBusy',
+    'Backend уже ведёт другую работу. Новый владелец не назначен: отправлен запрос данных, ответственность пока остаётся у тебя.',
+    'Backend is already working on another assignment. No new owner was assigned: evidence was requested, and you retain responsibility.',
+  ],
+  [
+    'backendReply',
+    'Backend прислал ответ: запрос обработан корректно; для восстановления после потери ответа нужен прежний ключ. Поиск ошибки кнопки больше не объясняет второй заказ.',
+    'Backend replied: the request was processed correctly; recovery after a lost reply needs the original key. A button bug no longer explains the second order.',
+  ],
+  [
+    'contractChanged',
+    'Backend изменил адрес проверки: pending теперь содержит statusUrl. Прежний обработчик обращается к старому адресу и получает 404; правильный ключ сам по себе этого не исправляет.',
+    'Backend changed status polling: pending now includes statusUrl. The old handler polls the previous endpoint and receives 404; keeping the correct key alone does not fix this.',
+  ],
+  [
+    'reviewDue',
+    'Коллега принёс изменение оплаты. Нужно проверить границу восстановления, а не снова собирать исходный баг.',
+    'A colleague submitted a payment change. Review its recovery boundary instead of gathering the original bug again.',
+  ],
+  [
+    'reviewOld',
+    'Предложение коллеги: после timeout создать новый operationKey. Это может повторно списать деньги.',
+    'Colleague proposal: create a new operationKey after timeout. This can charge twice.',
+  ],
+  [
+    'reviewComment',
+    'Коллеге отправлено замечание с воспроизведением. Он меняет обработчик повтора; результат ещё не готов.',
+    'A reproducible review comment was sent. The colleague is changing retry handling; the result is not ready yet.',
+  ],
+  [
+    'reviewNew',
+    'Коллега изменил работу: timeout сохраняет ключ, pending не создаёт новый заказ. Проверь именно новый вариант.',
+    'The colleague reworked it: timeout retains the key; pending creates no new order. Verify this new version.',
+  ],
+  [
+    'reviewApproved',
+    'Изменённая работа коллеги проверена: повтор использует прежнюю операцию. Договорились наблюдать новый контракт Backend.',
+    'The colleague’s changed work was verified: retry reuses the operation. The team will watch the new Backend contract.',
+  ],
+  [
+    'risk',
+    'Принята ограниченная проверка: pending не проверен. Коллега продолжает выпуск; риск восстановления остаётся.',
+    'A bounded review was accepted: pending is untested. The colleague proceeds with the release; recovery risk remains.',
+  ],
+  [
+    'incident',
+    'QA воспроизвела принятый риск: после pending повтор создаёт новый заказ. Теперь надо ограничить воздействие и посмотреть результат.',
+    'QA reproduced the accepted risk: retry after pending creates another order. Contain the impact, then observe the result.',
+  ],
+  [
+    'mitigated',
+    'Повтор для pending временно выключен. Дубли должны прекратиться, но часть пользователей не может завершить оплату. Нужно посмотреть реальные запросы.',
+    'Retry for pending is temporarily disabled. Duplicates should stop, but some users cannot finish payment. Inspect actual requests.',
+  ],
+  [
+    'effect',
+    'После ограничения: новых дублей 0; pending оплат 7. Ущерб ограничен частично: завершение платежа всё ещё заблокировано.',
+    'After mitigation: 0 new duplicates; 7 pending payments. Impact is partially contained; completing payment is still blocked.',
+  ],
+  [
+    'proper',
+    'Изменён обработчик pending: сохраняется ключ, проверяется статус исходной операции. Оба состояния дают один заказ.',
+    'Pending handling was changed: retain the key and check the original operation. Both states yield one order.',
+  ],
+  [
+    'deferred',
+    'Контракт и невыполненная проверка переданы с ограничением. Система не исправлена; QA продолжит воспроизведение.',
+    'The contract and missing check were handed over with a limitation. The system is unchanged; QA will reproduce it again.',
+  ],
+  [
+    'qaEvidence',
+    'QA принесла данные по восстановлению: один ключ, два состояния — completed и pending. Нужно проверить оба, а не менять ключ вслепую.',
+    'QA brought recovery evidence: one key, two states — completed and pending. Check both rather than blindly change the key.',
+  ],
+  [
+    'scope',
+    'Product сузил выпуск: состояние pending пока исключено. Ограничение принято явно; оно не считается исправлением.',
+    'Product narrowed the release: pending is excluded for now. The explicit limit is accepted, not counted as a repair.',
+  ],
 ];
-rows.forEach(([id,ru,en])=>text('payment.causal.'+id,ru,en));
-export const causalKey=(id:string)=>'payment.causal.'+id;
-export const paymentLabel=(id:string,ru:string,en:string)=>text('payment.causal.action.'+id,ru,en);
+rows.forEach(([id, ru, en]) => text('payment.causal.' + id, ru, en));
+export const causalKey = (id: string) => 'payment.causal.' + id;
+export const paymentLabel = (id: string, ru: string, en: string) =>
+  text('payment.causal.action.' + id, ru, en);

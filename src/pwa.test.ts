@@ -1,29 +1,186 @@
-import {beforeEach,it,expect,vi} from 'vitest';
-const save=vi.hoisted(()=>vi.fn(()=>true));
-vi.mock('./world/store',()=>({saveBeforeUpdate:save}));
-let target:EventTarget,worker:{postMessage:ReturnType<typeof vi.fn>},registration:EventTarget&{waiting:unknown;update:ReturnType<typeof vi.fn>},reload:ReturnType<typeof vi.fn>;
-beforeEach(()=>{vi.resetModules();save.mockReset().mockReturnValue(true);vi.stubEnv('PROD',true);target=new EventTarget();worker={postMessage:vi.fn()};registration=Object.assign(new EventTarget(),{waiting:worker,update:vi.fn(async()=>{})});reload=vi.fn();vi.stubGlobal('location',{reload});vi.stubGlobal('document',Object.assign(new EventTarget(),{visibilityState:'visible'}));vi.stubGlobal('matchMedia',()=>Object.assign(new EventTarget(),{matches:false}));vi.stubGlobal('window',Object.assign(new EventTarget(),{isSecureContext:true}));vi.stubGlobal('navigator',{serviceWorker:Object.assign(target,{controller:{},register:vi.fn(async()=>registration),ready:Promise.resolve()})});vi.stubGlobal('MessageChannel',class{port1={close:vi.fn(),onmessage:null};port2={};});});
-it('checks on request without activation or reload, then saves once before activation',async()=>{const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();expect(registration.update).toHaveBeenCalledOnce();expect(reload).not.toHaveBeenCalled();expect(worker.postMessage).toHaveBeenCalledWith({type:'GET_VERSION'},expect.any(Array));worker.postMessage.mockImplementation((message)=>{if(message.type==='ACTIVATE_UPDATE')expect(save).toHaveBeenCalledOnce();});pwa.applyUpdate();pwa.applyUpdate();expect(worker.postMessage.mock.calls.filter(([m])=>m.type==='ACTIVATE_UPDATE')).toHaveLength(1);target.dispatchEvent(new Event('controllerchange'));target.dispatchEvent(new Event('controllerchange'));expect(reload).toHaveBeenCalledOnce();});
-it('never activates when saving fails; a subsequent retry can succeed',async()=>{const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();save.mockReturnValue(false);pwa.applyUpdate();expect(worker.postMessage.mock.calls.some(([m])=>m.type==='ACTIVATE_UPDATE')).toBe(false);expect(reload).not.toHaveBeenCalled();save.mockReturnValue(true);pwa.applyUpdate();expect(worker.postMessage.mock.calls.some(([m])=>m.type==='ACTIVATE_UPDATE')).toBe(true);});
-it('can apply a downloaded update while the update check is offline',async()=>{const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();registration.update.mockRejectedValue(new Error('offline'));await pwa.checkForUpdate();pwa.applyUpdate();expect(worker.postMessage.mock.calls.some(([m])=>m.type==='ACTIVATE_UPDATE')).toBe(true);});
-
-it('checks even when version is clicked before startup registration finishes',async()=>{const pwa=await import('./pwa');await pwa.checkForUpdate();expect(navigator.serviceWorker.register).toHaveBeenCalledOnce();expect(registration.update).toHaveBeenCalledOnce();pwa.applyUpdate();expect(save).toHaveBeenCalledOnce();});
-
-it('discovers a waiting update on startup without opening the version panel',async()=>{const pwa=await import('./pwa');pwa.startPwa();await vi.waitFor(()=>expect(registration.update).toHaveBeenCalledOnce());expect(worker.postMessage).toHaveBeenCalledWith({type:'GET_VERSION'},expect.any(Array));expect(reload).not.toHaveBeenCalled();});
-it('does not announce a first installation as an update',async()=>{Object.assign(navigator.serviceWorker,{controller:null});const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();pwa.applyUpdate();expect(worker.postMessage).not.toHaveBeenCalled();expect(save).not.toHaveBeenCalled();});
-it('discovers an update installed during the session',async()=>{registration.waiting=null;const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();const installing=Object.assign(new EventTarget(),{state:'installing'});Object.assign(registration,{installing});registration.dispatchEvent(new Event('updatefound'));registration.waiting=worker;installing.state='installed';installing.dispatchEvent(new Event('statechange'));expect(worker.postMessage).toHaveBeenCalledWith({type:'GET_VERSION'},expect.any(Array));expect(reload).not.toHaveBeenCalled();});
-it('checks when returning to the app without reloading',async()=>{const pwa=await import('./pwa');pwa.startPwa();await pwa.checkForUpdate();document.dispatchEvent(new Event('visibilitychange'));await pwa.checkForUpdate();expect(registration.update).toHaveBeenCalledTimes(2);expect(reload).not.toHaveBeenCalled();});
-
-it.each(['0.10.6','0.10.8'])('does not offer an update to current or older version %s',async(version)=>{
- let reply:((event:{data:{version:string}})=>void)|undefined;
- vi.stubGlobal('MessageChannel',class{port1={close:vi.fn(),set onmessage(fn:typeof reply){reply=fn;}};port2={};});
- const pwa=await import('./pwa');await pwa.checkForUpdate();reply!({data:{version}});pwa.applyUpdate();
- expect(save).not.toHaveBeenCalled();expect(worker.postMessage.mock.calls.some(([m])=>m.type==='ACTIVATE_UPDATE')).toBe(false);
+import { beforeEach, it, expect, vi } from 'vitest';
+const save = vi.hoisted(() => vi.fn(() => true));
+vi.mock('./world/store', () => ({ saveBeforeUpdate: save }));
+let target: EventTarget,
+  worker: { postMessage: ReturnType<typeof vi.fn> },
+  registration: EventTarget & { waiting: unknown; update: ReturnType<typeof vi.fn> },
+  reload: ReturnType<typeof vi.fn>;
+beforeEach(() => {
+  vi.resetModules();
+  save.mockReset().mockReturnValue(true);
+  vi.stubEnv('PROD', true);
+  target = new EventTarget();
+  worker = { postMessage: vi.fn() };
+  registration = Object.assign(new EventTarget(), {
+    waiting: worker,
+    update: vi.fn(async () => {}),
+  });
+  reload = vi.fn();
+  vi.stubGlobal('location', { reload });
+  vi.stubGlobal('document', Object.assign(new EventTarget(), { visibilityState: 'visible' }));
+  vi.stubGlobal('matchMedia', () => Object.assign(new EventTarget(), { matches: false }));
+  vi.stubGlobal('window', Object.assign(new EventTarget(), { isSecureContext: true }));
+  vi.stubGlobal('navigator', {
+    serviceWorker: Object.assign(target, {
+      controller: {},
+      register: vi.fn(async () => registration),
+      ready: Promise.resolve(),
+    }),
+  });
+  vi.stubGlobal(
+    'MessageChannel',
+    class {
+      port1 = { close: vi.fn(), onmessage: null };
+      port2 = {};
+    },
+  );
 });
-it('does not apply an older waiting worker while the new one is downloading',async()=>{
- Object.assign(registration,{installing:Object.assign(new EventTarget(),{state:'installing'})});
- const pwa=await import('./pwa');await pwa.checkForUpdate();pwa.applyUpdate();expect(save).not.toHaveBeenCalled();
+it('checks on request without activation or reload, then saves once before activation', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await pwa.checkForUpdate();
+  expect(registration.update).toHaveBeenCalledOnce();
+  expect(reload).not.toHaveBeenCalled();
+  expect(worker.postMessage).toHaveBeenCalledWith({ type: 'GET_VERSION' }, expect.any(Array));
+  worker.postMessage.mockImplementation((message) => {
+    if (message.type === 'ACTIVATE_UPDATE') expect(save).toHaveBeenCalledOnce();
+  });
+  pwa.applyUpdate();
+  pwa.applyUpdate();
+  expect(worker.postMessage.mock.calls.filter(([m]) => m.type === 'ACTIVATE_UPDATE')).toHaveLength(
+    1,
+  );
+  target.dispatchEvent(new Event('controllerchange'));
+  target.dispatchEvent(new Event('controllerchange'));
+  expect(reload).toHaveBeenCalledOnce();
+});
+it('never activates when saving fails; a subsequent retry can succeed', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await pwa.checkForUpdate();
+  save.mockReturnValue(false);
+  pwa.applyUpdate();
+  expect(worker.postMessage.mock.calls.some(([m]) => m.type === 'ACTIVATE_UPDATE')).toBe(false);
+  expect(reload).not.toHaveBeenCalled();
+  save.mockReturnValue(true);
+  pwa.applyUpdate();
+  expect(worker.postMessage.mock.calls.some(([m]) => m.type === 'ACTIVATE_UPDATE')).toBe(true);
+});
+it('can apply a downloaded update while the update check is offline', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await pwa.checkForUpdate();
+  registration.update.mockRejectedValue(new Error('offline'));
+  await pwa.checkForUpdate();
+  pwa.applyUpdate();
+  expect(worker.postMessage.mock.calls.some(([m]) => m.type === 'ACTIVATE_UPDATE')).toBe(true);
 });
 
-it('native installation is deferred until the install action, and honors userChoice',async()=>{const pwa=await import('./pwa');pwa.startPwa();const prompt=vi.fn(async()=>{}),event=Object.assign(new Event('beforeinstallprompt',{cancelable:true}),{prompt,userChoice:Promise.resolve({outcome:'accepted'})});window.dispatchEvent(event);expect(event.defaultPrevented).toBe(true);expect(prompt).not.toHaveBeenCalled();expect(await pwa.installApp()).toBe('accepted');expect(prompt).toHaveBeenCalledOnce();await pwa.installApp();expect(prompt).toHaveBeenCalledOnce();});
-it('appinstalled clears a deferred install event',async()=>{const pwa=await import('./pwa');pwa.startPwa();const prompt=vi.fn(async()=>({outcome:'accepted'}));window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'),{prompt}));window.dispatchEvent(new Event('appinstalled'));await pwa.installApp();expect(prompt).not.toHaveBeenCalled();});
+it('checks even when version is clicked before startup registration finishes', async () => {
+  const pwa = await import('./pwa');
+  await pwa.checkForUpdate();
+  expect(navigator.serviceWorker.register).toHaveBeenCalledOnce();
+  expect(registration.update).toHaveBeenCalledOnce();
+  pwa.applyUpdate();
+  expect(save).toHaveBeenCalledOnce();
+});
+
+it('discovers a waiting update on startup without opening the version panel', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await vi.waitFor(() => expect(registration.update).toHaveBeenCalledOnce());
+  expect(worker.postMessage).toHaveBeenCalledWith({ type: 'GET_VERSION' }, expect.any(Array));
+  expect(reload).not.toHaveBeenCalled();
+});
+it('does not announce a first installation as an update', async () => {
+  Object.assign(navigator.serviceWorker, { controller: null });
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await pwa.checkForUpdate();
+  pwa.applyUpdate();
+  expect(worker.postMessage).not.toHaveBeenCalled();
+  expect(save).not.toHaveBeenCalled();
+});
+it('discovers an update installed during the session', async () => {
+  registration.waiting = null;
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await pwa.checkForUpdate();
+  const installing = Object.assign(new EventTarget(), { state: 'installing' });
+  Object.assign(registration, { installing });
+  registration.dispatchEvent(new Event('updatefound'));
+  registration.waiting = worker;
+  installing.state = 'installed';
+  installing.dispatchEvent(new Event('statechange'));
+  expect(worker.postMessage).toHaveBeenCalledWith({ type: 'GET_VERSION' }, expect.any(Array));
+  expect(reload).not.toHaveBeenCalled();
+});
+it('checks when returning to the app without reloading', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  await pwa.checkForUpdate();
+  document.dispatchEvent(new Event('visibilitychange'));
+  await pwa.checkForUpdate();
+  expect(registration.update).toHaveBeenCalledTimes(2);
+  expect(reload).not.toHaveBeenCalled();
+});
+
+it.each(['0.10.6', '0.10.8'])(
+  'does not offer an update to current or older version %s',
+  async (version) => {
+    let reply: ((event: { data: { version: string } }) => void) | undefined;
+    vi.stubGlobal(
+      'MessageChannel',
+      class {
+        port1 = {
+          close: vi.fn(),
+          set onmessage(fn: typeof reply) {
+            reply = fn;
+          },
+        };
+        port2 = {};
+      },
+    );
+    const pwa = await import('./pwa');
+    await pwa.checkForUpdate();
+    reply!({ data: { version } });
+    pwa.applyUpdate();
+    expect(save).not.toHaveBeenCalled();
+    expect(worker.postMessage.mock.calls.some(([m]) => m.type === 'ACTIVATE_UPDATE')).toBe(false);
+  },
+);
+it('does not apply an older waiting worker while the new one is downloading', async () => {
+  Object.assign(registration, {
+    installing: Object.assign(new EventTarget(), { state: 'installing' }),
+  });
+  const pwa = await import('./pwa');
+  await pwa.checkForUpdate();
+  pwa.applyUpdate();
+  expect(save).not.toHaveBeenCalled();
+});
+
+it('native installation is deferred until the install action, and honors userChoice', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  const prompt = vi.fn(async () => {}),
+    event = Object.assign(new Event('beforeinstallprompt', { cancelable: true }), {
+      prompt,
+      userChoice: Promise.resolve({ outcome: 'accepted' }),
+    });
+  window.dispatchEvent(event);
+  expect(event.defaultPrevented).toBe(true);
+  expect(prompt).not.toHaveBeenCalled();
+  expect(await pwa.installApp()).toBe('accepted');
+  expect(prompt).toHaveBeenCalledOnce();
+  await pwa.installApp();
+  expect(prompt).toHaveBeenCalledOnce();
+});
+it('appinstalled clears a deferred install event', async () => {
+  const pwa = await import('./pwa');
+  pwa.startPwa();
+  const prompt = vi.fn(async () => ({ outcome: 'accepted' }));
+  window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'), { prompt }));
+  window.dispatchEvent(new Event('appinstalled'));
+  await pwa.installApp();
+  expect(prompt).not.toHaveBeenCalled();
+});

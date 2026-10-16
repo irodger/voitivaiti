@@ -1,98 +1,745 @@
-.theme-picker{border:0;padding:0;margin:22px 0;display:grid;gap:9px}.theme-picker legend{font-size:13px;margin-bottom:12px}.theme-picker button{display:flex;align-items:center;gap:12px;min-height:48px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);text-align:left;font-size:12px}.theme-picker button[aria-pressed=true]{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}.theme-picker button>svg{margin-left:auto}.theme-swatches{display:flex;gap:4px}.theme-swatches i{width:18px;height:18px;border-radius:50%;background:#395a40}.theme-swatches i+i{background:#d1e9a5}.swatches-violet i{background:#6641a8}.swatches-violet i+i{background:#f2cd53}
-.world-game.theme-violet{--ink:#30233f;--muted:#6e627b;--green:#6641a8;--lime:#f2cd53;--paper:#fffdfa;--line:#e4dced;--orange:#af7134;background:#f6f3f9;color:var(--ink)}
-.world-game.theme-violet :is(h1,h2,h3,h4){color:#30233f}.world-game.theme-violet :is(.world-modal,.world-card,.world-task-panel,.world-hud,.expectation-card,.skill-next,.skill-term-grid details){background:#fffdfa;border-color:#e4dced;color:#30233f}.world-game.theme-violet :is(.speech,.selected-priority,.problem-context,.current-step-card,.work-remainder,.skill-work-cycle){background:#f0eafa;border-color:#ded0ec;color:#3f3153}.world-game.theme-violet :is(.speech p,.fine-print,.world-card p,.world-modal p,.expectation-meta,.skill-next li p){color:#675574}
-.world-game.theme-violet .primary-button{background:linear-gradient(125deg,#754cb7,#58318e);border-color:#512c83;color:#fff;box-shadow:0 3px 0 #422367}.world-game.theme-violet .primary-button svg{color:#ffe28a}.world-game.theme-violet :is(.world-secondary,.team-member-body>button){background:#fff4c8;border-color:#e2c875;color:#4b345d}.world-game.theme-violet :is(.bottom-nav,.laptop-content,.laptop-menubar){background:#fffdfa;color:#3f3153}.world-game.theme-violet :is(.bottom-nav button.active,.laptop-apps>button.active,.schedule-strip button.active){background:#f4d969;color:#442768}.world-game.theme-violet :is(.bottom-nav button,.icon-button,.header-player small,.eyebrow,.world-game .eyebrow){color:#6f587f}.world-game.theme-violet .header-clock{background:#eee5f7;color:#54316f}.world-game.theme-violet :is(.hud-money,.skill-profile){background:linear-gradient(135deg,#513179,#704aa2);color:#fff8e1}.world-game.theme-violet .hud-money :is(b,strong,small){color:#fff8e1}.world-game.theme-violet :is(.skill-profile h2,.skill-profile p,.skill-profile small){color:#fff3ca}.world-game.theme-violet :is(.stat-track,.skill-bar){background:#e8dff0}.world-game.theme-violet :is(.stat-track i,.skill-bar i,.team-trust-track i){background:#dcb340}.world-game.theme-violet :is(.team-banner,.skill-map-emblem){background:linear-gradient(125deg,#ece2f6,#fff2c2);border-color:#dfccec;color:#583879}.world-game.theme-violet :is(.team-banner-copy>p:last-of-type,.team-banner-stats>span,.team-banner-stats b,.team-member-purpose,.team-trust small,.team-trust>div:first-child){color:#6e587c}.world-game.theme-violet .team-member{--team-accent:#725099;--team-tint:#eee4f7;border-color:#e4dced}.world-game.theme-violet :is(.career-road>div,.remainder-card,.skill-practice){border-color:#dfd1eb;background:#fbf8fd}.world-game.theme-violet :is(.skill-road-dot,.skill-road-count){background:#eee5f7;color:#674886}.world-game.theme-violet .met :is(.skill-road-dot,.skill-road-count){background:#fff0b6;color:#634623}.world-game.theme-violet :is(.laptop-apps,.laptop-step-list){background:#f0eafa}.world-game.theme-violet .live-dot{background:#8054b2}.world-game.theme-violet button:focus-visible{outline-color:#a77c22}
-.world-game.theme-violet :is(.montage-result,.career-pacing,.queue-items button,.life-current-focus){background:#f0eafa;color:#493457;border-color:#dfd0ec}.world-game.theme-violet .montage-result p{color:#604b70}.world-game.theme-violet .stat-money{background:linear-gradient(135deg,#513179,#704aa2);color:#fff4cf}.world-game.theme-violet .stat-money :is(small,b,svg){color:#fff4cf}.world-game.theme-violet .focus-hud .life-status{color:#493457}.world-game.theme-violet .theme-picker button:focus-visible{outline:3px solid #ae8123;outline-offset:3px}
+.theme-picker {
+  border: 0;
+  padding: 0;
+  margin: 22px 0;
+  display: grid;
+  gap: 9px;
+}
+.theme-picker legend {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.theme-picker button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  text-align: left;
+  font-size: 12px;
+}
+.theme-picker button[aria-pressed='true'] {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+.theme-picker button > svg {
+  margin-left: auto;
+}
+.theme-swatches {
+  display: flex;
+  gap: 4px;
+}
+.theme-swatches i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #395a40;
+}
+.theme-swatches i + i {
+  background: #d1e9a5;
+}
+.swatches-violet i {
+  background: #6641a8;
+}
+.swatches-violet i + i {
+  background: #f2cd53;
+}
+.world-game.theme-violet {
+  --ink: #30233f;
+  --muted: #6e627b;
+  --green: #6641a8;
+  --lime: #f2cd53;
+  --paper: #fffdfa;
+  --line: #e4dced;
+  --orange: #af7134;
+  background: #f6f3f9;
+  color: var(--ink);
+}
+.world-game.theme-violet :is(h1, h2, h3, h4) {
+  color: #30233f;
+}
+.world-game.theme-violet
+  :is(
+    .world-modal,
+    .world-card,
+    .world-task-panel,
+    .world-hud,
+    .expectation-card,
+    .skill-next,
+    .skill-term-grid details
+  ) {
+  background: #fffdfa;
+  border-color: #e4dced;
+  color: #30233f;
+}
+.world-game.theme-violet
+  :is(
+    .speech,
+    .selected-priority,
+    .problem-context,
+    .current-step-card,
+    .work-remainder,
+    .skill-work-cycle
+  ) {
+  background: #f0eafa;
+  border-color: #ded0ec;
+  color: #3f3153;
+}
+.world-game.theme-violet
+  :is(.speech p, .fine-print, .world-card p, .world-modal p, .expectation-meta, .skill-next li p) {
+  color: #675574;
+}
+.world-game.theme-violet .primary-button {
+  background: linear-gradient(125deg, #754cb7, #58318e);
+  border-color: #512c83;
+  color: #fff;
+  box-shadow: 0 3px 0 #422367;
+}
+.world-game.theme-violet .primary-button svg {
+  color: #ffe28a;
+}
+.world-game.theme-violet :is(.world-secondary, .team-member-body > button) {
+  background: #fff4c8;
+  border-color: #e2c875;
+  color: #4b345d;
+}
+.world-game.theme-violet :is(.bottom-nav, .laptop-content, .laptop-menubar) {
+  background: #fffdfa;
+  color: #3f3153;
+}
+.world-game.theme-violet
+  :is(.bottom-nav button.active, .laptop-apps > button.active, .schedule-strip button.active) {
+  background: #f4d969;
+  color: #442768;
+}
+.world-game.theme-violet
+  :is(.bottom-nav button, .icon-button, .header-player small, .eyebrow, .world-game .eyebrow) {
+  color: #6f587f;
+}
+.world-game.theme-violet .header-clock {
+  background: #eee5f7;
+  color: #54316f;
+}
+.world-game.theme-violet :is(.hud-money, .skill-profile) {
+  background: linear-gradient(135deg, #513179, #704aa2);
+  color: #fff8e1;
+}
+.world-game.theme-violet .hud-money :is(b, strong, small) {
+  color: #fff8e1;
+}
+.world-game.theme-violet :is(.skill-profile h2, .skill-profile p, .skill-profile small) {
+  color: #fff3ca;
+}
+.world-game.theme-violet :is(.stat-track, .skill-bar) {
+  background: #e8dff0;
+}
+.world-game.theme-violet :is(.stat-track i, .skill-bar i, .team-trust-track i) {
+  background: #dcb340;
+}
+.world-game.theme-violet :is(.team-banner, .skill-map-emblem) {
+  background: linear-gradient(125deg, #ece2f6, #fff2c2);
+  border-color: #dfccec;
+  color: #583879;
+}
+.world-game.theme-violet
+  :is(
+    .team-banner-copy > p:last-of-type,
+    .team-banner-stats > span,
+    .team-banner-stats b,
+    .team-member-purpose,
+    .team-trust small,
+    .team-trust > div:first-child
+  ) {
+  color: #6e587c;
+}
+.world-game.theme-violet .team-member {
+  --team-accent: #725099;
+  --team-tint: #eee4f7;
+  border-color: #e4dced;
+}
+.world-game.theme-violet :is(.career-road > div, .remainder-card, .skill-practice) {
+  border-color: #dfd1eb;
+  background: #fbf8fd;
+}
+.world-game.theme-violet :is(.skill-road-dot, .skill-road-count) {
+  background: #eee5f7;
+  color: #674886;
+}
+.world-game.theme-violet .met :is(.skill-road-dot, .skill-road-count) {
+  background: #fff0b6;
+  color: #634623;
+}
+.world-game.theme-violet :is(.laptop-apps, .laptop-step-list) {
+  background: #f0eafa;
+}
+.world-game.theme-violet .live-dot {
+  background: #8054b2;
+}
+.world-game.theme-violet button:focus-visible {
+  outline-color: #a77c22;
+}
+.world-game.theme-violet
+  :is(.montage-result, .career-pacing, .queue-items button, .life-current-focus) {
+  background: #f0eafa;
+  color: #493457;
+  border-color: #dfd0ec;
+}
+.world-game.theme-violet .montage-result p {
+  color: #604b70;
+}
+.world-game.theme-violet .stat-money {
+  background: linear-gradient(135deg, #513179, #704aa2);
+  color: #fff4cf;
+}
+.world-game.theme-violet .stat-money :is(small, b, svg) {
+  color: #fff4cf;
+}
+.world-game.theme-violet .focus-hud .life-status {
+  color: #493457;
+}
+.world-game.theme-violet .theme-picker button:focus-visible {
+  outline: 3px solid #ae8123;
+  outline-offset: 3px;
+}
 /* Violet scheme: extend to contextual screens and preserve state distinctions. */
-.world-game.theme-violet :is(.focus-bar,.current-status){color:#432c5b}.world-game.theme-violet .focus-bar small{color:#766184}.world-game.theme-violet .focus-bar:hover{background:#f1eafa}.world-game.theme-violet :is(.career-map,.company-identity){background:radial-gradient(ellipse at 15% 15%,#eadff7,transparent 65%),#faf7fd;border-color:#dfd1eb}.world-game.theme-violet :is(.career-map header p,.company-metric-grid article>p,.company-tech,.company-timeline li span,.company-timeline li>small){color:#705c7e}.world-game.theme-violet :is(.career-map header>span,.company-tags span,.company-project-metrics>span){background:#eee3f8;color:#62427d}.world-game.theme-violet .career-map-board{background-image:radial-gradient(#9a7cb438 1px,transparent 1px)}.world-game.theme-violet .career-map-node{background:#fffdfa;border-color:#dfd1eb;color:#412e55}.world-game.theme-violet .career-map-node.current{background:linear-gradient(145deg,#7044a3,#47256e);border-color:#7147a1;color:#fff5ce}.world-game.theme-violet .career-map-node.current small{color:#ffe39a}.world-game.theme-violet .career-map-node.next{border-color:#d0a333;background:#fff5cc}.world-game.theme-violet :is(.career-map-emblem,.company-project-icon){background:#eee3f8;color:#78519c}.world-game.theme-violet .career-map-node.passed .career-map-emblem{background:#f8e7a3;color:#6a4824}.world-game.theme-violet .career-map-lines path{stroke:#c8b2dc}.world-game.theme-violet .career-map-lines path.travelled{stroke:#8761af}.world-game.theme-violet .company-meter{background:#e9dff0}.world-game.theme-violet .company-meter i{background:#956ac0}.world-game.theme-violet .company-timeline{background:#fffdfa;border-color:#e4dced}.world-game.theme-violet .company-timeline li::before{background:#b28bd2}.world-game.theme-violet .company-timeline li{border-color:#e1d2ed}
-.world-game.theme-violet :is(.choice,.evidence-grid button,.mechanic-card){border-color:#dfd2ea;color:#432f58}.world-game.theme-violet :is(.choice.selected,.choice[aria-pressed=true],.laptop-step-list .active){background:#f9ebae;border-color:#d7b951;color:#4a315c}.world-game.theme-violet :is(.laptop-step-list .completed,.mechanic-feedback,.feedback-success){background:#ede2f6;color:#52366a}.world-game.theme-violet .primary-button:disabled{background:#b6a8c5;border-color:#ab9cba;box-shadow:none;color:#fff}.world-game.theme-violet .world-secondary:hover:not(:disabled){background:#f9e79d}.world-game.theme-violet .primary-button:hover:not(:disabled){background:linear-gradient(125deg,#8056c2,#63369b)}.world-game.theme-violet :is(.skill-icon,.skill-debugging .skill-icon,.skill-communication .skill-icon,.skill-leadership .skill-icon){background:#eee3f8;color:#76519b}.world-game.theme-violet .skill-practice p{color:#705c7e}.world-game.theme-violet .skill-work-cycle li>span{background:#ffe8a0;color:#68442c}.world-game.theme-violet .skill-work-cycle li>svg{color:#8e70ab}.world-game.theme-violet .skill-section-title>svg{color:#8154a8}.world-game.theme-violet .skill-section-title>span{background:#f6e6ab;color:#624328}
-@media(prefers-reduced-motion:no-preference){.theme-picker button{transition:background .18s,border-color .18s}.world-game.theme-violet .primary-button{transition:background .18s}}
-.world-game.theme-violet{background:#f6f3f9;color:#30233f}.world-game.theme-violet .eyebrow{color:#755b86}
-.world-game.theme-violet :is(.header-clock,.schedule-strip,.laptop-apps,.current-step-card,.speech,.montage-result){background:#f1eafa;border-color:#dfd1eb;color:#5e4074}
-.world-game.theme-violet :is(.primary-button,.world-card .primary-button){background:linear-gradient(125deg,#754cb7,#58318e);border-color:#512c83;color:#fff;box-shadow:0 3px 0 #422367}
-.world-game.theme-violet .primary-button:disabled{background:#b6a8c5;border-color:#ab9cba;box-shadow:none}
-.world-game.theme-violet .stat-money{background:linear-gradient(120deg,#70479c,#4e2d76);color:#fff4cf}
-.world-game.theme-violet .stat-money small{color:#eee0fc}
-.world-game.theme-violet :is(.world-hud,.world-task-panel,.world-modal){background:#fffdfa;border-color:#e4dced}
-.world-game.theme-violet :is(.hud-stat small,.speaker span,.fine-print,.scene-top,.queue-items small){color:#755e81}
-.world-game.theme-violet :is(.speech p,.montage-result p,.office-content>p){color:#64506f}
-.world-game.theme-violet :is(.bottom-nav button.active,.schedule-strip button.active,.queue-items button[aria-pressed=true]){background:#f6dc72;color:#49315f;border-color:#d3b34e}
-.world-game.theme-violet .bottom-nav button.active::after{background:#8054ac}
-.world-game.theme-violet :is(.stat-track,.team-trust-track){background:#e7ddef}
-.world-game.theme-violet .stat-track i{background:#d4a933}
-.world-game.theme-violet :is(.office-shortcuts button,.desk-hotspot,.apartment-action,.world-role-grid button){background:#fff8df;color:#604074;border-color:#e4d2a0}
-.world-game.theme-violet .cinematic-office .scene-top>span:first-child{background:#4e326cde;color:#fff1bf;border-color:#cab8dc44}
-.world-game.theme-violet :is(.office-activity,.home-room-label,.apartment-footer button){background:#4e326cde;color:#fff1bf}
-.world-game.theme-violet :is(.settings-button,.brand small,.header-clock,.laptop-menubar,.laptop-step-list){color:#6e4a89}
-.world-game.theme-violet .settings-button{background:#fffdfa;border-color:#dfd1eb}
-.world-game.theme-violet .world-secondary{background:#fff1be;color:#513666;border-color:#dfc570}
-.world-game.theme-violet .laptop-shell{background:#4f3764}
-.world-game.theme-violet :is(.floating-feedback>div,.term-discovery,.progress-segments .completed){background:#f7e6a6;color:#664b23}
-.world-game.theme-violet :is(.requirements li.met,.company-current,.term-link){color:#764696}
-.world-game.theme-violet .cinematic-office .scene-top>span:last-child{color:#fff4dc}
+.world-game.theme-violet :is(.focus-bar, .current-status) {
+  color: #432c5b;
+}
+.world-game.theme-violet .focus-bar small {
+  color: #766184;
+}
+.world-game.theme-violet .focus-bar:hover {
+  background: #f1eafa;
+}
+.world-game.theme-violet :is(.career-map, .company-identity) {
+  background: radial-gradient(ellipse at 15% 15%, #eadff7, transparent 65%), #faf7fd;
+  border-color: #dfd1eb;
+}
+.world-game.theme-violet
+  :is(
+    .career-map header p,
+    .company-metric-grid article > p,
+    .company-tech,
+    .company-timeline li span,
+    .company-timeline li > small
+  ) {
+  color: #705c7e;
+}
+.world-game.theme-violet
+  :is(.career-map header > span, .company-tags span, .company-project-metrics > span) {
+  background: #eee3f8;
+  color: #62427d;
+}
+.world-game.theme-violet .career-map-board {
+  background-image: radial-gradient(#9a7cb438 1px, transparent 1px);
+}
+.world-game.theme-violet .career-map-node {
+  background: #fffdfa;
+  border-color: #dfd1eb;
+  color: #412e55;
+}
+.world-game.theme-violet .career-map-node.current {
+  background: linear-gradient(145deg, #7044a3, #47256e);
+  border-color: #7147a1;
+  color: #fff5ce;
+}
+.world-game.theme-violet .career-map-node.current small {
+  color: #ffe39a;
+}
+.world-game.theme-violet .career-map-node.next {
+  border-color: #d0a333;
+  background: #fff5cc;
+}
+.world-game.theme-violet :is(.career-map-emblem, .company-project-icon) {
+  background: #eee3f8;
+  color: #78519c;
+}
+.world-game.theme-violet .career-map-node.passed .career-map-emblem {
+  background: #f8e7a3;
+  color: #6a4824;
+}
+.world-game.theme-violet .career-map-lines path {
+  stroke: #c8b2dc;
+}
+.world-game.theme-violet .career-map-lines path.travelled {
+  stroke: #8761af;
+}
+.world-game.theme-violet .company-meter {
+  background: #e9dff0;
+}
+.world-game.theme-violet .company-meter i {
+  background: #956ac0;
+}
+.world-game.theme-violet .company-timeline {
+  background: #fffdfa;
+  border-color: #e4dced;
+}
+.world-game.theme-violet .company-timeline li::before {
+  background: #b28bd2;
+}
+.world-game.theme-violet .company-timeline li {
+  border-color: #e1d2ed;
+}
+.world-game.theme-violet :is(.choice, .evidence-grid button, .mechanic-card) {
+  border-color: #dfd2ea;
+  color: #432f58;
+}
+.world-game.theme-violet
+  :is(.choice.selected, .choice[aria-pressed='true'], .laptop-step-list .active) {
+  background: #f9ebae;
+  border-color: #d7b951;
+  color: #4a315c;
+}
+.world-game.theme-violet :is(.laptop-step-list .completed, .mechanic-feedback, .feedback-success) {
+  background: #ede2f6;
+  color: #52366a;
+}
+.world-game.theme-violet .primary-button:disabled {
+  background: #b6a8c5;
+  border-color: #ab9cba;
+  box-shadow: none;
+  color: #fff;
+}
+.world-game.theme-violet .world-secondary:hover:not(:disabled) {
+  background: #f9e79d;
+}
+.world-game.theme-violet .primary-button:hover:not(:disabled) {
+  background: linear-gradient(125deg, #8056c2, #63369b);
+}
+.world-game.theme-violet
+  :is(
+    .skill-icon,
+    .skill-debugging .skill-icon,
+    .skill-communication .skill-icon,
+    .skill-leadership .skill-icon
+  ) {
+  background: #eee3f8;
+  color: #76519b;
+}
+.world-game.theme-violet .skill-practice p {
+  color: #705c7e;
+}
+.world-game.theme-violet .skill-work-cycle li > span {
+  background: #ffe8a0;
+  color: #68442c;
+}
+.world-game.theme-violet .skill-work-cycle li > svg {
+  color: #8e70ab;
+}
+.world-game.theme-violet .skill-section-title > svg {
+  color: #8154a8;
+}
+.world-game.theme-violet .skill-section-title > span {
+  background: #f6e6ab;
+  color: #624328;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .theme-picker button {
+    transition:
+      background 0.18s,
+      border-color 0.18s;
+  }
+  .world-game.theme-violet .primary-button {
+    transition: background 0.18s;
+  }
+}
+.world-game.theme-violet {
+  background: #f6f3f9;
+  color: #30233f;
+}
+.world-game.theme-violet .eyebrow {
+  color: #755b86;
+}
+.world-game.theme-violet
+  :is(.header-clock, .schedule-strip, .laptop-apps, .current-step-card, .speech, .montage-result) {
+  background: #f1eafa;
+  border-color: #dfd1eb;
+  color: #5e4074;
+}
+.world-game.theme-violet :is(.primary-button, .world-card .primary-button) {
+  background: linear-gradient(125deg, #754cb7, #58318e);
+  border-color: #512c83;
+  color: #fff;
+  box-shadow: 0 3px 0 #422367;
+}
+.world-game.theme-violet .primary-button:disabled {
+  background: #b6a8c5;
+  border-color: #ab9cba;
+  box-shadow: none;
+}
+.world-game.theme-violet .stat-money {
+  background: linear-gradient(120deg, #70479c, #4e2d76);
+  color: #fff4cf;
+}
+.world-game.theme-violet .stat-money small {
+  color: #eee0fc;
+}
+.world-game.theme-violet :is(.world-hud, .world-task-panel, .world-modal) {
+  background: #fffdfa;
+  border-color: #e4dced;
+}
+.world-game.theme-violet
+  :is(.hud-stat small, .speaker span, .fine-print, .scene-top, .queue-items small) {
+  color: #755e81;
+}
+.world-game.theme-violet :is(.speech p, .montage-result p, .office-content > p) {
+  color: #64506f;
+}
+.world-game.theme-violet
+  :is(
+    .bottom-nav button.active,
+    .schedule-strip button.active,
+    .queue-items button[aria-pressed='true']
+  ) {
+  background: #f6dc72;
+  color: #49315f;
+  border-color: #d3b34e;
+}
+.world-game.theme-violet .bottom-nav button.active::after {
+  background: #8054ac;
+}
+.world-game.theme-violet :is(.stat-track, .team-trust-track) {
+  background: #e7ddef;
+}
+.world-game.theme-violet .stat-track i {
+  background: #d4a933;
+}
+.world-game.theme-violet
+  :is(.office-shortcuts button, .desk-hotspot, .apartment-action, .world-role-grid button) {
+  background: #fff8df;
+  color: #604074;
+  border-color: #e4d2a0;
+}
+.world-game.theme-violet .cinematic-office .scene-top > span:first-child {
+  background: #4e326cde;
+  color: #fff1bf;
+  border-color: #cab8dc44;
+}
+.world-game.theme-violet :is(.office-activity, .home-room-label, .apartment-footer button) {
+  background: #4e326cde;
+  color: #fff1bf;
+}
+.world-game.theme-violet
+  :is(.settings-button, .brand small, .header-clock, .laptop-menubar, .laptop-step-list) {
+  color: #6e4a89;
+}
+.world-game.theme-violet .settings-button {
+  background: #fffdfa;
+  border-color: #dfd1eb;
+}
+.world-game.theme-violet .world-secondary {
+  background: #fff1be;
+  color: #513666;
+  border-color: #dfc570;
+}
+.world-game.theme-violet .laptop-shell {
+  background: #4f3764;
+}
+.world-game.theme-violet
+  :is(.floating-feedback > div, .term-discovery, .progress-segments .completed) {
+  background: #f7e6a6;
+  color: #664b23;
+}
+.world-game.theme-violet :is(.requirements li.met, .company-current, .term-link) {
+  color: #764696;
+}
+.world-game.theme-violet .cinematic-office .scene-top > span:last-child {
+  color: #fff4dc;
+}
 /* Interaction states belong to the selected palette too. */
-.world-game.theme-violet .nav-inner button:hover:not(.active){background:#eee3f8;color:#624081}
-.world-game.theme-violet :is(.settings-button,.icon-button):hover{background:#eee3f8;color:#624081}
-.world-game.theme-violet .office-shortcuts button:hover:enabled,.world-game.theme-violet .office-laptop:hover .desk-hotspot{background:#ffeaa1;color:#563472;border-color:#d6b24d}
-.world-game.theme-violet :is(.choice:not(:disabled):hover,.technical-actions>button:hover,.world-role-grid button:hover){background:#f2e9fb;color:#553171;border-color:#ba9ad6}
-.world-game.theme-violet button.focus-bar:hover{background:#f2e9fb}
-.world-game.theme-violet .primary-button:hover:enabled{box-shadow:0 6px 16px #66338b30,inset 0 1px #c6a3e577,inset 0 -2px #422367}
-.world-game.theme-violet .world-secondary:hover:enabled{background:#ffe59a;color:#53316e;border-color:#d7b447}
-.world-game.theme-violet :is(.office-scene,.cinematic-office,.home-room.apartment-scene){background:#c5b6d4;border-color:#d9cae7}
-.world-game.theme-violet .apartment-scene.phase-night{background:#766584}
-.world-game.theme-violet .apartment-action:hover{background:#ffe59a;color:#563472;box-shadow:0 0 0 4px #e9c85140,0 4px 14px #57337440}
-.world-game.theme-violet .resident-target:hover .resident-name,.world-game.theme-violet .resident-target:focus-visible .resident-name{background:#ffe9a1;color:#563472;outline-color:#ad80cf}
-.world-game.theme-violet .resident-detail{background:#fffaf0f5;border-color:#dbc8e9;color:#53336c}
-.world-game.theme-violet .resident-detail :is(small,strong){color:#796187}
-.world-game.theme-violet .resident-target:active .office-person{filter:drop-shadow(0 0 4px #eacd74)}
-.world-game.theme-violet .team-member:hover{border-color:#b798d0;box-shadow:0 8px 22px #62388d18}
-.world-game.theme-violet .start-button:hover{background:#ffe69b;color:#563472}
-.world-game.theme-violet .nav-inner button.active::after{background:#8854ad}
-.world-game.theme-violet,.world-game.theme-violet *{scrollbar-color:#9270b4 #eee6f5;scrollbar-width:thin}
-.world-game.theme-violet ::-webkit-scrollbar{width:9px;height:9px}
-.world-game.theme-violet ::-webkit-scrollbar-track{background:#eee6f5;border-radius:8px}
-.world-game.theme-violet ::-webkit-scrollbar-thumb{background:#9270b4;border:2px solid #eee6f5;border-radius:8px}
-.world-game.theme-violet ::-webkit-scrollbar-thumb:hover{background:#714b98}
-@media(hover:hover) and (pointer:fine){
-.world-game.theme-violet{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32' viewBox='0 0 28 32'%3E%3Cpath d='M3 2v23l6-6 5 10 5-3-5-9h9Z' fill='%236641a8' stroke='%23ffe28a' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2,auto}
-.world-game.theme-violet :is(button:not(:disabled),a,summary,select,[role=button]){cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 17V5q0-4 4-3q2 0 2 3v9q2-3 4 0q3-2 4 1q4-1 4 3v5q0 6-6 7h-7q-3-1-5-4l-6-7q-2-3 1-4q2-1 5 2Z' fill='%23f2cd53' stroke='%236641a8' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 13 3,pointer}
-.world-game.theme-violet :is(input,textarea,[contenteditable=true]){cursor:text}
-.world-game.theme-violet button:disabled{cursor:not-allowed}
+.world-game.theme-violet .nav-inner button:hover:not(.active) {
+  background: #eee3f8;
+  color: #624081;
+}
+.world-game.theme-violet :is(.settings-button, .icon-button):hover {
+  background: #eee3f8;
+  color: #624081;
+}
+.world-game.theme-violet .office-shortcuts button:hover:enabled,
+.world-game.theme-violet .office-laptop:hover .desk-hotspot {
+  background: #ffeaa1;
+  color: #563472;
+  border-color: #d6b24d;
+}
+.world-game.theme-violet
+  :is(
+    .choice:not(:disabled):hover,
+    .technical-actions > button:hover,
+    .world-role-grid button:hover
+  ) {
+  background: #f2e9fb;
+  color: #553171;
+  border-color: #ba9ad6;
+}
+.world-game.theme-violet button.focus-bar:hover {
+  background: #f2e9fb;
+}
+.world-game.theme-violet .primary-button:hover:enabled {
+  box-shadow:
+    0 6px 16px #66338b30,
+    inset 0 1px #c6a3e577,
+    inset 0 -2px #422367;
+}
+.world-game.theme-violet .world-secondary:hover:enabled {
+  background: #ffe59a;
+  color: #53316e;
+  border-color: #d7b447;
+}
+.world-game.theme-violet :is(.office-scene, .cinematic-office, .home-room.apartment-scene) {
+  background: #c5b6d4;
+  border-color: #d9cae7;
+}
+.world-game.theme-violet .apartment-scene.phase-night {
+  background: #766584;
+}
+.world-game.theme-violet .apartment-action:hover {
+  background: #ffe59a;
+  color: #563472;
+  box-shadow:
+    0 0 0 4px #e9c85140,
+    0 4px 14px #57337440;
+}
+.world-game.theme-violet .resident-target:hover .resident-name,
+.world-game.theme-violet .resident-target:focus-visible .resident-name {
+  background: #ffe9a1;
+  color: #563472;
+  outline-color: #ad80cf;
+}
+.world-game.theme-violet .resident-detail {
+  background: #fffaf0f5;
+  border-color: #dbc8e9;
+  color: #53336c;
+}
+.world-game.theme-violet .resident-detail :is(small, strong) {
+  color: #796187;
+}
+.world-game.theme-violet .resident-target:active .office-person {
+  filter: drop-shadow(0 0 4px #eacd74);
+}
+.world-game.theme-violet .team-member:hover {
+  border-color: #b798d0;
+  box-shadow: 0 8px 22px #62388d18;
+}
+.world-game.theme-violet .start-button:hover {
+  background: #ffe69b;
+  color: #563472;
+}
+.world-game.theme-violet .nav-inner button.active::after {
+  background: #8854ad;
+}
+.world-game.theme-violet,
+.world-game.theme-violet * {
+  scrollbar-color: #9270b4 #eee6f5;
+  scrollbar-width: thin;
+}
+.world-game.theme-violet ::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+.world-game.theme-violet ::-webkit-scrollbar-track {
+  background: #eee6f5;
+  border-radius: 8px;
+}
+.world-game.theme-violet ::-webkit-scrollbar-thumb {
+  background: #9270b4;
+  border: 2px solid #eee6f5;
+  border-radius: 8px;
+}
+.world-game.theme-violet ::-webkit-scrollbar-thumb:hover {
+  background: #714b98;
+}
+@media (hover: hover) and (pointer: fine) {
+  .world-game.theme-violet {
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32' viewBox='0 0 28 32'%3E%3Cpath d='M3 2v23l6-6 5 10 5-3-5-9h9Z' fill='%236641a8' stroke='%23ffe28a' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E")
+        3 2,
+      auto;
+  }
+  .world-game.theme-violet :is(button:not(:disabled), a, summary, select, [role='button']) {
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 17V5q0-4 4-3q2 0 2 3v9q2-3 4 0q3-2 4 1q4-1 4 3v5q0 6-6 7h-7q-3-1-5-4l-6-7q-2-3 1-4q2-1 5 2Z' fill='%23f2cd53' stroke='%236641a8' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E")
+        13 3,
+      pointer;
+  }
+  .world-game.theme-violet :is(input, textarea, [contenteditable='true']) {
+    cursor: text;
+  }
+  .world-game.theme-violet button:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* Theme surfaces share one palette, including lazily loaded Home styles. */
-.world-game.theme-violet :is(.home-tabs,.release-item,.version-update){border-color:var(--line)}
-.world-game.theme-violet .home-tabs button{color:var(--muted)}
-.world-game.theme-violet .home-tabs button.active{background:#f6dc72;color:#49315f}
-.world-game.theme-violet .home-tabs button:hover:not(.active){background:#eee4f7;color:#583879}
-.world-game.theme-violet :is(.home-shop article,.home-shop article.installed,.home-pay-note,.market-orders){background:#f1eafa;border-color:#dfd1eb}
-.world-game.theme-violet :is(.home-shop article>svg,.home-shop p,.home-pay small,.home-pay>span,.home-market,.home-market a,.home-pay-note,.home-pay-note b){color:#6e587c}
-.world-game.theme-violet .home-shop button{background:#fff1be;color:#604074}
-.world-game.theme-violet .home-shop button:disabled{background:#e8dff0;color:#6e587c}
-.world-game.theme-violet .avatar-backdrop{fill:#e3d3f1}
-.world-game.theme-violet .avatar-backdrop[data-tone="1"],.world-game.theme-violet .avatar-backdrop[data-tone="3"],.world-game.theme-violet .avatar-backdrop[data-tone="5"]{fill:#f9e8ac}
-.world-game.theme-violet .office-scene:has(.living-office){background:radial-gradient(ellipse at 35% 25%,#eee4f7,#c8b8da 80%);border-color:#d9cce5}
-.world-game.theme-violet .office-scene:has(.living-office) .office-render{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1448 1086'%3E%3Cpath fill='white' d='M11 250L377 0H670L1438 120V628L1237 1081L830 961L775 1039L11 796Z'/%3E%3C/svg%3E");mask-size:contain;mask-position:center;mask-repeat:no-repeat}
-.world-game.theme-violet .home-room.apartment-scene{background:radial-gradient(ellipse at 35% 25%,#eee4f7,#c8b8da 80%)}
-.world-game.theme-violet .home-room.apartment-scene.phase-night{background:#544465}
-.world-game.theme-violet .apartment-art{clip-path:polygon(1% 19%,34% 0,39% 0,99% 18%,99% 72%,67.5% 97%,55% 88%,48.5% 95.5%,1% 69.5%)}
+.world-game.theme-violet :is(.home-tabs, .release-item, .version-update) {
+  border-color: var(--line);
+}
+.world-game.theme-violet .home-tabs button {
+  color: var(--muted);
+}
+.world-game.theme-violet .home-tabs button.active {
+  background: #f6dc72;
+  color: #49315f;
+}
+.world-game.theme-violet .home-tabs button:hover:not(.active) {
+  background: #eee4f7;
+  color: #583879;
+}
+.world-game.theme-violet
+  :is(.home-shop article, .home-shop article.installed, .home-pay-note, .market-orders) {
+  background: #f1eafa;
+  border-color: #dfd1eb;
+}
+.world-game.theme-violet
+  :is(
+    .home-shop article > svg,
+    .home-shop p,
+    .home-pay small,
+    .home-pay > span,
+    .home-market,
+    .home-market a,
+    .home-pay-note,
+    .home-pay-note b
+  ) {
+  color: #6e587c;
+}
+.world-game.theme-violet .home-shop button {
+  background: #fff1be;
+  color: #604074;
+}
+.world-game.theme-violet .home-shop button:disabled {
+  background: #e8dff0;
+  color: #6e587c;
+}
+.world-game.theme-violet .avatar-backdrop {
+  fill: #e3d3f1;
+}
+.world-game.theme-violet .avatar-backdrop[data-tone='1'],
+.world-game.theme-violet .avatar-backdrop[data-tone='3'],
+.world-game.theme-violet .avatar-backdrop[data-tone='5'] {
+  fill: #f9e8ac;
+}
+.world-game.theme-violet .office-scene:has(.living-office) {
+  background: radial-gradient(ellipse at 35% 25%, #eee4f7, #c8b8da 80%);
+  border-color: #d9cce5;
+}
+.world-game.theme-violet .office-scene:has(.living-office) .office-render {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1448 1086'%3E%3Cpath fill='white' d='M11 250L377 0H670L1438 120V628L1237 1081L830 961L775 1039L11 796Z'/%3E%3C/svg%3E");
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+}
+.world-game.theme-violet .home-room.apartment-scene {
+  background: radial-gradient(ellipse at 35% 25%, #eee4f7, #c8b8da 80%);
+}
+.world-game.theme-violet .home-room.apartment-scene.phase-night {
+  background: #544465;
+}
+.world-game.theme-violet .apartment-art {
+  clip-path: polygon(
+    1% 19%,
+    34% 0,
+    39% 0,
+    99% 18%,
+    99% 72%,
+    67.5% 97%,
+    55% 88%,
+    48.5% 95.5%,
+    1% 69.5%
+  );
+}
 
 /* Home details and commerce use the selected interface palette. */
-.world-game.theme-violet :is(.focus-bar>svg,.home-pay>svg){color:var(--green)}
-.world-game.theme-violet :is(.routine-panel p,.routine-panel small,.apartment-action small,.autosave,.marketplace .market-brand small,.market-delivery-note,.market-product-copy p,.market-price small,.market-shipping p,.shipping-track){color:var(--muted)}
-.world-game.theme-violet :is(.routine-panel,.home-pay,.market-catalog>article,.market-shipping,.market-shipping article){border-color:var(--line)}
-.world-game.theme-violet .marketplace .market-brand>svg{background:#eee4f7;color:var(--green)}
-.world-game.theme-violet .market-catalog>article{background:var(--paper);box-shadow:0 3px 8px #432c5b08}
-.world-game.theme-violet .market-product-art{background:radial-gradient(ellipse at 50% 70%,#e4d6f1,#f6f0fb 72%)}
-.world-game.theme-violet .market-product-art>.market-owned-badge{background:#fff3cde8;border-color:#e8cc78;color:#604074}
-.world-game.theme-violet .market-price b{color:var(--ink)}
-.world-game.theme-violet .market-buy{background:var(--green);border-color:#57348c;color:#fff8dc}
-.world-game.theme-violet .market-buy:hover{background:#57348c}
-.world-game.theme-violet :is(.market-buy,.market-receive):focus-visible{outline-color:#b88718}
-.world-game.theme-violet .market-shipping{background:#f1eafa}
-.world-game.theme-violet .shipping-track .reached{color:var(--green)}
-.world-game.theme-violet .market-receive{background:#fff1be;border-color:#e8cc78;color:#604074}
-.world-game.theme-violet .market-receive:hover{background:#f6dc72}
-.world-game.theme-violet :is(.delivery-stage-label,.delivery-stage-name,.delivery-panel-top button,.delivery-panel .delivery-story,.delivery-panel .delivery-paid){color:var(--muted)}
-.world-game.theme-violet .delivery-stage{background:radial-gradient(ellipse at 50% 70%,#e7d9f2,#f5eefb 60%,#d3c1e3);border-color:var(--line)}
-.world-game.theme-violet .delivery-panel .delivery-benefit{background:#f1eafa;border-color:var(--line);color:var(--ink)}
+.world-game.theme-violet :is(.focus-bar > svg, .home-pay > svg) {
+  color: var(--green);
+}
+.world-game.theme-violet
+  :is(
+    .routine-panel p,
+    .routine-panel small,
+    .apartment-action small,
+    .autosave,
+    .marketplace .market-brand small,
+    .market-delivery-note,
+    .market-product-copy p,
+    .market-price small,
+    .market-shipping p,
+    .shipping-track
+  ) {
+  color: var(--muted);
+}
+.world-game.theme-violet
+  :is(
+    .routine-panel,
+    .home-pay,
+    .market-catalog > article,
+    .market-shipping,
+    .market-shipping article
+  ) {
+  border-color: var(--line);
+}
+.world-game.theme-violet .marketplace .market-brand > svg {
+  background: #eee4f7;
+  color: var(--green);
+}
+.world-game.theme-violet .market-catalog > article {
+  background: var(--paper);
+  box-shadow: 0 3px 8px #432c5b08;
+}
+.world-game.theme-violet .market-product-art {
+  background: radial-gradient(ellipse at 50% 70%, #e4d6f1, #f6f0fb 72%);
+}
+.world-game.theme-violet .market-product-art > .market-owned-badge {
+  background: #fff3cde8;
+  border-color: #e8cc78;
+  color: #604074;
+}
+.world-game.theme-violet .market-price b {
+  color: var(--ink);
+}
+.world-game.theme-violet .market-buy {
+  background: var(--green);
+  border-color: #57348c;
+  color: #fff8dc;
+}
+.world-game.theme-violet .market-buy:hover {
+  background: #57348c;
+}
+.world-game.theme-violet :is(.market-buy, .market-receive):focus-visible {
+  outline-color: #b88718;
+}
+.world-game.theme-violet .market-shipping {
+  background: #f1eafa;
+}
+.world-game.theme-violet .shipping-track .reached {
+  color: var(--green);
+}
+.world-game.theme-violet .market-receive {
+  background: #fff1be;
+  border-color: #e8cc78;
+  color: #604074;
+}
+.world-game.theme-violet .market-receive:hover {
+  background: #f6dc72;
+}
+.world-game.theme-violet
+  :is(
+    .delivery-stage-label,
+    .delivery-stage-name,
+    .delivery-panel-top button,
+    .delivery-panel .delivery-story,
+    .delivery-panel .delivery-paid
+  ) {
+  color: var(--muted);
+}
+.world-game.theme-violet .delivery-stage {
+  background: radial-gradient(ellipse at 50% 70%, #e7d9f2, #f5eefb 60%, #d3c1e3);
+  border-color: var(--line);
+}
+.world-game.theme-violet .delivery-panel .delivery-benefit {
+  background: #f1eafa;
+  border-color: var(--line);
+  color: var(--ink);
+}

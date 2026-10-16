@@ -1,6 +1,209 @@
-.office-contacts{flex:none;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--paper);box-shadow:0 5px 18px #25203808}.office-contacts>header{display:flex;align-items:center;gap:8px;color:var(--green)}.office-contacts>header>h3{font-size:12px;margin:0}.office-contacts>header>span{margin-left:auto;font-size:10px;padding:3px 7px;background:var(--soft);border-radius:7px}.world-game .office-contacts>p{font-size:10px;line-height:1.5;color:var(--muted);margin:7px 0 10px}.office-contact-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.world-game .office-contact-grid>button{display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;min-width:0;padding:9px 6px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}.office-contact-grid>button>b{font-size:11px;overflow-wrap:anywhere}.office-contact-grid>button>small{display:flex;gap:4px;align-items:center;justify-content:center;font-size:9px;line-height:1.5;color:var(--muted)}.office-contact-grid>button>small>svg{flex-shrink:0}.world-game .office-contact-grid>button[data-expectation]{border-color:color-mix(in srgb,var(--green) 45%,var(--line));background:linear-gradient(120deg,var(--soft),var(--paper))}.office-contact-grid>button[data-expectation]>small{color:var(--green);font-weight:600}.office-contact-task{font-size:9px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;color:var(--ink)}.office-contact-grid>button:hover{box-shadow:0 3px 10px #25203814}.office-contact-grid>button:focus-visible{outline:2px solid var(--green);outline-offset:2px}.office-contacts>footer{font-size:9px;line-height:1.6;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:10px}@media(max-width:650px){.office-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.world-game .office-contact-grid>button{display:grid;grid-template-columns:36px minmax(0,1fr);gap:4px 8px;text-align:left;padding:10px;align-items:center}.office-contact-grid>button>svg{grid-row:span 2}.office-contact-grid>button>small{justify-content:start}.office-contact-task{grid-column:1/-1}.office-contacts{padding:12px}}
+.office-contacts {
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  background: var(--paper);
+  box-shadow: 0 5px 18px #25203808;
+}
+.office-contacts > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--green);
+}
+.office-contacts > header > h3 {
+  font-size: 12px;
+  margin: 0;
+}
+.office-contacts > header > span {
+  margin-left: auto;
+  font-size: 10px;
+  padding: 3px 7px;
+  background: var(--soft);
+  border-radius: 7px;
+}
+.world-game .office-contacts > p {
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 7px 0 10px;
+}
+.office-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+.world-game .office-contact-grid > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 9px 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.office-contact-grid > button > b {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.office-contact-grid > button > small {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.office-contact-grid > button > small > svg {
+  flex-shrink: 0;
+}
+.world-game .office-contact-grid > button[data-expectation] {
+  border-color: color-mix(in srgb, var(--green) 45%, var(--line));
+  background: linear-gradient(120deg, var(--soft), var(--paper));
+}
+.office-contact-grid > button[data-expectation] > small {
+  color: var(--green);
+  font-weight: 600;
+}
+.office-contact-task {
+  font-size: 9px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 100%;
+  color: var(--ink);
+}
+.office-contact-grid > button:hover {
+  box-shadow: 0 3px 10px #25203814;
+}
+.office-contact-grid > button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+.office-contacts > footer {
+  font-size: 9px;
+  line-height: 1.6;
+  color: var(--muted);
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  margin-top: 10px;
+}
+@media (max-width: 650px) {
+  .office-contact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .world-game .office-contact-grid > button {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 4px 8px;
+    text-align: left;
+    padding: 10px;
+    align-items: center;
+  }
+  .office-contact-grid > button > svg {
+    grid-row: span 2;
+  }
+  .office-contact-grid > button > small {
+    justify-content: start;
+  }
+  .office-contact-task {
+    grid-column: 1/-1;
+  }
+  .office-contacts {
+    padding: 12px;
+  }
+}
 
-.world-game .office-contacts{padding:0;overflow:hidden}.office-contacts>summary{display:flex;gap:10px;align-items:center;min-height:58px;padding:10px 13px;cursor:pointer;list-style:none;color:var(--green)}.office-contacts>summary>span{display:grid;gap:3px;flex:1;min-width:0}.office-contacts>summary b{font-size:12px}.office-contacts>summary small{font-size:9px;color:var(--muted);line-height:1.5}.office-contacts>summary>svg{flex-shrink:0}.office-contacts[open]>summary{border-bottom:1px solid var(--line);background:var(--soft)}.office-contacts[open]>summary>svg:last-child{transform:rotate(180deg)}.office-contact-content{padding:12px}.world-game .office-contact-content>p{font-size:10px;line-height:1.5;color:var(--muted);margin:0 0 10px}.office-contact-content>footer{font-size:9px;line-height:1.6;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:10px}.office-contacts>summary:focus-visible{outline:2px solid var(--green);outline-offset:-3px}
+.world-game .office-contacts {
+  padding: 0;
+  overflow: hidden;
+}
+.office-contacts > summary {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 58px;
+  padding: 10px 13px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--green);
+}
+.office-contacts > summary > span {
+  display: grid;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.office-contacts > summary b {
+  font-size: 12px;
+}
+.office-contacts > summary small {
+  font-size: 9px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.office-contacts > summary > svg {
+  flex-shrink: 0;
+}
+.office-contacts[open] > summary {
+  border-bottom: 1px solid var(--line);
+  background: var(--soft);
+}
+.office-contacts[open] > summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.office-contact-content {
+  padding: 12px;
+}
+.world-game .office-contact-content > p {
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.office-contact-content > footer {
+  font-size: 9px;
+  line-height: 1.6;
+  color: var(--muted);
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  margin-top: 10px;
+}
+.office-contacts > summary:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: -3px;
+}
 
-@media(min-width:651px){.world-game .office-contacts{position:relative;overflow:visible}.office-contacts[open]>.office-contact-content{position:absolute;bottom:calc(100% + 8px);left:0;right:0;z-index:8;border:1px solid var(--line);border-radius:16px;background:var(--paper);box-shadow:0 12px 30px #25203826}.office-contact-content>p{margin-top:0}}
-@media(max-width:650px){.office-contact-grid>button{scroll-margin-block:100px}}
+@media (min-width: 651px) {
+  .world-game .office-contacts {
+    position: relative;
+    overflow: visible;
+  }
+  .office-contacts[open] > .office-contact-content {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 8;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 12px 30px #25203826;
+  }
+  .office-contact-content > p {
+    margin-top: 0;
+  }
+}
+@media (max-width: 650px) {
+  .office-contact-grid > button {
+    scroll-margin-block: 100px;
+  }
+}

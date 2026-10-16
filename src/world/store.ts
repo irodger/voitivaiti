@@ -1,53 +1,347 @@
 import { findActiveCharacter } from './selectors';
-import {moneyArrival,type MoneyArrival} from './moneyArrival';
-import {addRunTime,flushRunTiming} from './runTiming';
-import {restoreColleagueAppearances} from './characterAppearance';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {isOrderedPlan,planOrder} from './planOrder';
+import { moneyArrival, type MoneyArrival } from './moneyArrival';
+import { addRunTime, flushRunTiming } from './runTiming';
+import { restoreColleagueAppearances } from './characterAppearance';
+import { resolveTaskTemplate } from '../content/scenarios';
+import { isOrderedPlan, planOrder } from './planOrder';
 import { rememberPlayerName } from './playerName';
-import { ensureLife,emptyMeta,archiveCareer } from './life';
+import { ensureLife, emptyMeta, archiveCareer } from './life';
 import type { MetaProgress } from './lifeTypes';
-const readMeta=():MetaProgress=>{try{return JSON.parse(localStorage.getItem('voiti-vaiti-meta')??'null')??emptyMeta();}catch{return emptyMeta();}};
-const saveMeta=(meta:MetaProgress|undefined)=>{if(meta)try{localStorage.setItem('voiti-vaiti-meta',JSON.stringify(meta));}catch{/* campaign save still retains meta */}};
+const readMeta = (): MetaProgress => {
+  try {
+    return JSON.parse(localStorage.getItem('voiti-vaiti-meta') ?? 'null') ?? emptyMeta();
+  } catch {
+    return emptyMeta();
+  }
+};
+const saveMeta = (meta: MetaProgress | undefined) => {
+  if (meta)
+    try {
+      localStorage.setItem('voiti-vaiti-meta', JSON.stringify(meta));
+    } catch {
+      /* campaign save still retains meta */
+    }
+};
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Campaign,Feedback,Task } from './types';
-import { transition,type Action } from './engine';
+import type { Campaign, Feedback, Task } from './types';
+import { transition, type Action } from './engine';
 import { emptyCampaign, generateWorld, makeCharacter, makeSchedule, makeTask } from './simulation';
 import { templateById } from '../content/scenarios';
 import { professionById } from '../content/professions';
-type Store=Campaign&{moneyArrival:MoneyArrival|null;dismissMoneyArrival:()=>void;recordRunTime:(id:string,elapsedMs:number)=>void;feedback:Feedback[];dispatch:(action:Action)=>void;begin:()=>void;reset:()=>void;clearFeedback:()=>void};
-export function snapshot(s:Campaign):Campaign{return Object.fromEntries(Object.keys(emptyCampaign()).map(k=>[k,s[k as keyof Campaign]])) as unknown as Campaign;}
-export function migrateLegacy(raw:unknown):Campaign{
- const old=raw as Record<string,unknown>;if(!old||typeof old!=='object')return emptyCampaign();
- if(old.schemaVersion===3&&!old.company)return {...emptyCampaign(),meta:(old.meta as MetaProgress)??readMeta(),phase:old.phase==='create'?'create':'start'};
- if(old.schemaVersion===3&&old.company){const c=old as unknown as Campaign;if(Array.isArray(c.characters)&&c.characters.some(ch=>ch.id===c.activeCharacterId&&professionById[ch.profession])&&Array.isArray(c.tasks)&&c.tasks.every(t=>templateById[t.templateId]))return restoreColleagueAppearances(restoreActionProgress(ensureLife({...emptyCampaign(),...c,meta:c.meta??readMeta()})));return emptyCampaign();}
- const people=old.characters as {id:string;name:string;avatarId:string;profession:string}[]|undefined;
- const person=people?.find(p=>p.id===old.activeCharacterId);if(!person)return {...emptyCampaign(),phase:old.gamePhase==='creation'?'create':'start'};
- const c=emptyCampaign(),world=generateWorld(1427),ch=makeCharacter(person.id,person.name,person.avatarId,professionById[person.profession]?person.profession:'frontend');// Reconstruct legacy saves without adding a newly scheduled company campaign.
- delete world.company.structure;for(const project of world.company.projects)for(const problem of project.problems)delete problem.ownerTeamId;
- Object.assign(c,world);c.characters.push(ch);c.company!.employeeIds.push(ch.id);c.activeCharacterId=ch.id;ch.currentProjectIds=[c.company!.projects[0].id];Object.assign(ch.stats,old.playerStats??{});const skills=(old.skills??{}) as Record<string,number>;ch.skills={craft:(skills.htmlCss??1)+(skills.javascript??0),debugging:skills.debugging??0,communication:skills.communication??1,leadership:0};c.company!.currentDay=Number(old.currentDay??1);c.time=Number(old.time??540);c.dayStart={...ch.stats};c.schedule=makeSchedule(c);c.schedule.find(e=>e.type==='sync')!.status='completed';
- for(const templateId of (old.completedTasks??[]) as string[]){const t=makeTask(c);const template=templateById[templateId];if(!template)continue;t.templateId=templateId;t.currentStepId=template.steps.at(-1)!.id;t.completedStepIds=template.steps.map(s=>s.id);t.status='completed';t.rewarded=true;t.progress=Object.fromEntries(template.steps.map(s=>[s.id,{status:'completed',draft:[],allocation:{},clicks:2,run:'done',charged:true}]));c.tasks.push(t);ch.completedWork.push(t.id);}
- if(ch.completedWork.length)ch.milestones.push('independent');
- const currentId=String(old.currentTaskId??'FE-1427'),template=templateById[currentId];
- if(old.gamePhase==='task'&&template){const t:Task=makeTask(c);t.templateId=currentId;t.currentStepId=template.steps.some(s=>s.id===old.currentStepId)?String(old.currentStepId):template.steps[0].id;t.taskElapsedMinutes=Number(old.taskElapsedMinutes??0);t.taskStartedAtGameTime=Number(old.taskStartedAtGameTime??c.time);const completed=(old.completedStepIds??[]) as string[];const interaction=(old.interaction??{}) as Record<string,unknown>;t.progress=Object.fromEntries(template.steps.map(s=>{const done=completed.includes(`${currentId}:${s.id}`);return [s.id,{status:done?'completed':s.id===t.currentStepId?'active':'locked',draft:[],allocation:{},clicks:s.id===t.currentStepId?Number(interaction.clicks??0):0,run:s.id===t.currentStepId?(interaction.terminal??interaction.review??'idle') as 'idle'|'running'|'done':'idle',charged:done||((old.chargedReviewIds??[]) as string[]).includes(`${currentId}:${s.id}`),choiceId:s.id===t.currentStepId?String(interaction.choiceId??''):undefined,responseKey:s.id===t.currentStepId&&interaction.choiceId?`response.${currentId}.${s.id}.${interaction.choiceId}`:undefined}];}));t.completedStepIds=template.steps.filter(s=>completed.includes(`${currentId}:${s.id}`)).map(s=>s.id);const attempts=(old.attemptsByStep??{}) as Record<string,number>;t.attemptsByStep=Object.fromEntries(template.steps.map(s=>[s.id,attempts[`${currentId}:${s.id}`]??0]));c.tasks.push(t);c.activeTaskId=t.id;c.phase='office';}
- else if(['home','finished','day-end'].includes(String(old.gamePhase))){c.phase='home';c.schedule.forEach(e=>e.status='completed');}else{c.phase='office';if(ch.completedWork.length>=c.company!.currentDay)c.schedule.find(e=>e.type==='task')!.status='completed';}
- return restoreActionProgress(ensureLife(c));
+type Store = Campaign & {
+  moneyArrival: MoneyArrival | null;
+  dismissMoneyArrival: () => void;
+  recordRunTime: (id: string, elapsedMs: number) => void;
+  feedback: Feedback[];
+  dispatch: (action: Action) => void;
+  begin: () => void;
+  reset: () => void;
+  clearFeedback: () => void;
+};
+export function snapshot(s: Campaign): Campaign {
+  return Object.fromEntries(
+    Object.keys(emptyCampaign()).map((k) => [k, s[k as keyof Campaign]]),
+  ) as unknown as Campaign;
 }
-export const useWorld=create<Store>()(persist<Store, [], [], Campaign>((set,get)=>({...emptyCampaign(),meta:readMeta(),feedback:[],moneyArrival:null,dismissMoneyArrival:()=>set({moneyArrival:null}),recordRunTime:(id,elapsedMs)=>{const ch=get().characters.find(ch=>ch.id===id);if(!ch||id!==get().activeCharacterId||get().phase==='ended')return;set({characters:get().characters.map(ch=>ch.id===id?{...ch,runTiming:addRunTime(ch.runTiming,elapsedMs,Date.now())}:ch)});},dispatch:action=>{flushRunTiming();const before=snapshot(get());if(action.type==='next-career'){const previous=findActiveCharacter(before);if(previous)rememberPlayerName(previous.name);}const result=transition(before,action);if(action.type==='rename'||action.type==='onboarding'&&action.name){const current=findActiveCharacter(result.campaign);if(current&&(action.type==='rename'||current.firstDay?.currentOnboardingStep!=='arrival'))rememberPlayerName(current.name);}saveMeta(result.campaign.meta);set({...result.campaign,feedback:result.feedback,moneyArrival:before.activeCharacterId!==result.campaign.activeCharacterId?null:moneyArrival(before,result.campaign)??get().moneyArrival});},begin:()=>{if(get().phase==='start')set({phase:'create'});},reset:()=>{flushRunTiming();const current=structuredClone(snapshot(get()));const previous=findActiveCharacter(current);if(previous&&previous.firstDay?.currentOnboardingStep!=='arrival')rememberPlayerName(previous.name);if(current.company&&!current.life?.ended)archiveCareer(current,'quit');const meta=current.meta??readMeta();saveMeta(meta);set({...emptyCampaign(),meta,feedback:[],moneyArrival:null});},clearFeedback:()=>set({feedback:[]})}),{name:'voiti-vaiti-campaign',version:3,partialize:snapshot,migrate:migrateLegacy,merge:(persisted,current)=>({...current,...migrateLegacy(persisted)}),storage:{getItem:name=>{try{const value=localStorage.getItem(name);return value?JSON.parse(value):null;}catch{return null;}},setItem:(name,value)=>{try{localStorage.setItem(name,JSON.stringify(value));}catch{queueMicrotask(()=>{if(!useWorld.getState().saveWarning)useWorld.setState({saveWarning:true});});}},removeItem:name=>{try{localStorage.removeItem(name);}catch{/* Reset also clears in-memory state. */}}}}));
-
-
+export function migrateLegacy(raw: unknown): Campaign {
+  const old = raw as Record<string, unknown>;
+  if (!old || typeof old !== 'object') return emptyCampaign();
+  if (old.schemaVersion === 3 && !old.company)
+    return {
+      ...emptyCampaign(),
+      meta: (old.meta as MetaProgress) ?? readMeta(),
+      phase: old.phase === 'create' ? 'create' : 'start',
+    };
+  if (old.schemaVersion === 3 && old.company) {
+    const c = old as unknown as Campaign;
+    if (
+      Array.isArray(c.characters) &&
+      c.characters.some((ch) => ch.id === c.activeCharacterId && professionById[ch.profession]) &&
+      Array.isArray(c.tasks) &&
+      c.tasks.every((t) => templateById[t.templateId])
+    )
+      return restoreColleagueAppearances(
+        restoreActionProgress(ensureLife({ ...emptyCampaign(), ...c, meta: c.meta ?? readMeta() })),
+      );
+    return emptyCampaign();
+  }
+  const people = old.characters as
+    { id: string; name: string; avatarId: string; profession: string }[] | undefined;
+  const person = people?.find((p) => p.id === old.activeCharacterId);
+  if (!person)
+    return { ...emptyCampaign(), phase: old.gamePhase === 'creation' ? 'create' : 'start' };
+  const c = emptyCampaign(),
+    world = generateWorld(1427),
+    ch = makeCharacter(
+      person.id,
+      person.name,
+      person.avatarId,
+      professionById[person.profession] ? person.profession : 'frontend',
+    ); // Reconstruct legacy saves without adding a newly scheduled company campaign.
+  delete world.company.structure;
+  for (const project of world.company.projects)
+    for (const problem of project.problems) delete problem.ownerTeamId;
+  Object.assign(c, world);
+  c.characters.push(ch);
+  c.company!.employeeIds.push(ch.id);
+  c.activeCharacterId = ch.id;
+  ch.currentProjectIds = [c.company!.projects[0].id];
+  Object.assign(ch.stats, old.playerStats ?? {});
+  const skills = (old.skills ?? {}) as Record<string, number>;
+  ch.skills = {
+    craft: (skills.htmlCss ?? 1) + (skills.javascript ?? 0),
+    debugging: skills.debugging ?? 0,
+    communication: skills.communication ?? 1,
+    leadership: 0,
+  };
+  c.company!.currentDay = Number(old.currentDay ?? 1);
+  c.time = Number(old.time ?? 540);
+  c.dayStart = { ...ch.stats };
+  c.schedule = makeSchedule(c);
+  c.schedule.find((e) => e.type === 'sync')!.status = 'completed';
+  for (const templateId of (old.completedTasks ?? []) as string[]) {
+    const t = makeTask(c);
+    const template = templateById[templateId];
+    if (!template) continue;
+    t.templateId = templateId;
+    t.currentStepId = template.steps.at(-1)!.id;
+    t.completedStepIds = template.steps.map((s) => s.id);
+    t.status = 'completed';
+    t.rewarded = true;
+    t.progress = Object.fromEntries(
+      template.steps.map((s) => [
+        s.id,
+        { status: 'completed', draft: [], allocation: {}, clicks: 2, run: 'done', charged: true },
+      ]),
+    );
+    c.tasks.push(t);
+    ch.completedWork.push(t.id);
+  }
+  if (ch.completedWork.length) ch.milestones.push('independent');
+  const currentId = String(old.currentTaskId ?? 'FE-1427'),
+    template = templateById[currentId];
+  if (old.gamePhase === 'task' && template) {
+    const t: Task = makeTask(c);
+    t.templateId = currentId;
+    t.currentStepId = template.steps.some((s) => s.id === old.currentStepId)
+      ? String(old.currentStepId)
+      : template.steps[0].id;
+    t.taskElapsedMinutes = Number(old.taskElapsedMinutes ?? 0);
+    t.taskStartedAtGameTime = Number(old.taskStartedAtGameTime ?? c.time);
+    const completed = (old.completedStepIds ?? []) as string[];
+    const interaction = (old.interaction ?? {}) as Record<string, unknown>;
+    t.progress = Object.fromEntries(
+      template.steps.map((s) => {
+        const done = completed.includes(`${currentId}:${s.id}`);
+        return [
+          s.id,
+          {
+            status: done ? 'completed' : s.id === t.currentStepId ? 'active' : 'locked',
+            draft: [],
+            allocation: {},
+            clicks: s.id === t.currentStepId ? Number(interaction.clicks ?? 0) : 0,
+            run:
+              s.id === t.currentStepId
+                ? ((interaction.terminal ?? interaction.review ?? 'idle') as
+                    'idle' | 'running' | 'done')
+                : 'idle',
+            charged:
+              done || ((old.chargedReviewIds ?? []) as string[]).includes(`${currentId}:${s.id}`),
+            choiceId: s.id === t.currentStepId ? String(interaction.choiceId ?? '') : undefined,
+            responseKey:
+              s.id === t.currentStepId && interaction.choiceId
+                ? `response.${currentId}.${s.id}.${interaction.choiceId}`
+                : undefined,
+          },
+        ];
+      }),
+    );
+    t.completedStepIds = template.steps
+      .filter((s) => completed.includes(`${currentId}:${s.id}`))
+      .map((s) => s.id);
+    const attempts = (old.attemptsByStep ?? {}) as Record<string, number>;
+    t.attemptsByStep = Object.fromEntries(
+      template.steps.map((s) => [s.id, attempts[`${currentId}:${s.id}`] ?? 0]),
+    );
+    c.tasks.push(t);
+    c.activeTaskId = t.id;
+    c.phase = 'office';
+  } else if (['home', 'finished', 'day-end'].includes(String(old.gamePhase))) {
+    c.phase = 'home';
+    c.schedule.forEach((e) => (e.status = 'completed'));
+  } else {
+    c.phase = 'office';
+    if (ch.completedWork.length >= c.company!.currentDay)
+      c.schedule.find((e) => e.type === 'task')!.status = 'completed';
+  }
+  return restoreActionProgress(ensureLife(c));
+}
+export const useWorld = create<Store>()(
+  persist<Store, [], [], Campaign>(
+    (set, get) => ({
+      ...emptyCampaign(),
+      meta: readMeta(),
+      feedback: [],
+      moneyArrival: null,
+      dismissMoneyArrival: () => set({ moneyArrival: null }),
+      recordRunTime: (id, elapsedMs) => {
+        const ch = get().characters.find((ch) => ch.id === id);
+        if (!ch || id !== get().activeCharacterId || get().phase === 'ended') return;
+        set({
+          characters: get().characters.map((ch) =>
+            ch.id === id
+              ? { ...ch, runTiming: addRunTime(ch.runTiming, elapsedMs, Date.now()) }
+              : ch,
+          ),
+        });
+      },
+      dispatch: (action) => {
+        flushRunTiming();
+        const before = snapshot(get());
+        if (action.type === 'next-career') {
+          const previous = findActiveCharacter(before);
+          if (previous) rememberPlayerName(previous.name);
+        }
+        const result = transition(before, action);
+        if (action.type === 'rename' || (action.type === 'onboarding' && action.name)) {
+          const current = findActiveCharacter(result.campaign);
+          if (
+            current &&
+            (action.type === 'rename' || current.firstDay?.currentOnboardingStep !== 'arrival')
+          )
+            rememberPlayerName(current.name);
+        }
+        saveMeta(result.campaign.meta);
+        set({
+          ...result.campaign,
+          feedback: result.feedback,
+          moneyArrival:
+            before.activeCharacterId !== result.campaign.activeCharacterId
+              ? null
+              : (moneyArrival(before, result.campaign) ?? get().moneyArrival),
+        });
+      },
+      begin: () => {
+        if (get().phase === 'start') set({ phase: 'create' });
+      },
+      reset: () => {
+        flushRunTiming();
+        const current = structuredClone(snapshot(get()));
+        const previous = findActiveCharacter(current);
+        if (previous && previous.firstDay?.currentOnboardingStep !== 'arrival')
+          rememberPlayerName(previous.name);
+        if (current.company && !current.life?.ended) archiveCareer(current, 'quit');
+        const meta = current.meta ?? readMeta();
+        saveMeta(meta);
+        set({ ...emptyCampaign(), meta, feedback: [], moneyArrival: null });
+      },
+      clearFeedback: () => set({ feedback: [] }),
+    }),
+    {
+      name: 'voiti-vaiti-campaign',
+      version: 3,
+      partialize: snapshot,
+      migrate: migrateLegacy,
+      merge: (persisted, current) => ({ ...current, ...migrateLegacy(persisted) }),
+      storage: {
+        getItem: (name) => {
+          try {
+            const value = localStorage.getItem(name);
+            return value ? JSON.parse(value) : null;
+          } catch {
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch {
+            queueMicrotask(() => {
+              if (!useWorld.getState().saveWarning) useWorld.setState({ saveWarning: true });
+            });
+          }
+        },
+        removeItem: (name) => {
+          try {
+            localStorage.removeItem(name);
+          } catch {
+            /* Reset also clears in-memory state. */
+          }
+        },
+      },
+    },
+  ),
+);
 
 // Persist synchronously before handing control to a new service worker.
-export function saveBeforeUpdate(){try{const current=snapshot(useWorld.getState());localStorage.setItem('voiti-vaiti-campaign',JSON.stringify({state:current,version:3}));saveMeta(current.meta);return true;}catch{return false;}}
-
-function restoreActionProgress(c:Campaign){
- for(const task of c.tasks){
-  if(!task.rewarded){const steps=resolveTaskTemplate(task).steps;const unsafe=steps.find(step=>{const p=task.progress[step.id],mapping=step.actionFlow?.legacyActions;if(!p||!mapping||p.actionHistory!==undefined)return false;const id=mapping[p.choiceId??'']??p.draft.map(id=>mapping[id]).find(Boolean);return id&& !step.actionFlow!.actions.find(a=>a.id===id)?.completes;});
-   if(unsafe){const start=steps.indexOf(unsafe);task.currentStepId=unsafe.id;task.status='active';task.completedStepIds=task.completedStepIds.filter(id=>steps.findIndex(s=>s.id===id)<start);steps.slice(start).forEach((step,i)=>{const p=task.progress[step.id];p.status=i===0?'active':'locked';p.run='idle';p.responseKey=undefined;if(i>0){p.choiceId=undefined;p.draft=[];p.actionHistory=step.actionFlow?[]:undefined;}});}
+export function saveBeforeUpdate() {
+  try {
+    const current = snapshot(useWorld.getState());
+    localStorage.setItem('voiti-vaiti-campaign', JSON.stringify({ state: current, version: 3 }));
+    saveMeta(current.meta);
+    return true;
+  } catch {
+    return false;
   }
-  for(const step of resolveTaskTemplate(task).steps){const p=task.progress[step.id];if(p?.status==='active'&&step.actionFlow&&p.actionHistory?.length&&p.actionHistory.every(id=>id==='resume'))p.actionHistory=[];if(p&&p.status!=='completed'&&isOrderedPlan(step))p.draft=planOrder(step,p.draft);if(!step.actionFlow||!p||p.status!=='active'||p.actionHistory!==undefined)continue;
-  if(step.actionFlow.legacyActions){const mapping=step.actionFlow.legacyActions,id=mapping[p.choiceId??'']??p.draft.map(id=>mapping[id]).find(Boolean);p.actionHistory=id?[id]:[];p.responseKey=undefined;continue;}
-  if(p.choiceId||task.attemptsByStep[step.id]){const previous=step.actionFlow.actions.find(a=>a.id===p.choiceId&&!a.completes);p.actionHistory=previous?[previous.id]:[];p.responseKey=undefined;}
- }}return c;
+}
+
+function restoreActionProgress(c: Campaign) {
+  for (const task of c.tasks) {
+    if (!task.rewarded) {
+      const steps = resolveTaskTemplate(task).steps;
+      const unsafe = steps.find((step) => {
+        const p = task.progress[step.id],
+          mapping = step.actionFlow?.legacyActions;
+        if (!p || !mapping || p.actionHistory !== undefined) return false;
+        const id = mapping[p.choiceId ?? ''] ?? p.draft.map((id) => mapping[id]).find(Boolean);
+        return id && !step.actionFlow!.actions.find((a) => a.id === id)?.completes;
+      });
+      if (unsafe) {
+        const start = steps.indexOf(unsafe);
+        task.currentStepId = unsafe.id;
+        task.status = 'active';
+        task.completedStepIds = task.completedStepIds.filter(
+          (id) => steps.findIndex((s) => s.id === id) < start,
+        );
+        steps.slice(start).forEach((step, i) => {
+          const p = task.progress[step.id];
+          p.status = i === 0 ? 'active' : 'locked';
+          p.run = 'idle';
+          p.responseKey = undefined;
+          if (i > 0) {
+            p.choiceId = undefined;
+            p.draft = [];
+            p.actionHistory = step.actionFlow ? [] : undefined;
+          }
+        });
+      }
+    }
+    for (const step of resolveTaskTemplate(task).steps) {
+      const p = task.progress[step.id];
+      if (
+        p?.status === 'active' &&
+        step.actionFlow &&
+        p.actionHistory?.length &&
+        p.actionHistory.every((id) => id === 'resume')
+      )
+        p.actionHistory = [];
+      if (p && p.status !== 'completed' && isOrderedPlan(step)) p.draft = planOrder(step, p.draft);
+      if (!step.actionFlow || !p || p.status !== 'active' || p.actionHistory !== undefined)
+        continue;
+      if (step.actionFlow.legacyActions) {
+        const mapping = step.actionFlow.legacyActions,
+          id = mapping[p.choiceId ?? ''] ?? p.draft.map((id) => mapping[id]).find(Boolean);
+        p.actionHistory = id ? [id] : [];
+        p.responseKey = undefined;
+        continue;
+      }
+      if (p.choiceId || task.attemptsByStep[step.id]) {
+        const previous = step.actionFlow.actions.find((a) => a.id === p.choiceId && !a.completes);
+        p.actionHistory = previous ? [previous.id] : [];
+        p.responseKey = undefined;
+      }
+    }
+  }
+  return c;
 }

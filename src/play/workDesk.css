@@ -1,60 +1,840 @@
 /* The laptop is a workspace; application palettes stay local to their content. */
-.world-game .laptop-shell .laptop-apps{background:linear-gradient(165deg,#23283f,#171c30);border-color:#363c55;color:#d8ddf5}
-.world-game .laptop-shell .laptop-apps>button{color:#bec6e4;border:1px solid transparent;border-radius:11px;margin-bottom:6px;min-height:48px}
-.world-game .laptop-shell .laptop-apps>button:hover{background:#343b57;color:#fff}
-.world-game .laptop-shell .laptop-apps>button.active{background:linear-gradient(120deg,#6653bd,#424b9c);border-color:#8c80d6;color:#fff;box-shadow:0 4px 15px #0c102433}
-.world-game .laptop-shell .laptop-step-list{border-color:#414763}.world-game .laptop-shell .laptop-step-list button,.world-game .laptop-shell .laptop-steps-label{color:#c5cce4}.world-game .laptop-shell .laptop-step-list button.current{background:#373e5d;color:#fff}
-.world-game .work-desk{display:grid;gap:20px;color:#25314a}.world-game .work-desk h2{font-size:21px;letter-spacing:-.5px}.world-game .work-desk h3{font-size:16px;letter-spacing:-.2px}
-.world-game .desk-day{border:1px solid #d4dced;border-radius:16px;padding:20px;background:linear-gradient(120deg,#e8eefe,#fafbff);box-shadow:0 5px 18px #1f2f5108}
-.desk-day>div{display:flex;align-items:center;gap:12px}.desk-day>div>svg{color:#6253b8}.desk-day small{color:#66728c;font-size:10px}.desk-day b{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:16px}
-.desk-timeline{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:0}.desk-timeline li{flex:1;min-width:0;position:relative;text-align:center}.desk-timeline li:before{content:'';position:absolute;top:8px;left:0;right:0;border-top:2px solid #c6cee5}.desk-timeline li:first-child:before{left:50%}.desk-timeline li:last-child:before{right:50%}.desk-timeline li>span{position:relative;display:grid;place-items:center;margin:0 auto 8px;width:18px;height:18px;border:2px solid #a4afd2;border-radius:50%;background:#f5f7ff;color:#fff}.desk-timeline li.done>span{background:#6758b5;border-color:#6758b5}.desk-timeline small{display:block;padding:0 4px;font-size:9px;line-height:1.5;overflow-wrap:anywhere}
-.desk-columns{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:18px;align-items:start}.desk-main{display:grid;gap:18px;min-width:0}.desk-card{display:grid;gap:15px;padding:20px;border:1px solid #dbe1ee;border-radius:16px;background:#fff;box-shadow:0 5px 18px #23314e08}.desk-card-heading{display:flex;gap:9px;align-items:center}.desk-card-heading>svg{color:#6253b8}.desk-card-heading>span{margin-left:auto;border-radius:20px;background:#eee8fb;color:#60449a;padding:4px 9px;font-size:11px}.world-game .desk-card>p{font-size:12px;color:#62708a;line-height:1.6}
-.world-game .desk-card .desk-current{background:#f1edff;border-color:#d5c9f3}.world-game .desk-card .queue-items button,.world-game .desk-card .remainder-card{background:#f7f8fe;border:1px solid #dce2f1;border-radius:12px;padding:16px}.world-game .desk-card .queue-items button[aria-pressed=true]{border-color:#8b72d5;background:#f1ebff}.world-game .desk-card :is(.priority-queue p,.queue-items small,.remainder-card small){color:#68738c}
-.desk-colleagues:has(>h3:only-child){display:none}.desk-profile{display:grid;gap:12px;border-radius:16px;padding:12px;background:#20273e;box-shadow:0 8px 22px #1b234328}.desk-person{text-align:center;padding:16px 8px 8px;color:#f5f5ff;background:radial-gradient(ellipse at 50% 20%,#54507c,transparent 70%);border-radius:12px}.world-game .work-desk .desk-person h3{color:#fff;font-size:22px;margin-top:12px}.world-game .desk-person p{color:#bbc4e2;font-size:11px;margin-top:6px}
-.desk-stats{display:grid;gap:15px;padding:16px 12px;border-radius:12px;background:#fff}.desk-stats>div{display:grid;grid-template-columns:17px 1fr 60px 24px;gap:6px;align-items:center;font-size:10px}.desk-stats svg{color:#7360bd}.desk-stats b{text-align:right;color:#596580}.desk-stats meter{width:100%;height:10px;accent-color:#7360bd}.desk-stats meter::-webkit-meter-bar{background:#e9e7f3;border:0}.desk-stats meter::-webkit-meter-optimum-value{background:#7360bd}
-.desk-now,.desk-next{background:#f5f3fe;padding:16px;border-radius:12px}.desk-now small{color:#73608f;font-size:10px}.world-game .desk-now h3{font-size:13px;margin:8px 0;line-height:1.5}.desk-now button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;font-size:10px;padding:10px;background:#e6dcfa;border-radius:8px;color:#60439e}.desk-next p{display:flex;align-items:center;gap:7px;font-size:10px;color:#64718b;margin-top:12px}.desk-event-dot{width:6px;height:6px;border-radius:50%;background:#9b8acb;flex:none}
-@media(max-width:1200px){.desk-columns{grid-template-columns:1fr}.desk-profile{grid-template-columns:1fr 1fr}.desk-person{text-align:left;display:grid;grid-template-columns:54px 1fr;gap:4px 12px;align-items:center}.desk-person svg{width:54px;height:54px;grid-row:span 2}.world-game .work-desk .desk-person h3{font-size:17px;margin:0}.desk-person p{margin:0}.desk-next{display:none}}
-@media(max-width:600px){.desk-day,.desk-card{padding:14px}.desk-profile{grid-template-columns:1fr}.desk-person{display:none}.desk-stats{gap:10px}.desk-now{display:none}.desk-timeline{overflow-x:auto}.desk-timeline li{min-width:65px}.world-game .work-desk h2{font-size:19px}.desk-day b{font-size:13px}}
+.world-game .laptop-shell .laptop-apps {
+  background: linear-gradient(165deg, #23283f, #171c30);
+  border-color: #363c55;
+  color: #d8ddf5;
+}
+.world-game .laptop-shell .laptop-apps > button {
+  color: #bec6e4;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  margin-bottom: 6px;
+  min-height: 48px;
+}
+.world-game .laptop-shell .laptop-apps > button:hover {
+  background: #343b57;
+  color: #fff;
+}
+.world-game .laptop-shell .laptop-apps > button.active {
+  background: linear-gradient(120deg, #6653bd, #424b9c);
+  border-color: #8c80d6;
+  color: #fff;
+  box-shadow: 0 4px 15px #0c102433;
+}
+.world-game .laptop-shell .laptop-step-list {
+  border-color: #414763;
+}
+.world-game .laptop-shell .laptop-step-list button,
+.world-game .laptop-shell .laptop-steps-label {
+  color: #c5cce4;
+}
+.world-game .laptop-shell .laptop-step-list button.current {
+  background: #373e5d;
+  color: #fff;
+}
+.world-game .work-desk {
+  display: grid;
+  gap: 20px;
+  color: #25314a;
+}
+.world-game .work-desk h2 {
+  font-size: 21px;
+  letter-spacing: -0.5px;
+}
+.world-game .work-desk h3 {
+  font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.world-game .desk-day {
+  border: 1px solid #d4dced;
+  border-radius: 16px;
+  padding: 20px;
+  background: linear-gradient(120deg, #e8eefe, #fafbff);
+  box-shadow: 0 5px 18px #1f2f5108;
+}
+.desk-day > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.desk-day > div > svg {
+  color: #6253b8;
+}
+.desk-day small {
+  color: #66728c;
+  font-size: 10px;
+}
+.desk-day b {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 16px;
+}
+.desk-timeline {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  gap: 0;
+}
+.desk-timeline li {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  text-align: center;
+}
+.desk-timeline li:before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  border-top: 2px solid #c6cee5;
+}
+.desk-timeline li:first-child:before {
+  left: 50%;
+}
+.desk-timeline li:last-child:before {
+  right: 50%;
+}
+.desk-timeline li > span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 8px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #a4afd2;
+  border-radius: 50%;
+  background: #f5f7ff;
+  color: #fff;
+}
+.desk-timeline li.done > span {
+  background: #6758b5;
+  border-color: #6758b5;
+}
+.desk-timeline small {
+  display: block;
+  padding: 0 4px;
+  font-size: 9px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.desk-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 245px;
+  gap: 18px;
+  align-items: start;
+}
+.desk-main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.desk-card {
+  display: grid;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #dbe1ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 18px #23314e08;
+}
+.desk-card-heading {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.desk-card-heading > svg {
+  color: #6253b8;
+}
+.desk-card-heading > span {
+  margin-left: auto;
+  border-radius: 20px;
+  background: #eee8fb;
+  color: #60449a;
+  padding: 4px 9px;
+  font-size: 11px;
+}
+.world-game .desk-card > p {
+  font-size: 12px;
+  color: #62708a;
+  line-height: 1.6;
+}
+.world-game .desk-card .desk-current {
+  background: #f1edff;
+  border-color: #d5c9f3;
+}
+.world-game .desk-card .queue-items button,
+.world-game .desk-card .remainder-card {
+  background: #f7f8fe;
+  border: 1px solid #dce2f1;
+  border-radius: 12px;
+  padding: 16px;
+}
+.world-game .desk-card .queue-items button[aria-pressed='true'] {
+  border-color: #8b72d5;
+  background: #f1ebff;
+}
+.world-game .desk-card :is(.priority-queue p, .queue-items small, .remainder-card small) {
+  color: #68738c;
+}
+.desk-colleagues:has(> h3:only-child) {
+  display: none;
+}
+.desk-profile {
+  display: grid;
+  gap: 12px;
+  border-radius: 16px;
+  padding: 12px;
+  background: #20273e;
+  box-shadow: 0 8px 22px #1b234328;
+}
+.desk-person {
+  text-align: center;
+  padding: 16px 8px 8px;
+  color: #f5f5ff;
+  background: radial-gradient(ellipse at 50% 20%, #54507c, transparent 70%);
+  border-radius: 12px;
+}
+.world-game .work-desk .desk-person h3 {
+  color: #fff;
+  font-size: 22px;
+  margin-top: 12px;
+}
+.world-game .desk-person p {
+  color: #bbc4e2;
+  font-size: 11px;
+  margin-top: 6px;
+}
+.desk-stats {
+  display: grid;
+  gap: 15px;
+  padding: 16px 12px;
+  border-radius: 12px;
+  background: #fff;
+}
+.desk-stats > div {
+  display: grid;
+  grid-template-columns: 17px 1fr 60px 24px;
+  gap: 6px;
+  align-items: center;
+  font-size: 10px;
+}
+.desk-stats svg {
+  color: #7360bd;
+}
+.desk-stats b {
+  text-align: right;
+  color: #596580;
+}
+.desk-stats meter {
+  width: 100%;
+  height: 10px;
+  accent-color: #7360bd;
+}
+.desk-stats meter::-webkit-meter-bar {
+  background: #e9e7f3;
+  border: 0;
+}
+.desk-stats meter::-webkit-meter-optimum-value {
+  background: #7360bd;
+}
+.desk-now,
+.desk-next {
+  background: #f5f3fe;
+  padding: 16px;
+  border-radius: 12px;
+}
+.desk-now small {
+  color: #73608f;
+  font-size: 10px;
+}
+.world-game .desk-now h3 {
+  font-size: 13px;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+.desk-now button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font-size: 10px;
+  padding: 10px;
+  background: #e6dcfa;
+  border-radius: 8px;
+  color: #60439e;
+}
+.desk-next p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: #64718b;
+  margin-top: 12px;
+}
+.desk-event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9b8acb;
+  flex: none;
+}
+@media (max-width: 1200px) {
+  .desk-columns {
+    grid-template-columns: 1fr;
+  }
+  .desk-profile {
+    grid-template-columns: 1fr 1fr;
+  }
+  .desk-person {
+    text-align: left;
+    display: grid;
+    grid-template-columns: 54px 1fr;
+    gap: 4px 12px;
+    align-items: center;
+  }
+  .desk-person svg {
+    width: 54px;
+    height: 54px;
+    grid-row: span 2;
+  }
+  .world-game .work-desk .desk-person h3 {
+    font-size: 17px;
+    margin: 0;
+  }
+  .desk-person p {
+    margin: 0;
+  }
+  .desk-next {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .desk-day,
+  .desk-card {
+    padding: 14px;
+  }
+  .desk-profile {
+    grid-template-columns: 1fr;
+  }
+  .desk-person {
+    display: none;
+  }
+  .desk-stats {
+    gap: 10px;
+  }
+  .desk-now {
+    display: none;
+  }
+  .desk-timeline {
+    overflow-x: auto;
+  }
+  .desk-timeline li {
+    min-width: 65px;
+  }
+  .world-game .work-desk h2 {
+    font-size: 19px;
+  }
+  .desk-day b {
+    font-size: 13px;
+  }
+}
 
 /* Color communicates work type while names and icons keep the meaning explicit. */
-.world-game .desk-day{position:relative;overflow:hidden;min-height:152px;padding-right:245px;background:linear-gradient(115deg,#ece8ff,#edf3ff 65%,#fff0cf)}
-.desk-day-art{position:absolute;width:230px;height:145px;right:8px;top:6px;pointer-events:none}
-.world-game .work-desk [data-kind=bug]{--kind:#bd5278;--kind-tint:#fff0f5;--kind-line:#edc9d5}
-.world-game .work-desk [data-kind=feature]{--kind:#506bc1;--kind-tint:#edf2ff;--kind-line:#ccd8fa}
-.world-game .work-desk [data-kind=debt]{--kind:#ab742a;--kind-tint:#fff6e2;--kind-line:#efd7a8}
-.world-game .work-desk [data-kind=review]{--kind:#8660b4;--kind-tint:#f4edff;--kind-line:#dfcff4}
-.world-game .work-desk [data-kind=support]{--kind:#338395;--kind-tint:#eaf8fb;--kind-line:#bde3eb}
-.desk-kind-icon{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--kind-tint,#eee8fb);color:var(--kind,#7360bd);flex:none}
-.world-game .work-desk .remainder-card[data-kind],.world-game .work-desk .queue-items button[data-kind]{background:linear-gradient(115deg,var(--kind-tint),#fff);border-color:var(--kind-line);border-left:4px solid var(--kind);box-shadow:0 4px 12px #26335508;transition:box-shadow .2s,border-color .2s}
-.world-game .work-desk .queue-items button[data-kind]{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:6px 12px;align-items:center;text-align:left}
-.world-game .work-desk .queue-items .desk-kind-icon{grid-row:span 2}.world-game .work-desk .queue-items button b{font-size:13px}.world-game .work-desk .queue-items button small{grid-column:2/-1;margin:0}.world-game .work-desk .queue-pick-action{color:var(--kind);background:#ffffffb3;border:1px solid var(--kind-line);border-radius:20px;padding:5px 9px;font-size:10px}
-.world-game .work-desk .queue-items button[data-kind]:hover{box-shadow:0 5px 18px #26335518;border-color:var(--kind)}.world-game .work-desk .queue-items button[data-kind][aria-pressed=true]{outline:2px solid var(--kind);outline-offset:2px;background:var(--kind-tint)}
-.world-game .work-desk .remainder-card h2{display:flex;gap:12px;align-items:center;font-size:16px;line-height:1.4}.world-game .work-desk .remainder-actions button{background:#fff;color:var(--kind,#60439e);border-color:var(--kind-line,#dfcff4)}
-.world-game .desk-stats [data-stat=energy]{--stat:#388ea2}.world-game .desk-stats [data-stat=stress]{--stat:#cb607c}.world-game .desk-stats [data-stat=reputation]{--stat:#b98225}.desk-stats [data-stat] svg{color:var(--stat)}.desk-stats [data-stat] meter{accent-color:var(--stat)}.desk-stats [data-stat] meter::-webkit-meter-optimum-value{background:var(--stat)}
-.world-game .work-desk .desk-current{background:linear-gradient(120deg,#ede4ff,#fff4d8);border-left:4px solid #8a64bf}.world-game .desk-person{background:radial-gradient(ellipse at 15% 0,#7970b1,transparent 70%),linear-gradient(145deg,#34334f,#24374b)}.world-game .desk-now{background:linear-gradient(120deg,#eee7ff,#fff2ca)}
-@media(max-width:800px){.world-game .desk-day{padding-right:150px}.desk-day-art{width:145px;top:20px}.desk-timeline{position:relative}.desk-day>div{flex-wrap:wrap}.desk-day b{margin-left:0}}
-@media(max-width:600px){.world-game .desk-day{padding-right:14px;padding-top:18px}.desk-day-art{width:105px;right:5px;top:0;opacity:.3}.desk-day>div{position:relative}.world-game .work-desk .queue-items button[data-kind]{grid-template-columns:32px minmax(0,1fr)}.world-game .work-desk .queue-pick-action{grid-column:2;justify-self:start}.world-game .work-desk .queue-items .desk-kind-icon{width:32px;height:32px;grid-row:span 3}}
-@media(prefers-reduced-motion:reduce){.world-game .work-desk .queue-items button[data-kind]{transition:none}}
+.world-game .desk-day {
+  position: relative;
+  overflow: hidden;
+  min-height: 152px;
+  padding-right: 245px;
+  background: linear-gradient(115deg, #ece8ff, #edf3ff 65%, #fff0cf);
+}
+.desk-day-art {
+  position: absolute;
+  width: 230px;
+  height: 145px;
+  right: 8px;
+  top: 6px;
+  pointer-events: none;
+}
+.world-game .work-desk [data-kind='bug'] {
+  --kind: #bd5278;
+  --kind-tint: #fff0f5;
+  --kind-line: #edc9d5;
+}
+.world-game .work-desk [data-kind='feature'] {
+  --kind: #506bc1;
+  --kind-tint: #edf2ff;
+  --kind-line: #ccd8fa;
+}
+.world-game .work-desk [data-kind='debt'] {
+  --kind: #ab742a;
+  --kind-tint: #fff6e2;
+  --kind-line: #efd7a8;
+}
+.world-game .work-desk [data-kind='review'] {
+  --kind: #8660b4;
+  --kind-tint: #f4edff;
+  --kind-line: #dfcff4;
+}
+.world-game .work-desk [data-kind='support'] {
+  --kind: #338395;
+  --kind-tint: #eaf8fb;
+  --kind-line: #bde3eb;
+}
+.desk-kind-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--kind-tint, #eee8fb);
+  color: var(--kind, #7360bd);
+  flex: none;
+}
+.world-game .work-desk .remainder-card[data-kind],
+.world-game .work-desk .queue-items button[data-kind] {
+  background: linear-gradient(115deg, var(--kind-tint), #fff);
+  border-color: var(--kind-line);
+  border-left: 4px solid var(--kind);
+  box-shadow: 0 4px 12px #26335508;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.world-game .work-desk .queue-items button[data-kind] {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  align-items: center;
+  text-align: left;
+}
+.world-game .work-desk .queue-items .desk-kind-icon {
+  grid-row: span 2;
+}
+.world-game .work-desk .queue-items button b {
+  font-size: 13px;
+}
+.world-game .work-desk .queue-items button small {
+  grid-column: 2/-1;
+  margin: 0;
+}
+.world-game .work-desk .queue-pick-action {
+  color: var(--kind);
+  background: #ffffffb3;
+  border: 1px solid var(--kind-line);
+  border-radius: 20px;
+  padding: 5px 9px;
+  font-size: 10px;
+}
+.world-game .work-desk .queue-items button[data-kind]:hover {
+  box-shadow: 0 5px 18px #26335518;
+  border-color: var(--kind);
+}
+.world-game .work-desk .queue-items button[data-kind][aria-pressed='true'] {
+  outline: 2px solid var(--kind);
+  outline-offset: 2px;
+  background: var(--kind-tint);
+}
+.world-game .work-desk .remainder-card h2 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.world-game .work-desk .remainder-actions button {
+  background: #fff;
+  color: var(--kind, #60439e);
+  border-color: var(--kind-line, #dfcff4);
+}
+.world-game .desk-stats [data-stat='energy'] {
+  --stat: #388ea2;
+}
+.world-game .desk-stats [data-stat='stress'] {
+  --stat: #cb607c;
+}
+.world-game .desk-stats [data-stat='reputation'] {
+  --stat: #b98225;
+}
+.desk-stats [data-stat] svg {
+  color: var(--stat);
+}
+.desk-stats [data-stat] meter {
+  accent-color: var(--stat);
+}
+.desk-stats [data-stat] meter::-webkit-meter-optimum-value {
+  background: var(--stat);
+}
+.world-game .work-desk .desk-current {
+  background: linear-gradient(120deg, #ede4ff, #fff4d8);
+  border-left: 4px solid #8a64bf;
+}
+.world-game .desk-person {
+  background:
+    radial-gradient(ellipse at 15% 0, #7970b1, transparent 70%),
+    linear-gradient(145deg, #34334f, #24374b);
+}
+.world-game .desk-now {
+  background: linear-gradient(120deg, #eee7ff, #fff2ca);
+}
+@media (max-width: 800px) {
+  .world-game .desk-day {
+    padding-right: 150px;
+  }
+  .desk-day-art {
+    width: 145px;
+    top: 20px;
+  }
+  .desk-timeline {
+    position: relative;
+  }
+  .desk-day > div {
+    flex-wrap: wrap;
+  }
+  .desk-day b {
+    margin-left: 0;
+  }
+}
+@media (max-width: 600px) {
+  .world-game .desk-day {
+    padding-right: 14px;
+    padding-top: 18px;
+  }
+  .desk-day-art {
+    width: 105px;
+    right: 5px;
+    top: 0;
+    opacity: 0.3;
+  }
+  .desk-day > div {
+    position: relative;
+  }
+  .world-game .work-desk .queue-items button[data-kind] {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+  .world-game .work-desk .queue-pick-action {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .world-game .work-desk .queue-items .desk-kind-icon {
+    width: 32px;
+    height: 32px;
+    grid-row: span 3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-game .work-desk .queue-items button[data-kind] {
+    transition: none;
+  }
+}
 
 /* Cohesive dashboard composition: the day and tasks share the main column. */
-.world-game .laptop-shell .laptop-display[data-workdesk=true] .laptop-apps{display:none}
-.world-game .laptop-shell .laptop-display[data-workdesk=true] .laptop-content{padding:22px;background:radial-gradient(ellipse at 80% 0,#dcdcf9,transparent 70%),linear-gradient(145deg,#edf1fc,#e6ebf8)}
-.world-game .laptop-shell .laptop-display[data-workdesk=true] .laptop-content>div{max-width:none}
-.world-game .work-desk .desk-columns{grid-template-columns:minmax(0,1fr) 285px;gap:18px}.world-game .work-desk .desk-main{gap:16px}
-.world-game .work-desk .desk-day{min-height:132px;padding:18px 20px;background:linear-gradient(110deg,#f5f3ff,#e9efff);border:1px solid #cfd8f2;border-radius:14px;box-shadow:0 5px 16px #455b9810}
-.world-game .work-desk .desk-day h2{font-size:24px}.world-game .work-desk .desk-timeline{margin-top:18px}.world-game .work-desk .desk-timeline small{font-size:10px;color:#526381}
-.world-game .work-desk .desk-card{gap:12px;padding:18px;border-radius:14px;border-color:#ccd7ee;box-shadow:0 5px 18px #41589410}.world-game .work-desk .desk-card-heading h2{font-size:23px}.world-game .work-desk .desk-card>p{margin:0;font-size:12px;line-height:1.55}
-.world-game .work-desk .desk-profile{grid-template-columns:1fr;gap:12px;padding:10px;background:linear-gradient(150deg,#242b46,#18223b);border:1px solid #414e72;box-shadow:0 8px 26px #20355730}
-.world-game .work-desk .desk-person{display:block;position:relative;min-height:230px;padding:0;overflow:hidden;border-radius:11px;text-align:left;background:#293146}
-.desk-portrait-scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%}
-.desk-person-caption{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:48px 1fr;gap:3px 10px;align-items:center;padding:35px 14px 14px;background:linear-gradient(transparent,#111a30ee 40%)}
-.world-game .work-desk .desk-person-caption>svg{width:48px;height:48px;grid-row:span 2;filter:drop-shadow(0 3px 6px #0004)}
-.world-game .laptop-shell .work-desk .desk-person .desk-person-caption h3{color:#fff;font-size:20px;margin:0;line-height:1.2;overflow-wrap:anywhere}.world-game .laptop-shell .work-desk .desk-person .desk-person-caption p{color:#d4dff9;font-size:11px;margin:0;line-height:1.4}
-.world-game .work-desk .desk-stats{gap:16px;padding:16px 12px}.world-game .work-desk .desk-stats>div{grid-template-columns:18px 1fr 70px 26px;font-size:11px}.world-game .work-desk .desk-now{background:linear-gradient(115deg,#e4dcff,#fff1c4);padding:14px}.world-game .work-desk .desk-next{display:block;padding:14px}
-.world-game .work-desk .desk-sync{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;padding:16px;border:1px solid #e6c979;border-radius:12px;background:linear-gradient(115deg,#fff2cb,#fffaf0)}.desk-sync>svg{color:#b57b22}.world-game .work-desk .desk-sync p{font-size:12px;color:#735f44;margin-top:4px}.desk-sync .primary-button{grid-column:1/-1;min-height:44px}
-.world-game .work-desk .desk-colleagues .work-expectations>h3{display:none}.world-game .work-desk .expectation-card{padding:0;background:#f8f9ff;border:1px solid #d9e0f0;border-radius:10px;overflow:hidden}.world-game .work-desk .expectation-card summary{cursor:pointer;padding:12px 14px;list-style:none;position:relative;padding-right:35px}.expectation-card summary:after{content:'+';position:absolute;right:13px;top:15px;color:#765cb0;font-size:19px}.expectation-card details[open]>summary:after{content:'−'}.world-game .work-desk .expectation-card h4{font-size:13px;line-height:1.4}.world-game .work-desk .expectation-meta{font-size:10px;line-height:1.5;margin-top:6px;color:#66738f}.world-game .work-desk .expectation-card details> :not(summary){margin:10px 12px}.world-game .work-desk .expectation-card .speech{padding:12px}.world-game .work-desk .expectation-actions{gap:6px}
-.world-game .work-desk .remainder-card[data-kind]{padding:14px;box-shadow:none}.world-game .work-desk .remainder-card h2{font-size:14px}.world-game .work-desk .remainder-card p{font-size:12px;line-height:1.5;margin:9px 0}.world-game .work-desk .remainder-actions button{min-height:38px;font-size:11px}
-@media(max-width:900px){.world-game .work-desk .desk-columns{grid-template-columns:minmax(0,1fr) 220px}.world-game .work-desk .desk-person{min-height:200px}.world-game .work-desk .desk-stats>div{grid-template-columns:16px 1fr 45px 22px;font-size:9px}}
-@media(max-width:650px){.world-game .work-desk .desk-columns{display:flex;flex-direction:column}.world-game .work-desk .desk-main{width:100%}.world-game .work-desk .desk-profile{width:100%;grid-template-columns:1fr}.world-game .work-desk .desk-person{min-height:170px;display:block}.world-game .work-desk .desk-stats>div{font-size:11px;grid-template-columns:18px 1fr 100px 26px}.world-game .work-desk .desk-now{display:block}.world-game .work-desk .desk-next{display:none}.world-game .laptop-shell .laptop-display[data-workdesk=true] .laptop-content{padding:12px}.world-game .work-desk .desk-day{padding:14px;min-height:120px}.world-game .work-desk .desk-card{padding:14px}.world-game .work-desk .desk-day h2{font-size:21px}}
+.world-game .laptop-shell .laptop-display[data-workdesk='true'] .laptop-apps {
+  display: none;
+}
+.world-game .laptop-shell .laptop-display[data-workdesk='true'] .laptop-content {
+  padding: 22px;
+  background:
+    radial-gradient(ellipse at 80% 0, #dcdcf9, transparent 70%),
+    linear-gradient(145deg, #edf1fc, #e6ebf8);
+}
+.world-game .laptop-shell .laptop-display[data-workdesk='true'] .laptop-content > div {
+  max-width: none;
+}
+.world-game .work-desk .desk-columns {
+  grid-template-columns: minmax(0, 1fr) 285px;
+  gap: 18px;
+}
+.world-game .work-desk .desk-main {
+  gap: 16px;
+}
+.world-game .work-desk .desk-day {
+  min-height: 132px;
+  padding: 18px 20px;
+  background: linear-gradient(110deg, #f5f3ff, #e9efff);
+  border: 1px solid #cfd8f2;
+  border-radius: 14px;
+  box-shadow: 0 5px 16px #455b9810;
+}
+.world-game .work-desk .desk-day h2 {
+  font-size: 24px;
+}
+.world-game .work-desk .desk-timeline {
+  margin-top: 18px;
+}
+.world-game .work-desk .desk-timeline small {
+  font-size: 10px;
+  color: #526381;
+}
+.world-game .work-desk .desk-card {
+  gap: 12px;
+  padding: 18px;
+  border-radius: 14px;
+  border-color: #ccd7ee;
+  box-shadow: 0 5px 18px #41589410;
+}
+.world-game .work-desk .desk-card-heading h2 {
+  font-size: 23px;
+}
+.world-game .work-desk .desk-card > p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.world-game .work-desk .desk-profile {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 10px;
+  background: linear-gradient(150deg, #242b46, #18223b);
+  border: 1px solid #414e72;
+  box-shadow: 0 8px 26px #20355730;
+}
+.world-game .work-desk .desk-person {
+  display: block;
+  position: relative;
+  min-height: 230px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 11px;
+  text-align: left;
+  background: #293146;
+}
+.desk-portrait-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% 50%;
+}
+.desk-person-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 3px 10px;
+  align-items: center;
+  padding: 35px 14px 14px;
+  background: linear-gradient(transparent, #111a30ee 40%);
+}
+.world-game .work-desk .desk-person-caption > svg {
+  width: 48px;
+  height: 48px;
+  grid-row: span 2;
+  filter: drop-shadow(0 3px 6px #0004);
+}
+.world-game .laptop-shell .work-desk .desk-person .desk-person-caption h3 {
+  color: #fff;
+  font-size: 20px;
+  margin: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.world-game .laptop-shell .work-desk .desk-person .desk-person-caption p {
+  color: #d4dff9;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.4;
+}
+.world-game .work-desk .desk-stats {
+  gap: 16px;
+  padding: 16px 12px;
+}
+.world-game .work-desk .desk-stats > div {
+  grid-template-columns: 18px 1fr 70px 26px;
+  font-size: 11px;
+}
+.world-game .work-desk .desk-now {
+  background: linear-gradient(115deg, #e4dcff, #fff1c4);
+  padding: 14px;
+}
+.world-game .work-desk .desk-next {
+  display: block;
+  padding: 14px;
+}
+.world-game .work-desk .desk-sync {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e6c979;
+  border-radius: 12px;
+  background: linear-gradient(115deg, #fff2cb, #fffaf0);
+}
+.desk-sync > svg {
+  color: #b57b22;
+}
+.world-game .work-desk .desk-sync p {
+  font-size: 12px;
+  color: #735f44;
+  margin-top: 4px;
+}
+.desk-sync .primary-button {
+  grid-column: 1/-1;
+  min-height: 44px;
+}
+.world-game .work-desk .desk-colleagues .work-expectations > h3 {
+  display: none;
+}
+.world-game .work-desk .expectation-card {
+  padding: 0;
+  background: #f8f9ff;
+  border: 1px solid #d9e0f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.world-game .work-desk .expectation-card summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  list-style: none;
+  position: relative;
+  padding-right: 35px;
+}
+.expectation-card summary:after {
+  content: '+';
+  position: absolute;
+  right: 13px;
+  top: 15px;
+  color: #765cb0;
+  font-size: 19px;
+}
+.expectation-card details[open] > summary:after {
+  content: '−';
+}
+.world-game .work-desk .expectation-card h4 {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.world-game .work-desk .expectation-meta {
+  font-size: 10px;
+  line-height: 1.5;
+  margin-top: 6px;
+  color: #66738f;
+}
+.world-game .work-desk .expectation-card details > :not(summary) {
+  margin: 10px 12px;
+}
+.world-game .work-desk .expectation-card .speech {
+  padding: 12px;
+}
+.world-game .work-desk .expectation-actions {
+  gap: 6px;
+}
+.world-game .work-desk .remainder-card[data-kind] {
+  padding: 14px;
+  box-shadow: none;
+}
+.world-game .work-desk .remainder-card h2 {
+  font-size: 14px;
+}
+.world-game .work-desk .remainder-card p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 9px 0;
+}
+.world-game .work-desk .remainder-actions button {
+  min-height: 38px;
+  font-size: 11px;
+}
+@media (max-width: 900px) {
+  .world-game .work-desk .desk-columns {
+    grid-template-columns: minmax(0, 1fr) 220px;
+  }
+  .world-game .work-desk .desk-person {
+    min-height: 200px;
+  }
+  .world-game .work-desk .desk-stats > div {
+    grid-template-columns: 16px 1fr 45px 22px;
+    font-size: 9px;
+  }
+}
+@media (max-width: 650px) {
+  .world-game .work-desk .desk-columns {
+    display: flex;
+    flex-direction: column;
+  }
+  .world-game .work-desk .desk-main {
+    width: 100%;
+  }
+  .world-game .work-desk .desk-profile {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+  .world-game .work-desk .desk-person {
+    min-height: 170px;
+    display: block;
+  }
+  .world-game .work-desk .desk-stats > div {
+    font-size: 11px;
+    grid-template-columns: 18px 1fr 100px 26px;
+  }
+  .world-game .work-desk .desk-now {
+    display: block;
+  }
+  .world-game .work-desk .desk-next {
+    display: none;
+  }
+  .world-game .laptop-shell .laptop-display[data-workdesk='true'] .laptop-content {
+    padding: 12px;
+  }
+  .world-game .work-desk .desk-day {
+    padding: 14px;
+    min-height: 120px;
+  }
+  .world-game .work-desk .desk-card {
+    padding: 14px;
+  }
+  .world-game .work-desk .desk-day h2 {
+    font-size: 21px;
+  }
+}
 
-@media(min-width:901px){.world-game .work-desk .desk-day{min-height:118px;padding:15px 18px}.world-game .work-desk .desk-timeline{margin-top:14px}.world-game .work-desk .remainder-card[data-kind]{display:grid;grid-template-columns:minmax(0,1fr) 160px;gap:5px 14px;padding:12px;align-items:center}.world-game .work-desk .remainder-card>h2,.world-game .work-desk .remainder-card>small,.world-game .work-desk .remainder-card>p{grid-column:1;margin:0}.world-game .work-desk .remainder-card>.remainder-actions{grid-column:2;grid-row:1/4;display:flex;flex-direction:column;gap:6px;margin:0}.world-game .work-desk .remainder-card .remainder-actions button{width:100%;min-height:34px;padding:7px 10px}.world-game .work-desk .remainder-card .desk-kind-icon{width:30px;height:30px}.world-game .work-desk .remainder-card>.queue-agreement{grid-column:1/-1}}
+@media (min-width: 901px) {
+  .world-game .work-desk .desk-day {
+    min-height: 118px;
+    padding: 15px 18px;
+  }
+  .world-game .work-desk .desk-timeline {
+    margin-top: 14px;
+  }
+  .world-game .work-desk .remainder-card[data-kind] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px;
+    gap: 5px 14px;
+    padding: 12px;
+    align-items: center;
+  }
+  .world-game .work-desk .remainder-card > h2,
+  .world-game .work-desk .remainder-card > small,
+  .world-game .work-desk .remainder-card > p {
+    grid-column: 1;
+    margin: 0;
+  }
+  .world-game .work-desk .remainder-card > .remainder-actions {
+    grid-column: 2;
+    grid-row: 1/4;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+  }
+  .world-game .work-desk .remainder-card .remainder-actions button {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+  .world-game .work-desk .remainder-card .desk-kind-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .world-game .work-desk .remainder-card > .queue-agreement {
+    grid-column: 1/-1;
+  }
+}

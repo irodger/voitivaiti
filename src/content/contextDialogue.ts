@@ -1,22 +1,237 @@
-import {paymentConversationTopics} from './paymentCausalConversations';
+import { paymentConversationTopics } from './paymentCausalConversations';
 import './recovery';
 import { decisionOutcome } from '../world/decisions';
 import { text } from './localization';
-import type { Campaign,Character } from '../world/types';
+import type { Campaign, Character } from '../world/types';
 import { topicsFor } from './conversations';
-import { careerRank,eventActive } from '../world/life';
-export type Topic={choiceLabelKey?:string;selection?:{labelKey:string;amount?:number}[];paymentProblemId?:string;id:string;titleKey:string;bodyKey:string;priority:number;kind:'contextual'|'personal'|'small';choices:{id:string;labelKey:string;responseKey:string}[]};
-const data=[
-['incident','После инцидента','After the incident','Сервис снова работает. Но если просто разойтись, через неделю будем сидеть здесь опять.','The service is back. If we just leave, we will be here again next week.','Давай разберём причину без поиска виноватых.','Let us find the cause without blaming people.','Да. Запишем, что увидели, что помогло и что нужно изменить в системе.','Yes. Record what we saw, what helped, and what the system needs.'],
-['review','Как договариваться о ревью?','How do we arrange reviews?','Когда изменения ждут проверки, полезно договориться о сроке. Даже маленькая задача может надолго остаться в очереди.','When changes await review, agreeing on a time helps. Even a small task can stay in the queue for a long time.','Скажу, когда смогу посмотреть.','I will tell you when I can review it.','Вот это уже план. Даже честное «после обеда» лучше молчания.','That is a plan. Even an honest “after lunch” beats silence.'],
-['trust','Кажется, я тебя подвёл.','I think I let you down.','Меня раздражает не ошибка, а когда о ней узнаёшь последним.','The mistake is not what frustrates me. Finding out last is.','В следующий раз предупрежу раньше.','I will give you an earlier warning next time.','Договорились. Посмотрим на следующие задачи — доверие возвращается действиями.','Deal. Let us see the next tasks. Actions rebuild trust.'],
-['personal','Как ты отдыхаешь?','How do you unwind?','Вечером выключаю рабочие уведомления. Первую неделю было страшно, потом оказалось, что мир не рухнул.','I mute work notifications at night. Scary for a week, then the world did not end.','Попробую сегодня.','I will try that tonight.','Начни с часа без экрана. Коллеги могут подождать, а ты у себя один.','Start with an hour off-screen. Colleagues can wait. You only have one you.'],
-['senior','Можно твоё мнение?','Can I get your opinion?','У нас два варианта решения. Один быстрее сейчас, второй проще поддерживать. Как бы ты выбирал?','Two options: one faster today, the other easier to maintain. How would you choose?','Сравним риски и срок жизни решения.','Compare the risks and how long it must last.','Тогда я соберу ограничения, а не просто принесу тебе голосование за любимую технологию.','Then I will gather constraints rather than ask you to vote for a favourite technology.'],
-['dispute','О чём спорили у доски?','What was the debate about?','Требования поменялись после готового макета. Клиенту нужно иначе, а время команды никто не вернул.','Requirements changed after the design was done. The customer needs something else, but our time is gone.','Что можно оставить на потом?','What can wait?'],
-['morning','Как утро?','How is your morning?','Открыл почту. Закрыл почту. Сначала всё-таки кофе.','Opened email. Closed email. Coffee first after all.','Сначала один понятный шаг.','One clear step first.','Точно. Начну с того, что перестану читать всё одновременно.','Right. I will start by not reading everything at once.'],
-['evening','Пора домой?','Time to go home?','Кажется, я смотрю на одну строку уже десять минут. Это плохая оптимизация вечера.','I have stared at one line for ten minutes. Poor evening optimisation.','Оставим заметку на завтра.','Leave a note for tomorrow.','И закроем ноутбук. Завтрашний я оценит обе части плана.','Then close the laptop. Tomorrow’s me will appreciate both parts.'],
-['careful','Почему ты всё перепроверяешь?','Why double-check everything?','Один раз я доверился зелёной галочке. Теперь читаю, что именно она проверила.','Once I trusted a green checkmark. Now I read what it actually checked.','Давай посмотрим вместе.','Let us look together.','Не ради ритуала. Ради того, чтобы понимать, где заканчивается гарантия.','Not for the ritual. To understand where the guarantee ends.']
+import { careerRank, eventActive } from '../world/life';
+export type Topic = {
+  choiceLabelKey?: string;
+  selection?: { labelKey: string; amount?: number }[];
+  paymentProblemId?: string;
+  id: string;
+  titleKey: string;
+  bodyKey: string;
+  priority: number;
+  kind: 'contextual' | 'personal' | 'small';
+  choices: { id: string; labelKey: string; responseKey: string }[];
+};
+const data = [
+  [
+    'incident',
+    'После инцидента',
+    'After the incident',
+    'Сервис снова работает. Но если просто разойтись, через неделю будем сидеть здесь опять.',
+    'The service is back. If we just leave, we will be here again next week.',
+    'Давай разберём причину без поиска виноватых.',
+    'Let us find the cause without blaming people.',
+    'Да. Запишем, что увидели, что помогло и что нужно изменить в системе.',
+    'Yes. Record what we saw, what helped, and what the system needs.',
+  ],
+  [
+    'review',
+    'Как договариваться о ревью?',
+    'How do we arrange reviews?',
+    'Когда изменения ждут проверки, полезно договориться о сроке. Даже маленькая задача может надолго остаться в очереди.',
+    'When changes await review, agreeing on a time helps. Even a small task can stay in the queue for a long time.',
+    'Скажу, когда смогу посмотреть.',
+    'I will tell you when I can review it.',
+    'Вот это уже план. Даже честное «после обеда» лучше молчания.',
+    'That is a plan. Even an honest “after lunch” beats silence.',
+  ],
+  [
+    'trust',
+    'Кажется, я тебя подвёл.',
+    'I think I let you down.',
+    'Меня раздражает не ошибка, а когда о ней узнаёшь последним.',
+    'The mistake is not what frustrates me. Finding out last is.',
+    'В следующий раз предупрежу раньше.',
+    'I will give you an earlier warning next time.',
+    'Договорились. Посмотрим на следующие задачи — доверие возвращается действиями.',
+    'Deal. Let us see the next tasks. Actions rebuild trust.',
+  ],
+  [
+    'personal',
+    'Как ты отдыхаешь?',
+    'How do you unwind?',
+    'Вечером выключаю рабочие уведомления. Первую неделю было страшно, потом оказалось, что мир не рухнул.',
+    'I mute work notifications at night. Scary for a week, then the world did not end.',
+    'Попробую сегодня.',
+    'I will try that tonight.',
+    'Начни с часа без экрана. Коллеги могут подождать, а ты у себя один.',
+    'Start with an hour off-screen. Colleagues can wait. You only have one you.',
+  ],
+  [
+    'senior',
+    'Можно твоё мнение?',
+    'Can I get your opinion?',
+    'У нас два варианта решения. Один быстрее сейчас, второй проще поддерживать. Как бы ты выбирал?',
+    'Two options: one faster today, the other easier to maintain. How would you choose?',
+    'Сравним риски и срок жизни решения.',
+    'Compare the risks and how long it must last.',
+    'Тогда я соберу ограничения, а не просто принесу тебе голосование за любимую технологию.',
+    'Then I will gather constraints rather than ask you to vote for a favourite technology.',
+  ],
+  [
+    'dispute',
+    'О чём спорили у доски?',
+    'What was the debate about?',
+    'Требования поменялись после готового макета. Клиенту нужно иначе, а время команды никто не вернул.',
+    'Requirements changed after the design was done. The customer needs something else, but our time is gone.',
+    'Что можно оставить на потом?',
+    'What can wait?',
+  ],
+  [
+    'morning',
+    'Как утро?',
+    'How is your morning?',
+    'Открыл почту. Закрыл почту. Сначала всё-таки кофе.',
+    'Opened email. Closed email. Coffee first after all.',
+    'Сначала один понятный шаг.',
+    'One clear step first.',
+    'Точно. Начну с того, что перестану читать всё одновременно.',
+    'Right. I will start by not reading everything at once.',
+  ],
+  [
+    'evening',
+    'Пора домой?',
+    'Time to go home?',
+    'Кажется, я смотрю на одну строку уже десять минут. Это плохая оптимизация вечера.',
+    'I have stared at one line for ten minutes. Poor evening optimisation.',
+    'Оставим заметку на завтра.',
+    'Leave a note for tomorrow.',
+    'И закроем ноутбук. Завтрашний я оценит обе части плана.',
+    'Then close the laptop. Tomorrow’s me will appreciate both parts.',
+  ],
+  [
+    'careful',
+    'Почему ты всё перепроверяешь?',
+    'Why double-check everything?',
+    'Один раз я доверился зелёной галочке. Теперь читаю, что именно она проверила.',
+    'Once I trusted a green checkmark. Now I read what it actually checked.',
+    'Давай посмотрим вместе.',
+    'Let us look together.',
+    'Не ради ритуала. Ради того, чтобы понимать, где заканчивается гарантия.',
+    'Not for the ritual. To understand where the guarantee ends.',
+  ],
 ];
-const definitions:Topic[]=data.map(([id,ru,en,body,eng,a,ae,r,re])=>({id:'context-'+id,titleKey:text('context.'+id+'.title',ru,en),bodyKey:text('context.'+id+'.body',body,eng),priority:80,kind:id==='personal'?'personal':id==='morning'||id==='evening'?'small':'contextual',choices:[{id:'respond',labelKey:text('context.'+id+'.answer',a,ae),responseKey:text('context.'+id+'.reply',r??'Давай вместе отделим обязательное от желательного. Тогда спор превратится в план.',re??'Let us separate essentials from nice-to-haves. Then the debate becomes a plan.')}]}));
-export function availableTopics(c:Campaign,npc:Character):Topic[]{const ch=c.characters.find(x=>x.id===c.activeCharacterId)!,trust=ch.relationships.find(r=>r.characterId===npc.id)?.trust??20,l=c.life;const ids:string[]=[];if(c.schedule.some(e=>e.type==='incident')||c.company!.incidents.some(i=>c.company!.currentDay-i.day<=2))ids.push('incident');if(l?.queue.some(q=>q.id==='review'&&q.status==='waiting')&&['frontend','backend','qa'].includes(npc.profession))ids.push('review');if(trust<15)ids.push('trust');if(trust>=25)ids.push('personal');if(careerRank(ch)>=2)ids.push('senior');if(l?.officeEncounterDay===c.company!.currentDay)ids.push('dispute');if(npc.personality==='careful')ids.push('careful');ids.push(c.time>=1020?'evening':'morning');const topics:Topic[]=definitions.filter(d=>ids.includes(d.id.replace('context-','')));if(ch.stats.stress>=65&&npc.id==='sergey')topics.push({id:'stress-'+l?.calendarDay,titleKey:'life.warning70',bodyKey:'recovery.lead',priority:130,kind:'contextual',choices:[{id:'acknowledge',labelKey:'ui.next',responseKey:'recovery.vacationHint'}]});for(const e of l?.worldEvents??[]){if(!eventActive(c,e.id)||topics.some(t=>t.id.startsWith('world-'+e.id)))continue;topics.push({id:'world-'+e.id+'-'+e.day,titleKey:'life.event.'+e.id,bodyKey:'life.event.'+e.id+'.body',kind:'contextual',priority:100,choices:[{id:'acknowledge',labelKey:'ui.next',responseKey:'ui.inherited'}]});}for(const d of l?.professionalDecisions??[]){if(d.resolved&&d.characterId===ch.id&&d.npcId===npc.id)topics.push({id:'decision-'+d.decisionId,titleKey:'decision.followup.title',bodyKey:decisionOutcome(d),choiceLabelKey:d.choiceLabelKey,selection:d.selection,priority:110,kind:'contextual',choices:[{id:'acknowledge',labelKey:'ui.next',responseKey:'decision.committed'}]});}for(const project of c.company!.projects)for(const problem of project.problems)for(const consequence of problem.consequences??[]){const actor=c.characters.find(n=>n.id===consequence.actorId);const owner=actor?.profession==='designer'?'anya':actor?.profession==='product'?'oleg':actor?.profession==='qa'?'max':'sergey';if(consequence.resolved&&owner===npc.id)topics.push({id:'scene-'+consequence.id,titleKey:'decision.followup.title',bodyKey:problem.latestOutcomeKey??consequence.outcome.followupKey,priority:125,kind:'contextual',choices:[{id:'acknowledge',labelKey:'ui.next',responseKey:'loop.reply'}]});}for(const o of l?.obligations??[]){if(o.npcId===npc.id)topics.push({id:'obligation-'+o.day+'-'+o.work,titleKey:'loop.followup',bodyKey:'loop.obligation.'+o.kind,choiceLabelKey:'life.work.'+o.work,priority:120,kind:'contextual',choices:[{id:'acknowledge',labelKey:'loop.acknowledge',responseKey:'loop.reply'}]});}return [...paymentConversationTopics(c,npc),...topics,...topicsFor(npc.id).map(t=>({...t,priority:20,kind:'personal' as const}))].sort((a,b)=>b.priority-a.priority);}
-export function hasNewTopic(c:Campaign,npc:Character){const ch=c.characters.find(x=>x.id===c.activeCharacterId)!;return availableTopics(c,npc).some(t=>t.kind!=='small'&&!ch.conversations?.[npc.id+':'+t.id]);}
+const definitions: Topic[] = data.map(([id, ru, en, body, eng, a, ae, r, re]) => ({
+  id: 'context-' + id,
+  titleKey: text('context.' + id + '.title', ru, en),
+  bodyKey: text('context.' + id + '.body', body, eng),
+  priority: 80,
+  kind:
+    id === 'personal' ? 'personal' : id === 'morning' || id === 'evening' ? 'small' : 'contextual',
+  choices: [
+    {
+      id: 'respond',
+      labelKey: text('context.' + id + '.answer', a, ae),
+      responseKey: text(
+        'context.' + id + '.reply',
+        r ?? 'Давай вместе отделим обязательное от желательного. Тогда спор превратится в план.',
+        re ?? 'Let us separate essentials from nice-to-haves. Then the debate becomes a plan.',
+      ),
+    },
+  ],
+}));
+export function availableTopics(c: Campaign, npc: Character): Topic[] {
+  const ch = c.characters.find((x) => x.id === c.activeCharacterId)!,
+    trust = ch.relationships.find((r) => r.characterId === npc.id)?.trust ?? 20,
+    l = c.life;
+  const ids: string[] = [];
+  if (
+    c.schedule.some((e) => e.type === 'incident') ||
+    c.company!.incidents.some((i) => c.company!.currentDay - i.day <= 2)
+  )
+    ids.push('incident');
+  if (
+    l?.queue.some((q) => q.id === 'review' && q.status === 'waiting') &&
+    ['frontend', 'backend', 'qa'].includes(npc.profession)
+  )
+    ids.push('review');
+  if (trust < 15) ids.push('trust');
+  if (trust >= 25) ids.push('personal');
+  if (careerRank(ch) >= 2) ids.push('senior');
+  if (l?.officeEncounterDay === c.company!.currentDay) ids.push('dispute');
+  if (npc.personality === 'careful') ids.push('careful');
+  ids.push(c.time >= 1020 ? 'evening' : 'morning');
+  const topics: Topic[] = definitions.filter((d) => ids.includes(d.id.replace('context-', '')));
+  if (ch.stats.stress >= 65 && npc.id === 'sergey')
+    topics.push({
+      id: 'stress-' + l?.calendarDay,
+      titleKey: 'life.warning70',
+      bodyKey: 'recovery.lead',
+      priority: 130,
+      kind: 'contextual',
+      choices: [{ id: 'acknowledge', labelKey: 'ui.next', responseKey: 'recovery.vacationHint' }],
+    });
+  for (const e of l?.worldEvents ?? []) {
+    if (!eventActive(c, e.id) || topics.some((t) => t.id.startsWith('world-' + e.id))) continue;
+    topics.push({
+      id: 'world-' + e.id + '-' + e.day,
+      titleKey: 'life.event.' + e.id,
+      bodyKey: 'life.event.' + e.id + '.body',
+      kind: 'contextual',
+      priority: 100,
+      choices: [{ id: 'acknowledge', labelKey: 'ui.next', responseKey: 'ui.inherited' }],
+    });
+  }
+  for (const d of l?.professionalDecisions ?? []) {
+    if (d.resolved && d.characterId === ch.id && d.npcId === npc.id)
+      topics.push({
+        id: 'decision-' + d.decisionId,
+        titleKey: 'decision.followup.title',
+        bodyKey: decisionOutcome(d),
+        choiceLabelKey: d.choiceLabelKey,
+        selection: d.selection,
+        priority: 110,
+        kind: 'contextual',
+        choices: [{ id: 'acknowledge', labelKey: 'ui.next', responseKey: 'decision.committed' }],
+      });
+  }
+  for (const project of c.company!.projects)
+    for (const problem of project.problems)
+      for (const consequence of problem.consequences ?? []) {
+        const actor = c.characters.find((n) => n.id === consequence.actorId);
+        const owner =
+          actor?.profession === 'designer'
+            ? 'anya'
+            : actor?.profession === 'product'
+              ? 'oleg'
+              : actor?.profession === 'qa'
+                ? 'max'
+                : 'sergey';
+        if (consequence.resolved && owner === npc.id)
+          topics.push({
+            id: 'scene-' + consequence.id,
+            titleKey: 'decision.followup.title',
+            bodyKey: problem.latestOutcomeKey ?? consequence.outcome.followupKey,
+            priority: 125,
+            kind: 'contextual',
+            choices: [{ id: 'acknowledge', labelKey: 'ui.next', responseKey: 'loop.reply' }],
+          });
+      }
+  for (const o of l?.obligations ?? []) {
+    if (o.npcId === npc.id)
+      topics.push({
+        id: 'obligation-' + o.day + '-' + o.work,
+        titleKey: 'loop.followup',
+        bodyKey: 'loop.obligation.' + o.kind,
+        choiceLabelKey: 'life.work.' + o.work,
+        priority: 120,
+        kind: 'contextual',
+        choices: [{ id: 'acknowledge', labelKey: 'loop.acknowledge', responseKey: 'loop.reply' }],
+      });
+  }
+  return [
+    ...paymentConversationTopics(c, npc),
+    ...topics,
+    ...topicsFor(npc.id).map((t) => ({ ...t, priority: 20, kind: 'personal' as const })),
+  ].sort((a, b) => b.priority - a.priority);
+}
+export function hasNewTopic(c: Campaign, npc: Character) {
+  const ch = c.characters.find((x) => x.id === c.activeCharacterId)!;
+  return availableTopics(c, npc).some(
+    (t) => t.kind !== 'small' && !ch.conversations?.[npc.id + ':' + t.id],
+  );
+}

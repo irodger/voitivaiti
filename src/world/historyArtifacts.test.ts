@@ -1,27 +1,157 @@
-import {describe,it,expect,vi} from 'vitest';
-vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
-import {transition} from './engine';
-import {activeCharacter,activeTask,emptyCampaign,makeSchedule} from './simulation';
-import {finishPlaytestTask} from './playtestHelpers';
-import {resolveTaskTemplate} from '../content/scenarios';
-import {migrateLegacy} from './store';
-import {availableTechnicalActions} from './technicalActions';
-import {advanceCalendar} from './life';
-import {historyArtifact} from '../content/historyArtifacts';
-import {storyScene} from '../content/storyScenes';
-function start(){const c=transition(emptyCampaign(),{type:'new',name:'History',avatarId:'1',professionId:'frontend',seed:1427}).campaign;delete activeCharacter(c).firstDay;activeCharacter(c).completedWork=['one','two'];return c;}
-function assign(c:ReturnType<typeof start>){const project=c.company!.projects[0],q=c.life!.queue.find(q=>q.id==='bug')!;q.projectId=project.id;q.problemId=project.problems.find(p=>p.category==='interface')!.id;q.status='selected';q.explained=true;c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';return transition(c,{type:'take-task'}).campaign;}
-describe('evidence continues the world story',()=>{
- it('a recurring artifact contains the actual earlier result and limitations, and freezes on reload',()=>{let c=finishPlaytestTask(assign(start()),'limited');const prior=activeTask(c)!,summary=prior.outcome!.summaryKey;for(let i=0;i<8;i++)advanceCalendar(c);c=assign(c);const task=activeTask(c)!,step=resolveTaskTemplate(task).steps[0],a=step.actionFlow!.actions.find(a=>a.id==='previous')!;expect(a.artifact!.rows.find(r=>r.id==='previous-result')!.detailKey).toBe(summary);expect(a.artifact!.rows.filter(r=>r.id.startsWith('limitation')).map(r=>r.detailKey)).toContain(summary);c=transition(c,{type:'artifact-inspect',actionId:a.id,rowId:'previous-result'}).campaign;const saved=structuredClone(a.artifact);c.company!.projects[0].problems.find(p=>p.id===task.problemId)!.story!.limitations=[];c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.actions.find(a=>a.id==='previous')!.artifact).toEqual(saved);expect(activeTask(c)!.progress[step.id].artifactReadings!.previous).toContain('previous-result');expect(finishPlaytestTask(c).tasks.at(-1)!.rewarded).toBe(true);});
- it('colleague evidence cannot be inspected before the reply is ready',()=>{let c=start();activeCharacter(c).careerNodeId='level-2';c=assign(c);const step=resolveTaskTemplate(activeTask(c)!).steps[0];const replyArtifact=step.actionFlow!.actions.find(a=>a.id==='reply')!.artifact!;expect(replyArtifact).toBeTruthy();const firstRow=replyArtifact.rows[0].id;c=transition(c,{type:'technical-action',id:'request'}).campaign;expect(transition(c,{type:'artifact-inspect',actionId:'reply',rowId:firstRow}).campaign).toEqual(c);for(const id of ['local','audit'])c=transition(c,{type:'technical-action',id}).campaign;expect(availableTechnicalActions(step,activeTask(c)!.progress[step.id]).some(a=>a.id==='reply')).toBe(true);c=transition(c,{type:'artifact-inspect',actionId:'reply',rowId:firstRow}).campaign;expect(activeTask(c)!.progress[step.id].artifactReadings!.reply).toContain(firstRow);expect(finishPlaytestTask(c).tasks.at(-1)!.rewarded).toBe(true);});
- it('review distinguishes evidence of success from an untested neighboring case',()=>{const c=assign(start()),task=activeTask(c)!,base=resolveTaskTemplate(task),problem=c.company!.projects[0].problems.find(p=>p.id===task.problemId)!;const scene=storyScene(base,'review',1,problem),artifact=scene.steps[0].actionFlow!.actions.find(a=>a.id==='inspect-review')!.artifact!;expect(artifact.rows.map(r=>r.detailKey)).toEqual(['evidence.original.data','evidence.neighbor.data']);});
- it('uses the cause task rather than a later unrelated result and never invents a contract change',()=>{
-  let c=finishPlaytestTask(assign(start()),'limited');const task=activeTask(c)!,p=c.company!.projects[0].problems.find(p=>p.id===task.problemId)!,original=structuredClone(p.story!.encounters[0]);
-  p.story!.encounters.push({...original,taskId:'later-other-work',observations:['story.review.reply.result']});p.history.push({id:'later-other-work:encounter',day:2,kind:'problem-encounter',key:'story.review.reply.result'});p.story!.change='contract';
-  const encounter={version:1,grade:0,previousTaskId:task.id,causeKey:task.outcome!.followupKey,contextKeys:[]};
-  const artifact=historyArtifact(p,encounter)!;expect(artifact.rows.find(r=>r.id==='previous-result')!.detailKey).toBe(task.outcome!.summaryKey);expect(artifact.rows.find(r=>r.id==='new-condition')!.detailKey).toBe(task.outcome!.followupKey);expect(artifact.rows.filter(r=>r.id.startsWith('observation')).map(r=>r.detailKey)).toEqual(original.observations.slice(-2));
-  const review=storyScene(resolveTaskTemplate(task),'review',0,p,{...encounter,triggerId:'real-report'}).steps[0].actionFlow!.actions.find(a=>a.id==='inspect-review')!.artifact!;expect(review.rows.filter(r=>!r.optional).map(r=>r.id)).toEqual(['original','neighbor']);expect(review.rows.find(r=>r.id==='history-new-condition')!.detailKey).toBe(encounter.causeKey);
-  const scene=storyScene(resolveTaskTemplate(task),'recurrence',0,p,encounter);expect(scene.steps[0].actionFlow!.actions.find(a=>a.id==='previous')!.artifact).toEqual(artifact);
- });
-
+import { describe, it, expect, vi } from 'vitest';
+vi.stubGlobal('localStorage', { getItem: () => null, setItem: () => {}, removeItem: () => {} });
+import { transition } from './engine';
+import { activeCharacter, activeTask, emptyCampaign, makeSchedule } from './simulation';
+import { finishPlaytestTask } from './playtestHelpers';
+import { resolveTaskTemplate } from '../content/scenarios';
+import { migrateLegacy } from './store';
+import { availableTechnicalActions } from './technicalActions';
+import { advanceCalendar } from './life';
+import { historyArtifact } from '../content/historyArtifacts';
+import { storyScene } from '../content/storyScenes';
+function start() {
+  const c = transition(emptyCampaign(), {
+    type: 'new',
+    name: 'History',
+    avatarId: '1',
+    professionId: 'frontend',
+    seed: 1427,
+  }).campaign;
+  delete activeCharacter(c).firstDay;
+  activeCharacter(c).completedWork = ['one', 'two'];
+  return c;
+}
+function assign(c: ReturnType<typeof start>) {
+  const project = c.company!.projects[0],
+    q = c.life!.queue.find((q) => q.id === 'bug')!;
+  q.projectId = project.id;
+  q.problemId = project.problems.find((p) => p.category === 'interface')!.id;
+  q.status = 'selected';
+  q.explained = true;
+  c.phase = 'office';
+  c.time = 540;
+  c.activeTaskId = null;
+  c.schedule = makeSchedule(c);
+  c.schedule[0].status = 'completed';
+  return transition(c, { type: 'take-task' }).campaign;
+}
+describe('evidence continues the world story', () => {
+  it('a recurring artifact contains the actual earlier result and limitations, and freezes on reload', () => {
+    let c = finishPlaytestTask(assign(start()), 'limited');
+    const prior = activeTask(c)!,
+      summary = prior.outcome!.summaryKey;
+    for (let i = 0; i < 8; i++) advanceCalendar(c);
+    c = assign(c);
+    const task = activeTask(c)!,
+      step = resolveTaskTemplate(task).steps[0],
+      a = step.actionFlow!.actions.find((a) => a.id === 'previous')!;
+    expect(a.artifact!.rows.find((r) => r.id === 'previous-result')!.detailKey).toBe(summary);
+    expect(
+      a.artifact!.rows.filter((r) => r.id.startsWith('limitation')).map((r) => r.detailKey),
+    ).toContain(summary);
+    c = transition(c, {
+      type: 'artifact-inspect',
+      actionId: a.id,
+      rowId: 'previous-result',
+    }).campaign;
+    const saved = structuredClone(a.artifact);
+    c.company!.projects[0].problems.find((p) => p.id === task.problemId)!.story!.limitations = [];
+    c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+    expect(
+      resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.actions.find(
+        (a) => a.id === 'previous',
+      )!.artifact,
+    ).toEqual(saved);
+    expect(activeTask(c)!.progress[step.id].artifactReadings!.previous).toContain(
+      'previous-result',
+    );
+    expect(finishPlaytestTask(c).tasks.at(-1)!.rewarded).toBe(true);
+  });
+  it('colleague evidence cannot be inspected before the reply is ready', () => {
+    let c = start();
+    activeCharacter(c).careerNodeId = 'level-2';
+    c = assign(c);
+    const step = resolveTaskTemplate(activeTask(c)!).steps[0];
+    const replyArtifact = step.actionFlow!.actions.find((a) => a.id === 'reply')!.artifact!;
+    expect(replyArtifact).toBeTruthy();
+    const firstRow = replyArtifact.rows[0].id;
+    c = transition(c, { type: 'technical-action', id: 'request' }).campaign;
+    expect(
+      transition(c, { type: 'artifact-inspect', actionId: 'reply', rowId: firstRow }).campaign,
+    ).toEqual(c);
+    for (const id of ['local', 'audit'])
+      c = transition(c, { type: 'technical-action', id }).campaign;
+    expect(
+      availableTechnicalActions(step, activeTask(c)!.progress[step.id]).some(
+        (a) => a.id === 'reply',
+      ),
+    ).toBe(true);
+    c = transition(c, { type: 'artifact-inspect', actionId: 'reply', rowId: firstRow }).campaign;
+    expect(activeTask(c)!.progress[step.id].artifactReadings!.reply).toContain(firstRow);
+    expect(finishPlaytestTask(c).tasks.at(-1)!.rewarded).toBe(true);
+  });
+  it('review distinguishes evidence of success from an untested neighboring case', () => {
+    const c = assign(start()),
+      task = activeTask(c)!,
+      base = resolveTaskTemplate(task),
+      problem = c.company!.projects[0].problems.find((p) => p.id === task.problemId)!;
+    const scene = storyScene(base, 'review', 1, problem),
+      artifact = scene.steps[0].actionFlow!.actions.find(
+        (a) => a.id === 'inspect-review',
+      )!.artifact!;
+    expect(artifact.rows.map((r) => r.detailKey)).toEqual([
+      'evidence.original.data',
+      'evidence.neighbor.data',
+    ]);
+  });
+  it('uses the cause task rather than a later unrelated result and never invents a contract change', () => {
+    let c = finishPlaytestTask(assign(start()), 'limited');
+    const task = activeTask(c)!,
+      p = c.company!.projects[0].problems.find((p) => p.id === task.problemId)!,
+      original = structuredClone(p.story!.encounters[0]);
+    p.story!.encounters.push({
+      ...original,
+      taskId: 'later-other-work',
+      observations: ['story.review.reply.result'],
+    });
+    p.history.push({
+      id: 'later-other-work:encounter',
+      day: 2,
+      kind: 'problem-encounter',
+      key: 'story.review.reply.result',
+    });
+    p.story!.change = 'contract';
+    const encounter = {
+      version: 1,
+      grade: 0,
+      previousTaskId: task.id,
+      causeKey: task.outcome!.followupKey,
+      contextKeys: [],
+    };
+    const artifact = historyArtifact(p, encounter)!;
+    expect(artifact.rows.find((r) => r.id === 'previous-result')!.detailKey).toBe(
+      task.outcome!.summaryKey,
+    );
+    expect(artifact.rows.find((r) => r.id === 'new-condition')!.detailKey).toBe(
+      task.outcome!.followupKey,
+    );
+    expect(
+      artifact.rows.filter((r) => r.id.startsWith('observation')).map((r) => r.detailKey),
+    ).toEqual(original.observations.slice(-2));
+    const review = storyScene(resolveTaskTemplate(task), 'review', 0, p, {
+      ...encounter,
+      triggerId: 'real-report',
+    }).steps[0].actionFlow!.actions.find((a) => a.id === 'inspect-review')!.artifact!;
+    expect(review.rows.filter((r) => !r.optional).map((r) => r.id)).toEqual([
+      'original',
+      'neighbor',
+    ]);
+    expect(review.rows.find((r) => r.id === 'history-new-condition')!.detailKey).toBe(
+      encounter.causeKey,
+    );
+    const scene = storyScene(resolveTaskTemplate(task), 'recurrence', 0, p, encounter);
+    expect(scene.steps[0].actionFlow!.actions.find((a) => a.id === 'previous')!.artifact).toEqual(
+      artifact,
+    );
+  });
 });

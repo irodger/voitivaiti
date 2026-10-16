@@ -1,1 +1,44 @@
-.priority-impact{padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin:12px 0}.priority-impact h4{display:flex;gap:8px;align-items:center;margin:0 0 10px}.priority-impact>p{font-size:12px;line-height:1.6;display:flex;gap:8px}.priority-impact>p svg{flex-shrink:0;margin-top:3px}.priority-impact ul{display:grid;gap:10px;list-style:none;padding:0;margin:12px 0 0}.priority-impact li{display:grid;gap:6px;padding:12px;border-radius:10px;background:var(--paper)}.priority-impact li>b{font-size:12px}.priority-impact li>small{font-size:11px;color:var(--muted)}
+.priority-impact {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  margin: 12px 0;
+}
+.priority-impact h4 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 10px;
+}
+.priority-impact > p {
+  font-size: 12px;
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+}
+.priority-impact > p svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.priority-impact ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.priority-impact li {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--paper);
+}
+.priority-impact li > b {
+  font-size: 12px;
+}
+.priority-impact li > small {
+  font-size: 11px;
+  color: var(--muted);
+}

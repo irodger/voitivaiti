@@ -20,6 +20,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Check formatting
+        run: npm run format:check
+
       - name: Install testing browser and Linux libraries
         # Root is required for Linux libraries; retain the runner's Node and browser cache.
         run: sudo env "PATH=$PATH" "HOME=$HOME" npx puppeteer browsers install chrome --install-deps

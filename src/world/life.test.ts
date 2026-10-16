@@ -1,25 +1,269 @@
-import {finishPlaytestTask} from './playtestHelpers';
-import {resolveTaskTemplate} from '../content/scenarios';
-import { describe,it,expect,vi } from 'vitest';
-const storage=new Map<string,string>();vi.stubGlobal('localStorage',{getItem:(k:string)=>storage.get(k)??null,setItem:(k:string,v:string)=>storage.set(k,v),removeItem:(k:string)=>storage.delete(k)});
-import { transition } from './engine';import { emptyCampaign,activeCharacter,activeTask,canPromote,generateWorld } from './simulation';import { decision,closeWorkDay,finishLife,advanceCalendar,payWork,settleCalendarDay,takeVacation,montage,emptyDecisions,updateMeta } from './life';import { migrateLegacy,useWorld,snapshot } from './store';import { availableTopics,hasNewTopic } from '../content/contextDialogue';
-const start=()=>{const c=transition(emptyCampaign(),{type:'new',name:'Test',avatarId:'1',professionId:'frontend',seed:1427}).campaign;delete c.characters.find(n=>n.id===c.activeCharacterId)!.firstDay;return c;};
-describe('life and career simulation',()=>{
-it('calendar and high stats alone never grant professional mastery',()=>{const c=start(),ch=activeCharacter(c);ch.completedWork=['1','2','3','4'];ch.skills={craft:50,debugging:50,communication:50,leadership:50};ch.stats.reputation=50;ch.milestones=['independent'];c.life!.calendarDay=400;c.life!.performanceMilestones=5;updateMeta(c);expect(canPromote(ch,'level-1')).toBe(false);});
-it('simulates calendar, finances and project state, stops at an event and cannot repeat montage',()=>{let c=start();c.phase='home';c.life!.characterPlayedDays=3;const money=activeCharacter(c).stats.money,played=c.life!.playedDay,debt=c.company!.techDebt;c=transition(c,{type:'montage'}).campaign;expect(c.life!.calendarDay).toBe(15);expect(c.life!.playedDay).toBe(played);expect(c.life!.characterPlayedDays).toBe(3);expect(c.life!.worldEvents).toHaveLength(1);expect(c.company!.techDebt).toBeGreaterThan(debt);expect(activeCharacter(c).stats.money).not.toBe(money);expect(c.life!.montage!.days).toBe(14);c=transition(c,{type:'montage-close'}).campaign;expect(transition(c,{type:'montage'}).campaign).toEqual(c);expect(migrateLegacy(JSON.parse(JSON.stringify(c))).life).toEqual(c.life);});
-it('preserves earned perspectives and archived failures across a new career and reset',()=>{let c=start();c.meta!.perspectives.qa=['bug'];activeCharacter(c).stats.stress=100;finishLife(c);expect(c.phase).toBe('ended');expect(c.meta!.careers[0].outcome).toBe('burnout');const archive=JSON.stringify(c.meta);c=transition(c,{type:'next-career'}).campaign;expect(JSON.stringify(c.meta)).toBe(archive);c=transition(c,{type:'new',name:'Next',avatarId:'2',professionId:'qa',seed:88}).campaign;expect(c.meta!.careers).toHaveLength(1);expect(c.meta!.perspectives.qa).toEqual(['bug']);useWorld.setState(c);useWorld.getState().reset();expect(useWorld.getState().meta!.careers).toHaveLength(2);expect(JSON.parse(storage.get('voiti-vaiti-meta')!).perspectives.qa).toEqual(['bug']);expect(snapshot(useWorld.getState()).phase).toBe('start');});
-it('records concrete decisions, warns before dismissal and allows recovery',()=>{let c=start();for(let i=0;i<4;i++)decision(c,'riskyDeploys');c.life!.calendarDay=7;closeWorkDay(c);expect(c.life!.reviewDue).toBe(true);c=transition(c,{type:'performance',accept:true}).campaign;expect(c.life!.reviewStage).toBe(1);expect(c.phase).not.toBe('ended');c.life!.decisionHistory=[];for(let i=0;i<3;i++){c.life!.calendarDay++;closeWorkDay(c);}expect(c.life!.reviewStage).toBe(0);for(let round=0;round<4;round++){c.life!.calendarDay+=5;for(let i=0;i<4;i++)decision(c,'riskyDeploys');closeWorkDay(c);c=transition(c,{type:'performance',accept:true}).campaign;}expect(c.phase).toBe('ended');expect(c.meta!.careers[0].outcome).toBe('fired');});
-it('defers wages during payroll trouble and pays arrears only once',()=>{const c=start(),ch=activeCharacter(c),base=ch.stats.money;c.life!.worldEvents=[{id:'payroll',day:1,until:4}];expect(payWork(c)).toBe(0);const owed=c.life!.salaryHeld;expect(owed).toBeGreaterThan(0);payWork(c);expect(c.life!.salaryHeld).toBe(owed);advanceCalendar(c);advanceCalendar(c);advanceCalendar(c);expect(ch.stats.money).toBe(base+owed);expect(c.life!.salaryHeld).toBe(0);advanceCalendar(c);expect(ch.stats.money).toBe(base+owed);});
-it('generates repeatable but varied rosters and contextual topics',()=>{expect(generateWorld(5)).toEqual(generateWorld(5));expect(generateWorld(5).characters.map(x=>x.name)).not.toEqual(generateWorld(6).characters.map(x=>x.name));const c=start(),npc=c.characters.find(x=>x.id==='anya')!;c.life!.officeEncounterDay=c.company!.currentDay;expect(availableTopics(c,npc).some(x=>x.id==='context-dispute')).toBe(true);expect(hasNewTopic(c,npc)).toBe(true);activeCharacter(c).conversations=Object.fromEntries(availableTopics(c,npc).map(x=>[npc.id+':'+x.id,'respond']));expect(hasNewTopic(c,npc)).toBe(false);});
-it('applies priority tradeoffs without blocking deterministic task steps',()=>{let c=start();c.company!.currentDay=3;activeCharacter(c).careerNodeId='level-2';c.life!.queue.forEach(q=>q.urgency=5);c=transition(c,{type:'priority',id:'feature',explained:false}).campaign;expect(c.life!.decisions.communicationFailures).toBe(1);closeWorkDay(c);expect(c.life!.decisions.ignoredQa).toBe(1);expect(c.life!.decisions.ignoredReview).toBe(1);expect(c.meta!.perspectives.development).toContain('feature');expect(c.life!.decisions).not.toEqual(emptyDecisions());});
+import { finishPlaytestTask } from './playtestHelpers';
+import { resolveTaskTemplate } from '../content/scenarios';
+import { describe, it, expect, vi } from 'vitest';
+const storage = new Map<string, string>();
+vi.stubGlobal('localStorage', {
+  getItem: (k: string) => storage.get(k) ?? null,
+  setItem: (k: string, v: string) => storage.set(k, v),
+  removeItem: (k: string) => storage.delete(k),
+});
+import { transition } from './engine';
+import {
+  emptyCampaign,
+  activeCharacter,
+  activeTask,
+  canPromote,
+  generateWorld,
+} from './simulation';
+import {
+  decision,
+  closeWorkDay,
+  finishLife,
+  advanceCalendar,
+  payWork,
+  settleCalendarDay,
+  takeVacation,
+  montage,
+  emptyDecisions,
+  updateMeta,
+} from './life';
+import { migrateLegacy, useWorld, snapshot } from './store';
+import { availableTopics, hasNewTopic } from '../content/contextDialogue';
+const start = () => {
+  const c = transition(emptyCampaign(), {
+    type: 'new',
+    name: 'Test',
+    avatarId: '1',
+    professionId: 'frontend',
+    seed: 1427,
+  }).campaign;
+  delete c.characters.find((n) => n.id === c.activeCharacterId)!.firstDay;
+  return c;
+};
+describe('life and career simulation', () => {
+  it('calendar and high stats alone never grant professional mastery', () => {
+    const c = start(),
+      ch = activeCharacter(c);
+    ch.completedWork = ['1', '2', '3', '4'];
+    ch.skills = { craft: 50, debugging: 50, communication: 50, leadership: 50 };
+    ch.stats.reputation = 50;
+    ch.milestones = ['independent'];
+    c.life!.calendarDay = 400;
+    c.life!.performanceMilestones = 5;
+    updateMeta(c);
+    expect(canPromote(ch, 'level-1')).toBe(false);
+  });
+  it('simulates calendar, finances and project state, stops at an event and cannot repeat montage', () => {
+    let c = start();
+    c.phase = 'home';
+    c.life!.characterPlayedDays = 3;
+    const money = activeCharacter(c).stats.money,
+      played = c.life!.playedDay,
+      debt = c.company!.techDebt;
+    c = transition(c, { type: 'montage' }).campaign;
+    expect(c.life!.calendarDay).toBe(15);
+    expect(c.life!.playedDay).toBe(played);
+    expect(c.life!.characterPlayedDays).toBe(3);
+    expect(c.life!.worldEvents).toHaveLength(1);
+    expect(c.company!.techDebt).toBeGreaterThan(debt);
+    expect(activeCharacter(c).stats.money).not.toBe(money);
+    expect(c.life!.montage!.days).toBe(14);
+    c = transition(c, { type: 'montage-close' }).campaign;
+    expect(transition(c, { type: 'montage' }).campaign).toEqual(c);
+    expect(migrateLegacy(JSON.parse(JSON.stringify(c))).life).toEqual(c.life);
+  });
+  it('preserves earned perspectives and archived failures across a new career and reset', () => {
+    let c = start();
+    c.meta!.perspectives.qa = ['bug'];
+    activeCharacter(c).stats.stress = 100;
+    finishLife(c);
+    expect(c.phase).toBe('ended');
+    expect(c.meta!.careers[0].outcome).toBe('burnout');
+    const archive = JSON.stringify(c.meta);
+    c = transition(c, { type: 'next-career' }).campaign;
+    expect(JSON.stringify(c.meta)).toBe(archive);
+    c = transition(c, {
+      type: 'new',
+      name: 'Next',
+      avatarId: '2',
+      professionId: 'qa',
+      seed: 88,
+    }).campaign;
+    expect(c.meta!.careers).toHaveLength(1);
+    expect(c.meta!.perspectives.qa).toEqual(['bug']);
+    useWorld.setState(c);
+    useWorld.getState().reset();
+    expect(useWorld.getState().meta!.careers).toHaveLength(2);
+    expect(JSON.parse(storage.get('voiti-vaiti-meta')!).perspectives.qa).toEqual(['bug']);
+    expect(snapshot(useWorld.getState()).phase).toBe('start');
+  });
+  it('records concrete decisions, warns before dismissal and allows recovery', () => {
+    let c = start();
+    for (let i = 0; i < 4; i++) decision(c, 'riskyDeploys');
+    c.life!.calendarDay = 7;
+    closeWorkDay(c);
+    expect(c.life!.reviewDue).toBe(true);
+    c = transition(c, { type: 'performance', accept: true }).campaign;
+    expect(c.life!.reviewStage).toBe(1);
+    expect(c.phase).not.toBe('ended');
+    c.life!.decisionHistory = [];
+    for (let i = 0; i < 3; i++) {
+      c.life!.calendarDay++;
+      closeWorkDay(c);
+    }
+    expect(c.life!.reviewStage).toBe(0);
+    for (let round = 0; round < 4; round++) {
+      c.life!.calendarDay += 5;
+      for (let i = 0; i < 4; i++) decision(c, 'riskyDeploys');
+      closeWorkDay(c);
+      c = transition(c, { type: 'performance', accept: true }).campaign;
+    }
+    expect(c.phase).toBe('ended');
+    expect(c.meta!.careers[0].outcome).toBe('fired');
+  });
+  it('defers wages during payroll trouble and pays arrears only once', () => {
+    const c = start(),
+      ch = activeCharacter(c),
+      base = ch.stats.money;
+    c.life!.worldEvents = [{ id: 'payroll', day: 1, until: 4 }];
+    expect(payWork(c)).toBe(0);
+    const owed = c.life!.salaryHeld;
+    expect(owed).toBeGreaterThan(0);
+    payWork(c);
+    expect(c.life!.salaryHeld).toBe(owed);
+    advanceCalendar(c);
+    advanceCalendar(c);
+    advanceCalendar(c);
+    expect(ch.stats.money).toBe(base + owed);
+    expect(c.life!.salaryHeld).toBe(0);
+    advanceCalendar(c);
+    expect(ch.stats.money).toBe(base + owed);
+  });
+  it('generates repeatable but varied rosters and contextual topics', () => {
+    expect(generateWorld(5)).toEqual(generateWorld(5));
+    expect(generateWorld(5).characters.map((x) => x.name)).not.toEqual(
+      generateWorld(6).characters.map((x) => x.name),
+    );
+    const c = start(),
+      npc = c.characters.find((x) => x.id === 'anya')!;
+    c.life!.officeEncounterDay = c.company!.currentDay;
+    expect(availableTopics(c, npc).some((x) => x.id === 'context-dispute')).toBe(true);
+    expect(hasNewTopic(c, npc)).toBe(true);
+    activeCharacter(c).conversations = Object.fromEntries(
+      availableTopics(c, npc).map((x) => [npc.id + ':' + x.id, 'respond']),
+    );
+    expect(hasNewTopic(c, npc)).toBe(false);
+  });
+  it('applies priority tradeoffs without blocking deterministic task steps', () => {
+    let c = start();
+    c.company!.currentDay = 3;
+    activeCharacter(c).careerNodeId = 'level-2';
+    c.life!.queue.forEach((q) => (q.urgency = 5));
+    c = transition(c, { type: 'priority', id: 'feature', explained: false }).campaign;
+    expect(c.life!.decisions.communicationFailures).toBe(1);
+    closeWorkDay(c);
+    expect(c.life!.decisions.ignoredQa).toBe(1);
+    expect(c.life!.decisions.ignoredReview).toBe(1);
+    expect(c.meta!.perspectives.development).toContain('feature');
+    expect(c.life!.decisions).not.toEqual(emptyDecisions());
+  });
 });
 
-describe('priority work integration',()=>{it('uses the Frontend lens for debt work and restores the exact observations',()=>{let c=start();c.company!.currentDay=3;activeCharacter(c).completedWork=['old-1','old-2'];activeCharacter(c).careerNodeId='level-1';const act=(a:Parameters<typeof transition>[1])=>{c=transition(c,a).campaign;};act({type:'event',id:c.schedule[0].id,choiceId:'plan'});act({type:'priority',id:'debt',explained:true});act({type:'take-task'});expect(c.tasks.find(t=>t.id===c.activeTaskId)!.templateId).toBe('lens.frontend.performance');act({type:'technical-action',id:resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.initial[0]});c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.tasks.find(t=>t.id===c.activeTaskId)!.progress[resolveTaskTemplate(activeTask(c)!).steps[0].id].actionHistory).toEqual([resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.initial[0]]);c=finishPlaytestTask(c);expect(c.phase).toBe('reward');expect(c.tasks.find(t=>t.id===c.activeTaskId)!.rewarded).toBe(true);const stats={...activeCharacter(c).stats};act({type:'advance'});expect(activeCharacter(c).stats).toEqual(stats);});});
-
-describe('routine edge cases',()=>{
-it('requires the summary to close before another day and restores that lock',()=>{let c=start();c.phase='home';c.life!.characterPlayedDays=3;c=transition(c,{type:'montage'}).campaign;c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(transition(c,{type:'sleep'}).campaign).toEqual(c);expect(transition(c,{type:'vacation'}).campaign).toEqual(c);const calendar=c.life!.calendarDay;c=transition(c,{type:'montage-close'}).campaign;expect(c.phase).toBe('office');expect(c.life!.montage).toBeNull();expect(c.life!.calendarDay).toBeGreaterThan(calendar);expect(transition(c,{type:'montage-close'}).campaign).toEqual(c);});
-it('lets a stressed character recover over a full vacation',()=>{let c=start();c.phase='home';activeCharacter(c).stats.stress=95;c.life!.nextEventDay=100;c.company!.techDebt=95;c=transition(c,{type:'vacation'}).campaign;expect(c.life!.vacations!.at(-1)!.days).toBe(7);expect(c.life!.montage!.days).toBeGreaterThanOrEqual(7);expect(activeCharacter(c).stats.stress).toBeLessThan(50);expect(c.phase).toBe('home');});
-it('does not pay routine salary on actual calendar weekends',()=>{let c=start();c.phase='home';c.life!.characterPlayedDays=3;c.life!.nextEventDay=5;c=transition(c,{type:'montage'}).campaign;expect(c.life!.calendarDay).toBe(5);const pay=Math.round(90000/22);expect(c.life!.montage!.income).toBe(pay*2);});
+describe('priority work integration', () => {
+  it('uses the Frontend lens for debt work and restores the exact observations', () => {
+    let c = start();
+    c.company!.currentDay = 3;
+    activeCharacter(c).completedWork = ['old-1', 'old-2'];
+    activeCharacter(c).careerNodeId = 'level-1';
+    const act = (a: Parameters<typeof transition>[1]) => {
+      c = transition(c, a).campaign;
+    };
+    act({ type: 'event', id: c.schedule[0].id, choiceId: 'plan' });
+    act({ type: 'priority', id: 'debt', explained: true });
+    act({ type: 'take-task' });
+    expect(c.tasks.find((t) => t.id === c.activeTaskId)!.templateId).toBe(
+      'lens.frontend.performance',
+    );
+    act({
+      type: 'technical-action',
+      id: resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.initial[0],
+    });
+    c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+    expect(
+      c.tasks.find((t) => t.id === c.activeTaskId)!.progress[
+        resolveTaskTemplate(activeTask(c)!).steps[0].id
+      ].actionHistory,
+    ).toEqual([resolveTaskTemplate(activeTask(c)!).steps[0].actionFlow!.initial[0]]);
+    c = finishPlaytestTask(c);
+    expect(c.phase).toBe('reward');
+    expect(c.tasks.find((t) => t.id === c.activeTaskId)!.rewarded).toBe(true);
+    const stats = { ...activeCharacter(c).stats };
+    act({ type: 'advance' });
+    expect(activeCharacter(c).stats).toEqual(stats);
+  });
 });
 
-it('settles the same calendar interval for manual days, routine and vacation including weekends and event stops',()=>{const seed=start();seed.phase='home';seed.life!.characterPlayedDays=3;seed.life!.nextEventDay=6;const routine=structuredClone(seed);montage(routine);const vacation=structuredClone(seed);takeVacation(vacation,3);expect(routine.life!.calendarDay).toBe(6);expect(vacation.life!.calendarDay).toBe(6);const manual=structuredClone(seed);for(let day=2;day<=6;day++){advanceCalendar(manual);payWork(manual);closeWorkDay(manual);}expect(activeCharacter(routine).stats.money).toBe(activeCharacter(manual).stats.money);expect(activeCharacter(vacation).stats.money).toBe(activeCharacter(manual).stats.money);expect(routine.life!.lastExpenseCalendarDay).toBe(6);const before=activeCharacter(manual).stats.money;expect(settleCalendarDay(manual)).toEqual({salary:0,income:0,expenses:0});expect(activeCharacter(manual).stats.money).toBe(before);});
+describe('routine edge cases', () => {
+  it('requires the summary to close before another day and restores that lock', () => {
+    let c = start();
+    c.phase = 'home';
+    c.life!.characterPlayedDays = 3;
+    c = transition(c, { type: 'montage' }).campaign;
+    c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+    expect(transition(c, { type: 'sleep' }).campaign).toEqual(c);
+    expect(transition(c, { type: 'vacation' }).campaign).toEqual(c);
+    const calendar = c.life!.calendarDay;
+    c = transition(c, { type: 'montage-close' }).campaign;
+    expect(c.phase).toBe('office');
+    expect(c.life!.montage).toBeNull();
+    expect(c.life!.calendarDay).toBeGreaterThan(calendar);
+    expect(transition(c, { type: 'montage-close' }).campaign).toEqual(c);
+  });
+  it('lets a stressed character recover over a full vacation', () => {
+    let c = start();
+    c.phase = 'home';
+    activeCharacter(c).stats.stress = 95;
+    c.life!.nextEventDay = 100;
+    c.company!.techDebt = 95;
+    c = transition(c, { type: 'vacation' }).campaign;
+    expect(c.life!.vacations!.at(-1)!.days).toBe(7);
+    expect(c.life!.montage!.days).toBeGreaterThanOrEqual(7);
+    expect(activeCharacter(c).stats.stress).toBeLessThan(50);
+    expect(c.phase).toBe('home');
+  });
+  it('does not pay routine salary on actual calendar weekends', () => {
+    let c = start();
+    c.phase = 'home';
+    c.life!.characterPlayedDays = 3;
+    c.life!.nextEventDay = 5;
+    c = transition(c, { type: 'montage' }).campaign;
+    expect(c.life!.calendarDay).toBe(5);
+    const pay = Math.round(90000 / 22);
+    expect(c.life!.montage!.income).toBe(pay * 2);
+  });
+});
+
+it('settles the same calendar interval for manual days, routine and vacation including weekends and event stops', () => {
+  const seed = start();
+  seed.phase = 'home';
+  seed.life!.characterPlayedDays = 3;
+  seed.life!.nextEventDay = 6;
+  const routine = structuredClone(seed);
+  montage(routine);
+  const vacation = structuredClone(seed);
+  takeVacation(vacation, 3);
+  expect(routine.life!.calendarDay).toBe(6);
+  expect(vacation.life!.calendarDay).toBe(6);
+  const manual = structuredClone(seed);
+  for (let day = 2; day <= 6; day++) {
+    advanceCalendar(manual);
+    payWork(manual);
+    closeWorkDay(manual);
+  }
+  expect(activeCharacter(routine).stats.money).toBe(activeCharacter(manual).stats.money);
+  expect(activeCharacter(vacation).stats.money).toBe(activeCharacter(manual).stats.money);
+  expect(routine.life!.lastExpenseCalendarDay).toBe(6);
+  const before = activeCharacter(manual).stats.money;
+  expect(settleCalendarDay(manual)).toEqual({ salary: 0, income: 0, expenses: 0 });
+  expect(activeCharacter(manual).stats.money).toBe(before);
+});

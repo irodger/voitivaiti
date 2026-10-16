@@ -27,3 +27,7 @@ CLI QA browser access is provided by the local v2 plugin in .opencode/plugins/qa
 - One component owns one controller hook: put its subscriptions, state, effects, data preparation and multi-step handlers in `useComponentName.ts` beside the component. Compose reusable hooks inside that controller. Keep JSX, visual markup and adapters from UI events to controller arguments in the component.
 - Components that only render props or use a single presentation hook (for example useI18n) do not need an empty controller wrapper. Keep component-specific controllers next to their views; only hooks reused across owners or application-wide mechanisms belong in shared hooks/.
 - Controller hooks return data and actions, not JSX. Preserve hook invocation order, initializers, early-return guards, effect dependencies and cleanup while extracting logic. Do not change gameplay, persistence or callback sequencing as part of this refactor.
+
+## Formatting
+
+- Run `npm run format` after editing source or tests, and `npm run format:check` before completion. Use the project Prettier configuration; keep formatting changes separate from behavior changes. CI checks formatting before building/testing.

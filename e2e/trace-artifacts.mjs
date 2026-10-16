@@ -5,7 +5,8 @@ import { createGzip } from 'node:zlib';
 import { randomUUID } from 'node:crypto';
 
 const mode = process.env.E2E_TRACE ?? 'failure';
-if (!['failure', 'all', 'off'].includes(mode)) throw new Error('E2E_TRACE must be failure, all, or off');
+if (!['failure', 'all', 'off'].includes(mode))
+  throw new Error('E2E_TRACE must be failure, all, or off');
 
 // Capture the original execution, not a retry after failure. Keep full categories
 // and screenshots; retention and lossless compression reduce disk usage.
@@ -14,11 +15,15 @@ export async function startTrace(page, directory) {
   await mkdir(directory, { recursive: true });
   const pending = `${directory}/trace-${randomUUID()}.pending.json`;
   await page.tracing.start({ path: pending, screenshots: true });
-  return async failed => {
+  return async (failed) => {
     try {
       await page.tracing.stop();
       if (failed || mode === 'all') {
-        await pipeline(createReadStream(pending), createGzip(), createWriteStream(`${directory}/trace.json.gz`));
+        await pipeline(
+          createReadStream(pending),
+          createGzip(),
+          createWriteStream(`${directory}/trace.json.gz`),
+        );
       }
       await unlink(pending);
     } catch (error) {

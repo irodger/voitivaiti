@@ -1,16 +1,78 @@
-import { Activity,ArrowUpRight,BatteryMedium,Laptop2,Layers,Moon,Users } from 'lucide-react';
+import { Activity, ArrowUpRight, BatteryMedium, Laptop2, Layers, Moon, Users } from 'lucide-react';
 import '../content/spacesUx';
 import './spaces.css';
 import { useHomeStatus } from './useHomeStatus';
 import { useOfficeStatus } from './useOfficeStatus';
 
-export function OfficeStatus({openLaptop}:{openLaptop:()=>void}){
-const {w,t,current,ch,queue}=useOfficeStatus();
+export function OfficeStatus({ openLaptop }: { openLaptop: () => void }) {
+  const { w, t, current, ch, queue } = useOfficeStatus();
 
- return <div className="space-status office-status"><div className="space-status-heading"><span className="space-status-icon"><Laptop2 size={23}/></span><div><small>{t('spaces.office')}</small><h3>{t(current?current.titleKey:'desk.tasks')}</h3></div><button onClick={openLaptop} aria-label={t('ui.openLaptop')}><span className="office-mobile-open">{t('ui.openLaptop')}</span><ArrowUpRight size={20}/></button></div><div className="space-status-facts"><span><Layers size={15}/><b>{queue}</b>{t('spaces.queue')}</span><span><Users size={15}/><b>{w.characters.filter(c=>c.employed&&c.id!==ch.id).length}</b>{t('spaces.people')}</span></div></div>;
+  return (
+    <div className="space-status office-status">
+      <div className="space-status-heading">
+        <span className="space-status-icon">
+          <Laptop2 size={23} />
+        </span>
+        <div>
+          <small>{t('spaces.office')}</small>
+          <h3>{t(current ? current.titleKey : 'desk.tasks')}</h3>
+        </div>
+        <button onClick={openLaptop} aria-label={t('ui.openLaptop')}>
+          <span className="office-mobile-open">{t('ui.openLaptop')}</span>
+          <ArrowUpRight size={20} />
+        </button>
+      </div>
+      <div className="space-status-facts">
+        <span>
+          <Layers size={15} />
+          <b>{queue}</b>
+          {t('spaces.queue')}
+        </span>
+        <span>
+          <Users size={15} />
+          <b>{w.characters.filter((c) => c.employed && c.id !== ch.id).length}</b>
+          {t('spaces.people')}
+        </span>
+      </div>
+    </div>
+  );
 }
-export function HomeStatus(){
-const {ch,t,rest}=useHomeStatus();
+export function HomeStatus() {
+  const { ch, t, rest } = useHomeStatus();
 
- return <div className="space-status home-status"><div className="space-status-heading"><span className="space-status-icon"><Moon size={23}/></span><div><small>{t('ui.home')}</small><h3>{t('spaces.home')}</h3></div></div><div className="home-status-meters">{[{Icon:BatteryMedium,label:'spaces.energy',value:ch.stats.energy},{Icon:Activity,label:'spaces.stress',value:ch.stats.stress}].map(({Icon,label,value})=><div key={label}><span><Icon size={15}/>{t(label)}<b>{value}/100</b></span><meter min={0} max={100} value={value} aria-label={t(label)}/></div>)}</div><p className="sleep-preview"><Moon size={15}/><span><b>{t('spaces.sleep')}</b><small>{t('spaces.recovery',rest)}</small></span></p></div>;
+  return (
+    <div className="space-status home-status">
+      <div className="space-status-heading">
+        <span className="space-status-icon">
+          <Moon size={23} />
+        </span>
+        <div>
+          <small>{t('ui.home')}</small>
+          <h3>{t('spaces.home')}</h3>
+        </div>
+      </div>
+      <div className="home-status-meters">
+        {[
+          { Icon: BatteryMedium, label: 'spaces.energy', value: ch.stats.energy },
+          { Icon: Activity, label: 'spaces.stress', value: ch.stats.stress },
+        ].map(({ Icon, label, value }) => (
+          <div key={label}>
+            <span>
+              <Icon size={15} />
+              {t(label)}
+              <b>{value}/100</b>
+            </span>
+            <meter min={0} max={100} value={value} aria-label={t(label)} />
+          </div>
+        ))}
+      </div>
+      <p className="sleep-preview">
+        <Moon size={15} />
+        <span>
+          <b>{t('spaces.sleep')}</b>
+          <small>{t('spaces.recovery', rest)}</small>
+        </span>
+      </p>
+    </div>
+  );
 }

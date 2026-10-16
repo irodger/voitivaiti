@@ -1,11 +1,64 @@
-.profession-icon{display:inline-flex;flex:none;vertical-align:middle;filter:drop-shadow(0 2px 3px #10192250);line-height:0}
-.profession-icon>svg{display:block;overflow:visible}.profession-icon .profession-symbol{filter:drop-shadow(0 0 3px #d6f2ff50)}
-.world-game .world-role-grid>button{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:12px;align-content:center;padding:12px}
-.world-game .world-role-grid>button>.profession-icon{grid-column:1;grid-row:1 / span 2;align-self:center}
-.world-game .world-role-grid>button>b,.world-game .world-role-grid>button>small{grid-column:2}
-.world-game .world-role-grid>button>small{margin-top:5px;padding-right:12px;line-height:1.5}
-.world-game .world-role-grid .profession-icon svg{position:static;inset:auto;color:inherit}
-.world-game .world-role-grid>button.selected>.profession-icon{filter:drop-shadow(0 0 5px #c09a4770)}
-.profession-preview-heading{display:flex;align-items:center;gap:14px;margin-bottom:10px}.profession-preview-heading h3{margin:4px 0}
-.header-player .header-profession-icon{display:inline-flex;margin-right:2px}
-@media(max-width:500px){.world-game .world-role-grid>button{column-gap:12px}.profession-preview-heading{gap:12px}}
+.profession-icon {
+  display: inline-flex;
+  flex: none;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 3px #10192250);
+  line-height: 0;
+}
+.profession-icon > svg {
+  display: block;
+  overflow: visible;
+}
+.profession-icon .profession-symbol {
+  filter: drop-shadow(0 0 3px #d6f2ff50);
+}
+.world-game .world-role-grid > button {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 12px;
+  align-content: center;
+  padding: 12px;
+}
+.world-game .world-role-grid > button > .profession-icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+.world-game .world-role-grid > button > b,
+.world-game .world-role-grid > button > small {
+  grid-column: 2;
+}
+.world-game .world-role-grid > button > small {
+  margin-top: 5px;
+  padding-right: 12px;
+  line-height: 1.5;
+}
+.world-game .world-role-grid .profession-icon svg {
+  position: static;
+  inset: auto;
+  color: inherit;
+}
+.world-game .world-role-grid > button.selected > .profession-icon {
+  filter: drop-shadow(0 0 5px #c09a4770);
+}
+.profession-preview-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.profession-preview-heading h3 {
+  margin: 4px 0;
+}
+.header-player .header-profession-icon {
+  display: inline-flex;
+  margin-right: 2px;
+}
+@media (max-width: 500px) {
+  .world-game .world-role-grid > button {
+    column-gap: 12px;
+  }
+  .profession-preview-heading {
+    gap: 12px;
+  }
+}

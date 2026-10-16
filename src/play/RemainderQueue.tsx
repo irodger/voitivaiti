@@ -1,5 +1,5 @@
 import { gameConfig } from '../config/game';
-import { availableWork,workOwner } from '../world/workLoop';
+import { availableWork, workOwner } from '../world/workLoop';
 import { DelegationResults } from './DelegationResults';
 import { PriorityImpact } from './PriorityImpact';
 import { characterName } from './shared';
@@ -7,26 +7,108 @@ import { useRemainderQueue } from './useRemainderQueue';
 import { WorkItemContext } from './WorkItemContext';
 import { WorkKindIcon } from './WorkKindIcon';
 
-export function RemainderQueue(){
- const {w,ch,t,chosen,setChosen,level,queue,selected}=useRemainderQueue();
+export function RemainderQueue() {
+  const { w, ch, t, chosen, setChosen, level, queue, selected } = useRemainderQueue();
 
- return <><DelegationResults/><div className="remainder-queue">{queue.filter(q=>q.status!=='done'&&(!!q.delegatedTo||availableWork(ch).includes(q.id))&&(!!q.delegatedTo||!w.tasks.some(task=>task.paused&&!task.rewarded&&task.characterId===ch.id&&task.workKind===q.id))).map(q=>{
-  const npc=w.characters.find(n=>n.id===workOwner[q.id]),delegated=!!q.delegatedTo;
-  const canTake=availableWork(ch).includes(q.id)&&(!selected||selected.id===q.id);
-  const takeReason=w.life!.reviewDue?'review':w.time>=gameConfig.clock.lastTaskStart?'late':null;
-  const helpReason=w.time+q.minutes>gameConfig.clock.workdayEnd?'time':null;
-  const choose=(explained:boolean)=>{w.dispatch({type:'priority',id:q.id,explained});setChosen(null);};
-  return <article className="remainder-card" data-kind={q.id} key={q.id}>
-   <h2><WorkKindIcon kind={q.id}/>{t('life.work.'+q.id)}</h2>
-   <small>{npc?characterName(npc,t):t('ui.team')} · {t('loop.age',{days:q.age??0})} · ~{t('ui.min',{value:q.minutes})}</small>
-   <WorkItemContext item={q}/><p>{t('life.work.'+q.id+'.body')}</p>
-   {delegated?<small>{t('queue.delegated')}</small>:<div className="remainder-actions">
-    {canTake&&!takeReason&&<button onClick={()=>selected?w.dispatch({type:'take-task'}):setChosen(chosen===q.id?null:q.id)}>{t(selected?'queue.start':'queue.choose')}</button>}
-    {q.status==='waiting'&&availableWork(ch).includes(q.id)&&!helpReason&&<button onClick={()=>w.dispatch({type:'help-work',id:q.id})}>{t('queue.action.'+q.id)}</button>}
-    {!helpReason&&level>=3&&npc&&npc.employed&&npc.id!==ch.id&&!queue.some(item=>item.delegatedTo===npc.id)&&<button onClick={()=>w.dispatch({type:'delegate-work',id:q.id,npcId:npc.id})}>{t('queue.delegate',{name:characterName(npc,t)})}</button>}
-   </div>}
-   {!delegated&&((canTake&&takeReason)||helpReason)&&<small className="queue-unavailable">{t('queue.reason.'+(canTake&&takeReason?takeReason:helpReason))}</small>}
-   {chosen===q.id&&!selected&&canTake&&!takeReason&&<div className="queue-agreement"><PriorityImpact chosen={q.id}/><p>{t('queue.agree')}</p><div className="remainder-actions"><button onClick={()=>choose(true)}>{t('life.explain')}</button><button onClick={()=>choose(false)}>{t('life.dismiss')}</button></div></div>}
-  </article>;
- })}</div></>;
+  return (
+    <>
+      <DelegationResults />
+      <div className="remainder-queue">
+        {queue
+          .filter(
+            (q) =>
+              q.status !== 'done' &&
+              (!!q.delegatedTo || availableWork(ch).includes(q.id)) &&
+              (!!q.delegatedTo ||
+                !w.tasks.some(
+                  (task) =>
+                    task.paused &&
+                    !task.rewarded &&
+                    task.characterId === ch.id &&
+                    task.workKind === q.id,
+                )),
+          )
+          .map((q) => {
+            const npc = w.characters.find((n) => n.id === workOwner[q.id]),
+              delegated = !!q.delegatedTo;
+            const canTake = availableWork(ch).includes(q.id) && (!selected || selected.id === q.id);
+            const takeReason = w.life!.reviewDue
+              ? 'review'
+              : w.time >= gameConfig.clock.lastTaskStart
+                ? 'late'
+                : null;
+            const helpReason = w.time + q.minutes > gameConfig.clock.workdayEnd ? 'time' : null;
+            const choose = (explained: boolean) => {
+              w.dispatch({ type: 'priority', id: q.id, explained });
+              setChosen(null);
+            };
+            return (
+              <article className="remainder-card" data-kind={q.id} key={q.id}>
+                <h2>
+                  <WorkKindIcon kind={q.id} />
+                  {t('life.work.' + q.id)}
+                </h2>
+                <small>
+                  {npc ? characterName(npc, t) : t('ui.team')} ·{' '}
+                  {t('loop.age', { days: q.age ?? 0 })} · ~{t('ui.min', { value: q.minutes })}
+                </small>
+                <WorkItemContext item={q} />
+                <p>{t('life.work.' + q.id + '.body')}</p>
+                {delegated ? (
+                  <small>{t('queue.delegated')}</small>
+                ) : (
+                  <div className="remainder-actions">
+                    {canTake && !takeReason && (
+                      <button
+                        onClick={() =>
+                          selected
+                            ? w.dispatch({ type: 'take-task' })
+                            : setChosen(chosen === q.id ? null : q.id)
+                        }
+                      >
+                        {t(selected ? 'queue.start' : 'queue.choose')}
+                      </button>
+                    )}
+                    {q.status === 'waiting' && availableWork(ch).includes(q.id) && !helpReason && (
+                      <button onClick={() => w.dispatch({ type: 'help-work', id: q.id })}>
+                        {t('queue.action.' + q.id)}
+                      </button>
+                    )}
+                    {!helpReason &&
+                      level >= 3 &&
+                      npc &&
+                      npc.employed &&
+                      npc.id !== ch.id &&
+                      !queue.some((item) => item.delegatedTo === npc.id) && (
+                        <button
+                          onClick={() =>
+                            w.dispatch({ type: 'delegate-work', id: q.id, npcId: npc.id })
+                          }
+                        >
+                          {t('queue.delegate', { name: characterName(npc, t) })}
+                        </button>
+                      )}
+                  </div>
+                )}
+                {!delegated && ((canTake && takeReason) || helpReason) && (
+                  <small className="queue-unavailable">
+                    {t('queue.reason.' + (canTake && takeReason ? takeReason : helpReason))}
+                  </small>
+                )}
+                {chosen === q.id && !selected && canTake && !takeReason && (
+                  <div className="queue-agreement">
+                    <PriorityImpact chosen={q.id} />
+                    <p>{t('queue.agree')}</p>
+                    <div className="remainder-actions">
+                      <button onClick={() => choose(true)}>{t('life.explain')}</button>
+                      <button onClick={() => choose(false)}>{t('life.dismiss')}</button>
+                    </div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
+      </div>
+    </>
+  );
 }

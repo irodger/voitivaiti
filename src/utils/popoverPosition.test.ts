@@ -6,11 +6,16 @@ describe('popover placement', () => {
   const viewport = { width: 600, height: 500 };
 
   it('prefers below and clamps the right edge', () => {
-    expect(popoverPosition({ ...anchor, left: 590 }, { width: 200, height: 100 }, viewport)).toEqual({ left: 388, top: 308 });
+    expect(
+      popoverPosition({ ...anchor, left: 590 }, { width: 200, height: 100 }, viewport),
+    ).toEqual({ left: 388, top: 308 });
   });
 
   it('flips above when the below clearance is exhausted', () => {
-    expect(popoverPosition(anchor, { width: 200, height: 190 }, viewport)).toEqual({ left: 100, top: 52 });
+    expect(popoverPosition(anchor, { width: 200, height: 190 }, viewport)).toEqual({
+      left: 100,
+      top: 52,
+    });
   });
 
   it('preserves different term and decision clearance at the boundary', () => {
@@ -19,6 +24,8 @@ describe('popover placement', () => {
   });
 
   it('retains the minimum inset even when an overlay exceeds the viewport', () => {
-    expect(popoverPosition({ left: -20, top: 5, bottom: 20 }, { width: 800, height: 600 }, viewport)).toEqual({ left: 12, top: 12 });
+    expect(
+      popoverPosition({ left: -20, top: 5, bottom: 20 }, { width: 800, height: 600 }, viewport),
+    ).toEqual({ left: 12, top: 12 });
   });
 });

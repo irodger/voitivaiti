@@ -1,15 +1,86 @@
 /* AppId remains stable; professional tools adapt the editor and evidence surface. */
-.world-game .laptop-display[data-app=ide]:not([data-editor-kind=code]){--app-accent:#7851b2;--app-tint:#f1eafb;--app-paper:#fffdfb;--app-line:#dfd3ed;--app-code:#292139;--app-code-ink:#f0eafa}
-.world-game .laptop-display[data-app=ide][data-editor-kind=design]{--app-accent:#8952bd;--app-tint:#f5eaff;--app-line:#e4cff4}
-.world-game .laptop-display[data-app=ide][data-editor-kind=planning]{--app-accent:#95672a;--app-tint:#fff5df;--app-line:#ead9b6}
-.world-game .laptop-display[data-app=ide][data-editor-kind=analysis]{--app-accent:#326f96;--app-tint:#eaf4fc;--app-line:#c6deed}
-.world-game .laptop-display[data-app=console]:not([data-editor-kind=code]){--app-accent:#6a5797;--app-tint:#f0eafa;--app-paper:#fffdfb;--app-line:#ddd3eb;--app-code:#292139;--app-code-ink:#f0eafa}
-.world-game .laptop-display .context-material-editor{background:var(--app-paper);color:var(--ink);border-color:var(--app-line)}
-.world-game .laptop-display .context-material-editor aside{background:var(--app-tint);border-color:var(--app-line)}
-.world-game .laptop-display .context-material-editor aside h3,.world-game .laptop-display .context-material-editor aside>div{color:var(--ink)}
-.world-game .laptop-display .context-material-editor aside .selected{background:var(--paper);color:var(--app-accent);box-shadow:0 2px 8px #30203f0a}
-.world-game .laptop-display .context-material-editor .context-toolbar{background:var(--app-tint);color:var(--app-accent);border-color:var(--app-line)}
-.context-material-editor .context-records,.context-insights .context-records{padding:12px}
-.context-insights{border:1px solid var(--app-line);border-radius:14px;overflow:hidden;background:var(--app-paper);color:var(--ink)}
-.context-insights .context-toolbar{background:var(--app-tint);color:var(--app-accent)}.context-insights .context-terminal-title{color:var(--ink);font:inherit;font-size:12px;border-color:var(--app-line)}
-@media(max-width:650px){.world-game .laptop-launcher>button>span{max-width:100%;overflow-wrap:anywhere;line-height:1.25}.world-game .laptop-launcher>button{min-height:52px}}
+.world-game .laptop-display[data-app='ide']:not([data-editor-kind='code']) {
+  --app-accent: #7851b2;
+  --app-tint: #f1eafb;
+  --app-paper: #fffdfb;
+  --app-line: #dfd3ed;
+  --app-code: #292139;
+  --app-code-ink: #f0eafa;
+}
+.world-game .laptop-display[data-app='ide'][data-editor-kind='design'] {
+  --app-accent: #8952bd;
+  --app-tint: #f5eaff;
+  --app-line: #e4cff4;
+}
+.world-game .laptop-display[data-app='ide'][data-editor-kind='planning'] {
+  --app-accent: #95672a;
+  --app-tint: #fff5df;
+  --app-line: #ead9b6;
+}
+.world-game .laptop-display[data-app='ide'][data-editor-kind='analysis'] {
+  --app-accent: #326f96;
+  --app-tint: #eaf4fc;
+  --app-line: #c6deed;
+}
+.world-game .laptop-display[data-app='console']:not([data-editor-kind='code']) {
+  --app-accent: #6a5797;
+  --app-tint: #f0eafa;
+  --app-paper: #fffdfb;
+  --app-line: #ddd3eb;
+  --app-code: #292139;
+  --app-code-ink: #f0eafa;
+}
+.world-game .laptop-display .context-material-editor {
+  background: var(--app-paper);
+  color: var(--ink);
+  border-color: var(--app-line);
+}
+.world-game .laptop-display .context-material-editor aside {
+  background: var(--app-tint);
+  border-color: var(--app-line);
+}
+.world-game .laptop-display .context-material-editor aside h3,
+.world-game .laptop-display .context-material-editor aside > div {
+  color: var(--ink);
+}
+.world-game .laptop-display .context-material-editor aside .selected {
+  background: var(--paper);
+  color: var(--app-accent);
+  box-shadow: 0 2px 8px #30203f0a;
+}
+.world-game .laptop-display .context-material-editor .context-toolbar {
+  background: var(--app-tint);
+  color: var(--app-accent);
+  border-color: var(--app-line);
+}
+.context-material-editor .context-records,
+.context-insights .context-records {
+  padding: 12px;
+}
+.context-insights {
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--app-paper);
+  color: var(--ink);
+}
+.context-insights .context-toolbar {
+  background: var(--app-tint);
+  color: var(--app-accent);
+}
+.context-insights .context-terminal-title {
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  border-color: var(--app-line);
+}
+@media (max-width: 650px) {
+  .world-game .laptop-launcher > button > span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+  .world-game .laptop-launcher > button {
+    min-height: 52px;
+  }
+}

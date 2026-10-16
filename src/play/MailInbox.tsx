@@ -1,4 +1,4 @@
-import { ArrowLeft,ArrowRight,Coffee,Mail,MailOpen,Search,Send,X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Coffee, Mail, MailOpen, Search, Send, X } from 'lucide-react';
 import '../content/companyMail';
 import '../content/mailStyle';
 import type { CompanyMailMessage } from '../world/companyMailTypes';
@@ -6,8 +6,226 @@ import './mailInbox.css';
 import './mailStyle.css';
 import { TermText } from './TermText';
 import { useMailInbox } from './useMailInbox';
-export function MailInbox({onWork}:{onWork:(mail:CompanyMailMessage)=>void}){
- const {resetFilters,w,t,setSelected,filter,setFilter,query,setQuery,messages,mail,unread,team,sender,thread,position,visibleThreads,select,target,problem}=useMailInbox();
+export function MailInbox({ onWork }: { onWork: (mail: CompanyMailMessage) => void }) {
+  const {
+    resetFilters,
+    w,
+    t,
+    setSelected,
+    filter,
+    setFilter,
+    query,
+    setQuery,
+    messages,
+    mail,
+    unread,
+    team,
+    sender,
+    thread,
+    position,
+    visibleThreads,
+    select,
+    target,
+    problem,
+  } = useMailInbox();
 
- return <section className="mail-inbox" data-selected={!!mail}><header><div><Mail size={25}/><div><h2>{t('mail.title')}</h2><p>{t('mail.hint')}</p></div></div><span className="mail-count">{t('mail.unread')}: {unread}</span></header>{messages.length>0&&<div className="mail-tools"><div className="mail-filters" role="group" aria-label={t('mailStyle.filter')}>{(['all','unread','sent'] as const).map(id=><button key={id} aria-pressed={filter===id} onClick={()=>setFilter(id)}>{t('mailStyle.'+id)}<span>{id==='all'?messages.length:id==='unread'?unread:messages.filter(m=>m.direction==='outgoing').length}</span></button>)}</div><label className="mail-search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={t('mailStyle.search')} aria-label={t('mailStyle.search')}/>{query&&<button onClick={()=>setQuery('')} aria-label={t('mailStyle.clear')}><X size={16}/></button>}</label></div>}{messages.length===0?<div className="mail-empty"><MailOpen size={35}/><h3>{t('mail.empty')}</h3><p>{t('mail.emptyHint')}</p></div>:<div className="mail-columns"><nav className="mail-list" aria-label={t('mail.inbox')}>{visibleThreads.map(th=><section className="mail-thread-group" key={th.id}><header><span>{t('mail.thread')}</span><small>{th.letters.length} · {t('mail.unread')}: {th.unread}</small></header>{[...th.visibleLetters].reverse().map(m=>{const unread=m.direction==='incoming'&&!m.readBy.includes(w.activeCharacterId);return <button key={m.id} data-mail-id={m.id} className={unread?'unread':''} aria-current={mail?.id===m.id?'true':undefined} onClick={()=>select(m)}><div>{m.direction==='outgoing'?<Send size={15}/>:unread?<Mail size={15}/>:<MailOpen size={15}/>}<b>{sender(m)}</b><small>{t('ui.day',{day:m.day})}</small></div><strong>{t(m.subjectKey)}</strong><span className="mail-preview">{m.bodyKeys[0]&&t(m.bodyKeys[0])}</span><small>{m.direction==='outgoing'?t('mail.sent'):unread?t('mail.unread'):t('mail.read')}</small></button>;})}</section>)}{!visibleThreads.length&&<div className="mail-no-results"><Search size={25}/><h3>{t('mailStyle.noResults')}</h3><p>{t('mailStyle.noResultsHint')}</p><button onClick={resetFilters}>{t('mailStyle.reset')}</button></div>}<p className="mail-office-note"><Coffee size={14}/>{t('mailStyle.joke')}</p></nav><article className="mail-reader">{mail?<><button className="mail-back" onClick={()=>setSelected(null)}><ArrowLeft size={16}/>{t('mail.inbox')}</button><nav className="mail-thread-nav" aria-label={t('mail.thread')}><button disabled={position<=0} onClick={()=>select(thread!.letters[position-1])}><ArrowLeft size={14}/>{t('mail.earlier')}</button><span>{position+1} / {thread?.letters.length}</span><button disabled={!thread||position>=thread.letters.length-1} onClick={()=>select(thread!.letters[position+1])}>{t('mail.later')}<ArrowRight size={14}/></button></nav><div className="mail-reader-heading"><small>{team(mail.senderTeamId)}</small><h3>{t(mail.subjectKey)}</h3><p><b>{sender(mail)}</b> · {t('ui.day',{day:mail.day})}</p>{mail.recipientTeamId&&<p>{t('mail.to')}: {team(mail.recipientTeamId)}</p>}</div><div className="mail-body">{mail.bodyKeys.map((key,i)=><p key={i}><TermText>{t(key)}</TermText></p>)}</div>{problem&&<aside className="mail-related"><small>{t('mail.related')}</small><b>{t(problem.titleKey)}</b><p>{t('mail.state.'+target!.state)}</p>{target?.previous?.rewarded&&target.previous.outcome&&<div className="mail-previous-result"><small>{t('mail.previousResult')}</small><p><TermText>{t(target.previous.outcome.summaryKey)}</TermText></p></div>}<button onClick={()=>onWork(mail)}>{t(target?.canOpen?'mail.resume':'mail.queue')}<ArrowRight size={16}/></button></aside>}<footer><span>{t('mail.thread')} · {messages.filter(m=>m.threadId===mail.threadId).length}</span>{mail.direction==='incoming'&&mail.readBy.includes(w.activeCharacterId)&&<button onClick={()=>w.dispatch({type:'mail-unread',id:mail.id})}>{t('mail.markUnread')}</button>}</footer></>:<div className="mail-empty"><MailOpen size={32}/><p>{t('mail.select')}</p></div>}</article></div>}</section>;
+  return (
+    <section className="mail-inbox" data-selected={!!mail}>
+      <header>
+        <div>
+          <Mail size={25} />
+          <div>
+            <h2>{t('mail.title')}</h2>
+            <p>{t('mail.hint')}</p>
+          </div>
+        </div>
+        <span className="mail-count">
+          {t('mail.unread')}: {unread}
+        </span>
+      </header>
+      {messages.length > 0 && (
+        <div className="mail-tools">
+          <div className="mail-filters" role="group" aria-label={t('mailStyle.filter')}>
+            {(['all', 'unread', 'sent'] as const).map((id) => (
+              <button key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>
+                {t('mailStyle.' + id)}
+                <span>
+                  {id === 'all'
+                    ? messages.length
+                    : id === 'unread'
+                      ? unread
+                      : messages.filter((m) => m.direction === 'outgoing').length}
+                </span>
+              </button>
+            ))}
+          </div>
+          <label className="mail-search">
+            <Search size={17} />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t('mailStyle.search')}
+              aria-label={t('mailStyle.search')}
+            />
+            {query && (
+              <button onClick={() => setQuery('')} aria-label={t('mailStyle.clear')}>
+                <X size={16} />
+              </button>
+            )}
+          </label>
+        </div>
+      )}
+      {messages.length === 0 ? (
+        <div className="mail-empty">
+          <MailOpen size={35} />
+          <h3>{t('mail.empty')}</h3>
+          <p>{t('mail.emptyHint')}</p>
+        </div>
+      ) : (
+        <div className="mail-columns">
+          <nav className="mail-list" aria-label={t('mail.inbox')}>
+            {visibleThreads.map((th) => (
+              <section className="mail-thread-group" key={th.id}>
+                <header>
+                  <span>{t('mail.thread')}</span>
+                  <small>
+                    {th.letters.length} · {t('mail.unread')}: {th.unread}
+                  </small>
+                </header>
+                {[...th.visibleLetters].reverse().map((m) => {
+                  const unread =
+                    m.direction === 'incoming' && !m.readBy.includes(w.activeCharacterId);
+                  return (
+                    <button
+                      key={m.id}
+                      data-mail-id={m.id}
+                      className={unread ? 'unread' : ''}
+                      aria-current={mail?.id === m.id ? 'true' : undefined}
+                      onClick={() => select(m)}
+                    >
+                      <div>
+                        {m.direction === 'outgoing' ? (
+                          <Send size={15} />
+                        ) : unread ? (
+                          <Mail size={15} />
+                        ) : (
+                          <MailOpen size={15} />
+                        )}
+                        <b>{sender(m)}</b>
+                        <small>{t('ui.day', { day: m.day })}</small>
+                      </div>
+                      <strong>{t(m.subjectKey)}</strong>
+                      <span className="mail-preview">{m.bodyKeys[0] && t(m.bodyKeys[0])}</span>
+                      <small>
+                        {m.direction === 'outgoing'
+                          ? t('mail.sent')
+                          : unread
+                            ? t('mail.unread')
+                            : t('mail.read')}
+                      </small>
+                    </button>
+                  );
+                })}
+              </section>
+            ))}
+            {!visibleThreads.length && (
+              <div className="mail-no-results">
+                <Search size={25} />
+                <h3>{t('mailStyle.noResults')}</h3>
+                <p>{t('mailStyle.noResultsHint')}</p>
+                <button onClick={resetFilters}>{t('mailStyle.reset')}</button>
+              </div>
+            )}
+            <p className="mail-office-note">
+              <Coffee size={14} />
+              {t('mailStyle.joke')}
+            </p>
+          </nav>
+          <article className="mail-reader">
+            {mail ? (
+              <>
+                <button className="mail-back" onClick={() => setSelected(null)}>
+                  <ArrowLeft size={16} />
+                  {t('mail.inbox')}
+                </button>
+                <nav className="mail-thread-nav" aria-label={t('mail.thread')}>
+                  <button
+                    disabled={position <= 0}
+                    onClick={() => select(thread!.letters[position - 1])}
+                  >
+                    <ArrowLeft size={14} />
+                    {t('mail.earlier')}
+                  </button>
+                  <span>
+                    {position + 1} / {thread?.letters.length}
+                  </span>
+                  <button
+                    disabled={!thread || position >= thread.letters.length - 1}
+                    onClick={() => select(thread!.letters[position + 1])}
+                  >
+                    {t('mail.later')}
+                    <ArrowRight size={14} />
+                  </button>
+                </nav>
+                <div className="mail-reader-heading">
+                  <small>{team(mail.senderTeamId)}</small>
+                  <h3>{t(mail.subjectKey)}</h3>
+                  <p>
+                    <b>{sender(mail)}</b> · {t('ui.day', { day: mail.day })}
+                  </p>
+                  {mail.recipientTeamId && (
+                    <p>
+                      {t('mail.to')}: {team(mail.recipientTeamId)}
+                    </p>
+                  )}
+                </div>
+                <div className="mail-body">
+                  {mail.bodyKeys.map((key, i) => (
+                    <p key={i}>
+                      <TermText>{t(key)}</TermText>
+                    </p>
+                  ))}
+                </div>
+                {problem && (
+                  <aside className="mail-related">
+                    <small>{t('mail.related')}</small>
+                    <b>{t(problem.titleKey)}</b>
+                    <p>{t('mail.state.' + target!.state)}</p>
+                    {target?.previous?.rewarded && target.previous.outcome && (
+                      <div className="mail-previous-result">
+                        <small>{t('mail.previousResult')}</small>
+                        <p>
+                          <TermText>{t(target.previous.outcome.summaryKey)}</TermText>
+                        </p>
+                      </div>
+                    )}
+                    <button onClick={() => onWork(mail)}>
+                      {t(target?.canOpen ? 'mail.resume' : 'mail.queue')}
+                      <ArrowRight size={16} />
+                    </button>
+                  </aside>
+                )}
+                <footer>
+                  <span>
+                    {t('mail.thread')} ·{' '}
+                    {messages.filter((m) => m.threadId === mail.threadId).length}
+                  </span>
+                  {mail.direction === 'incoming' && mail.readBy.includes(w.activeCharacterId) && (
+                    <button onClick={() => w.dispatch({ type: 'mail-unread', id: mail.id })}>
+                      {t('mail.markUnread')}
+                    </button>
+                  )}
+                </footer>
+              </>
+            ) : (
+              <div className="mail-empty">
+                <MailOpen size={32} />
+                <p>{t('mail.select')}</p>
+              </div>
+            )}
+          </article>
+        </div>
+      )}
+    </section>
+  );
 }

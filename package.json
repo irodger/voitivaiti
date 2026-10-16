@@ -9,7 +9,9 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
     "test:e2e": "npm run build && npm run test:e2e:run",
-    "test:e2e:run": "node --test --test-concurrency=1 e2e/professions.e2e.mjs"
+    "test:e2e:run": "node --test --test-concurrency=1 e2e/professions.e2e.mjs",
+    "format": "prettier --write src e2e build \"*.{js,mjs,ts,json,html}\" \".github/workflows/*.{yml,yaml}\" \".vscode/*.json\"",
+    "format:check": "prettier --check src e2e build \"*.{js,mjs,ts,json,html}\" \".github/workflows/*.{yml,yaml}\" \".vscode/*.json\""
   },
   "dependencies": {
     "framer-motion": "^12.15.0",
@@ -22,6 +24,7 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.5.0",
+    "prettier": "3.9.10",
     "puppeteer": "^25.13.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",

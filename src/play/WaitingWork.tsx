@@ -1,25 +1,89 @@
-import { CheckCircle2,Clock3 } from 'lucide-react';
+import { CheckCircle2, Clock3 } from 'lucide-react';
 import { CharacterAvatar } from '../components/CharacterAvatar';
 import { resolveTaskTemplate } from '../content/scenarios';
 import '../content/waitingWork';
-import { formatCalendarDate,formatTime } from '../utils/format';
+import { formatCalendarDate, formatTime } from '../utils/format';
 import { waitingTask } from '../world/waitingTask';
-import { Button,characterName } from './shared';
+import { Button, characterName } from './shared';
 import { useWaitingWork } from './useWaitingWork';
 import './waitingWork.css';
-export function WaitingWork(){
-const {w,t,locale}=useWaitingWork();
+export function WaitingWork() {
+  const { w, t, locale } = useWaitingWork();
 
- return <>{w.tasks.filter(task=>task.paused&&!task.rewarded&&task.characterId===w.activeCharacterId).map(task=>{
-  const state=waitingTask(w,task),npc=w.characters.find(ch=>ch.id===state.dependency?.npcId),Icon=state.ready?CheckCircle2:Clock3;
-  return <article className="waiting-work-card" data-ready={state.ready||undefined} key={task.id}>
-   <header><Icon size={18}/><b>{t(state.ready?'waitingWork.ready':'waitingWork.pending')}</b><small>{t('waitingWork.saved')}</small></header>
-   <h4>{t(resolveTaskTemplate(task).titleKey)}</h4>
-   {state.dependency&&<div className="waiting-work-person">{npc&&<CharacterAvatar id={npc.avatarId} size={36}/>}<div>{npc&&<b>{characterName(npc,t)}</b>}<small>{t('waitingWork.expected',{date:formatCalendarDate(state.dependency.dueDay,locale),time:formatTime(state.dependency.dueMinute)})}</small></div></div>}
-   {!state.ready&&<><p className="waiting-work-count"><Clock3 size={14}/>{t(state.remaining>0?(state.today?'waitingWork.minutes':'waitingWork.future'):'waitingWork.waiting',{minutes:state.remaining})}</p><p>{t('waitingWork.tip')}</p></>}
-   {!state.canResume&&<p>{t(w.phase==='office'?'waitingWork.busy':'waitingWork.offDuty')}</p>}
-   {state.canWait&&<><Button secondary onClick={()=>w.dispatch({type:'wait-for-reply',id:task.id})}>{t('waitingWork.wait',{minutes:state.waitMinutes})}</Button><p>{t('waitingWork.waitNote')}</p></>}
-   <Button secondary disabled={!state.canResume} onClick={()=>w.dispatch({type:'resume-task',id:task.id})}>{t('story.resume')}</Button>
-  </article>;
- })}</>;
+  return (
+    <>
+      {w.tasks
+        .filter((task) => task.paused && !task.rewarded && task.characterId === w.activeCharacterId)
+        .map((task) => {
+          const state = waitingTask(w, task),
+            npc = w.characters.find((ch) => ch.id === state.dependency?.npcId),
+            Icon = state.ready ? CheckCircle2 : Clock3;
+          return (
+            <article
+              className="waiting-work-card"
+              data-ready={state.ready || undefined}
+              key={task.id}
+            >
+              <header>
+                <Icon size={18} />
+                <b>{t(state.ready ? 'waitingWork.ready' : 'waitingWork.pending')}</b>
+                <small>{t('waitingWork.saved')}</small>
+              </header>
+              <h4>{t(resolveTaskTemplate(task).titleKey)}</h4>
+              {state.dependency && (
+                <div className="waiting-work-person">
+                  {npc && <CharacterAvatar id={npc.avatarId} size={36} />}
+                  <div>
+                    {npc && <b>{characterName(npc, t)}</b>}
+                    <small>
+                      {t('waitingWork.expected', {
+                        date: formatCalendarDate(state.dependency.dueDay, locale),
+                        time: formatTime(state.dependency.dueMinute),
+                      })}
+                    </small>
+                  </div>
+                </div>
+              )}
+              {!state.ready && (
+                <>
+                  <p className="waiting-work-count">
+                    <Clock3 size={14} />
+                    {t(
+                      state.remaining > 0
+                        ? state.today
+                          ? 'waitingWork.minutes'
+                          : 'waitingWork.future'
+                        : 'waitingWork.waiting',
+                      { minutes: state.remaining },
+                    )}
+                  </p>
+                  <p>{t('waitingWork.tip')}</p>
+                </>
+              )}
+              {!state.canResume && (
+                <p>{t(w.phase === 'office' ? 'waitingWork.busy' : 'waitingWork.offDuty')}</p>
+              )}
+              {state.canWait && (
+                <>
+                  <Button
+                    secondary
+                    onClick={() => w.dispatch({ type: 'wait-for-reply', id: task.id })}
+                  >
+                    {t('waitingWork.wait', { minutes: state.waitMinutes })}
+                  </Button>
+                  <p>{t('waitingWork.waitNote')}</p>
+                </>
+              )}
+              <Button
+                secondary
+                disabled={!state.canResume}
+                onClick={() => w.dispatch({ type: 'resume-task', id: task.id })}
+              >
+                {t('story.resume')}
+              </Button>
+            </article>
+          );
+        })}
+    </>
+  );
 }

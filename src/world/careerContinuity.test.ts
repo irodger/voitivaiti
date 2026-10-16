@@ -1,39 +1,275 @@
-import {finishPlaytestTask} from './playtestHelpers';
-import {describe,it,expect,vi} from 'vitest';
-vi.stubGlobal('localStorage',{getItem:()=>null,setItem:()=>{},removeItem:()=>{}});
-import {transition,type Action} from './engine';
-import {emptyCampaign,activeCharacter,activeTask,candidates,canPromote,makeSchedule} from './simulation';
-import {migrateLegacy} from './store';
-import {ensureLife,takeVacation,advanceCalendar} from './life';
-import {promotionChecks} from './mastery';
-import type {Campaign} from './types';
-function start(){const c=transition(emptyCampaign(),{type:'new',name:'Original',avatarId:'1',professionId:'frontend',seed:1427}).campaign;activeCharacter(c).firstDay!.onboardingCompleted=true;activeCharacter(c).firstDay!.currentOnboardingStep='done';activeCharacter(c).completedWork=['intro1','intro2'];return c;}
-function act(c:Campaign,a:Action){return transition(c,a).campaign;}
-function work(c:Campaign,category='interface',style='shared'){
- if(category==='payment'){c.activeTaskId=null;const due=c.company!.projects[0].problems.find(p=>p.category===category)!.paymentCausal?.pending[0]?.day;while(due&&c.life!.calendarDay<due)advanceCalendar(c);}
- const q=c.life!.queue.find(q=>q.id==='bug')!,p=c.company!.projects[0];q.status='selected';q.explained=true;q.projectId=p.id;q.problemId=p.problems.find(p=>p.category===category)!.id;
- c.phase='office';c.time=540;c.activeTaskId=null;c.schedule=makeSchedule(c);c.schedule[0].status='completed';c=act(c,{type:'take-task'});
- return finishPlaytestTask(c,style);
+import { finishPlaytestTask } from './playtestHelpers';
+import { describe, it, expect, vi } from 'vitest';
+vi.stubGlobal('localStorage', { getItem: () => null, setItem: () => {}, removeItem: () => {} });
+import { transition, type Action } from './engine';
+import {
+  emptyCampaign,
+  activeCharacter,
+  activeTask,
+  candidates,
+  canPromote,
+  makeSchedule,
+} from './simulation';
+import { migrateLegacy } from './store';
+import { ensureLife, takeVacation, advanceCalendar } from './life';
+import { promotionChecks } from './mastery';
+import type { Campaign } from './types';
+function start() {
+  const c = transition(emptyCampaign(), {
+    type: 'new',
+    name: 'Original',
+    avatarId: '1',
+    professionId: 'frontend',
+    seed: 1427,
+  }).campaign;
+  activeCharacter(c).firstDay!.onboardingCompleted = true;
+  activeCharacter(c).firstDay!.currentOnboardingStep = 'done';
+  activeCharacter(c).completedWork = ['intro1', 'intro2'];
+  return c;
 }
-describe('v0.15 persistent company and lived career',()=>{
- it('migrates a v0.14 save and keeps a canonical company runtime after reload',()=>{const old=JSON.parse(JSON.stringify(start()));delete old.companyRuntime;old.life.worldEvents=[{id:'audit',day:1,until:20}];old.life.queue[0].expectation={state:'overdue',dueDay:1};let c=migrateLegacy(old);expect(c.companyRuntime!.worldEvents).toEqual(old.life.worldEvents);c.life!.calendarDay=8;expect(c.companyRuntime!.calendarDay).toBe(8);c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.life!.calendarDay).toBe(8);expect(c.life!.queue[0].expectation!.state).toBe('overdue');});
- it('keeps company events, pending decisions, debt, consequences and old NPC while resetting personal state',()=>{
-  let c=work(start(),'interface','limited'),old=activeCharacter(c);old.careerNodeId='level-3';old.stats.money=999;old.stats.stress=70;old.home={owned:['chair'],eveningDay:1,paidDay:1,lastPay:10};old.discoveredTerms=['null'];
-  c.life!.worldEvents.push({id:'audit',day:1,until:40});c.life!.professionalDecisions!.push({decisionId:'pending',choiceId:'local',choiceLabelKey:'ui.work',profession:'frontend',characterId:old.id,companyId:c.company!.id,projectId:c.company!.projects[0].id,day:1,minute:600,npcId:'sergey',tags:['debt'],immediateEffects:[],delayedEffects:[{target:'techDebt',value:5}],dueDay:20,resolved:false,context:{stability:50,techDebt:20,culture:'fast'}});
-  c.schedule.forEach(e=>e.status='completed');c.phase='office';ensureLife(c);const companyId=c.company!.id,problemId=activeTask(c)!.problemId,queue=JSON.stringify(c.life!.queue),qa=candidates(c).find(n=>n.profession==='qa')!;c=act(c,{type:'hire',id:qa.id});
-  expect(c.company!.id).toBe(companyId);expect(c.life!.worldEvents[0].id).toBe('audit');expect(c.life!.professionalDecisions![0].resolved).toBe(false);expect(JSON.stringify(c.life!.queue)).toBe(queue);
-  expect(c.company!.projects[0].problems.find(p=>p.id===problemId)!.consequences!.some(x=>!x.resolved)).toBe(true);
-  expect(c.characters.find(n=>n.id===old.id)).toMatchObject({playable:false,employed:true,stats:{money:999,stress:70}});expect(c.characters.find(n=>n.id===old.id)!.personalLife).not.toHaveProperty('worldEvents');
-  expect(activeCharacter(c)).toMatchObject({profession:'qa',stats:{money:45000,stress:15},discoveredTerms:[],experience:[]});expect(activeCharacter(c).firstDay!.onboardingCompleted).toBe(false);expect(activeCharacter(c).home).toBeUndefined();
-  c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.life!.professionalDecisions![0].decisionId).toBe('pending');expect(c.company!.projects[0].problems.find(p=>p.id===problemId)!.workaround).toBe(true);
- });
- it('vacation restores the character and advances the world without creating mastery',()=>{const c=start(),ch=activeCharacter(c);c.phase='home';ch.stats.stress=90;const before=JSON.stringify(ch.experience);expect(takeVacation(c,14)).toBe(true);expect(ch.stats.stress).toBeLessThan(90);expect(c.life!.calendarDay).toBeGreaterThan(14);expect(JSON.stringify(ch.experience)).toBe(before);expect(canPromote(ch,'level-1')).toBe(false);});
- it('actual different work situations unlock Middle without a calendar wait',()=>{let c=work(start(),'interface');expect(canPromote(activeCharacter(c),'level-1')).toBe(false);c=work(c,'payment');expect(canPromote(activeCharacter(c),'level-1')).toBe(false);c=work(c,'performance');c=work(c,'interface');expect(c.life!.calendarDay).toBe(1);expect(canPromote(activeCharacter(c),'level-1')).toBe(true);c=act(c,{type:'promote',nodeId:'level-1'});expect(activeCharacter(c).careerNodeId).toBe('level-1');expect(promotionChecks(activeCharacter(c),'level-2').find(x=>x.key==='mastery.mentoringOrReview')!.met).toBe(false);});
- it('a perspective episode uses the same problem, preserves identity and resumes after reload',()=>{let c=work(start(),'payment'),original=activeCharacter(c).id,taskId=c.activeTaskId,problemId=activeTask(c)!.problemId;c=act(c,{type:'perspective-start'});c=act(c,{type:'perspective-action',id:'reproduce'});c=act(c,{type:'perspective-action',id:'environment'});c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.perspective!.stage).toBe(2);expect(c.perspective!.observations.some(k=>k.includes('lens.qa.payment'))).toBe(true);c=act(c,{type:'perspective-action',id:'regression'});c=act(c,{type:'perspective-action',id:'approve'});expect(c.activeCharacterId).toBe(original);expect(c.activeTaskId).toBe(taskId);expect(activeTask(c)!.problemId).toBe(problemId);expect(c.meta!.perspectives.qa).toContain('payment');const stats={...activeCharacter(c).stats};c=act(c,{type:'perspective-action',id:'approve'});expect(activeCharacter(c).stats).toEqual(stats);});
- it('a temporary workaround cannot be approved away by a perspective visit',()=>{let c=work(start(),'interface','limited');c=act(c,{type:'perspective-start'});for(const id of ['reproduce','environment','regression','approve'])c=act(c,{type:'perspective-action',id});expect(c.perspective!.choice).toBe('return');expect(c.company!.projects[0].problems.find(p=>p.id===activeTask(c)!.problemId)!.workaround).toBe(true);});
- it('mentoring in a real episode contributes to Senior readiness, calendar does not',()=>{let c=work(start(),'payment');activeCharacter(c).careerNodeId='level-1';c=work(c,'performance');expect(canPromote(activeCharacter(c),'level-2')).toBe(false);c=act(c,{type:'perspective-start'});for(const id of ['reproduce','environment','regression','mentor','teach-case','teach-limits'])c=act(c,{type:'perspective-action',id});expect(canPromote(activeCharacter(c),'level-2')).toBe(false);for(const category of ['interface','payment','performance','interface','payment'])c=work(c,category);expect(canPromote(activeCharacter(c),'level-2')).toBe(true);});
- it('cancelling an optional episode permits normal continuation without granting experience',()=>{let c=work(start());c=act(c,{type:'perspective-start'});c=act(c,{type:'perspective-action',id:'reproduce'});c=act(c,{type:'perspective-action',id:'close'});expect(c.perspective).toBeUndefined();expect(activeCharacter(c).experience!.some(e=>e.id.startsWith('perspective:'))).toBe(false);c=act(c,{type:'reward-close'});expect(c.phase).toBe('office');});
+function act(c: Campaign, a: Action) {
+  return transition(c, a).campaign;
+}
+function work(c: Campaign, category = 'interface', style = 'shared') {
+  if (category === 'payment') {
+    c.activeTaskId = null;
+    const due = c.company!.projects[0].problems.find((p) => p.category === category)!.paymentCausal
+      ?.pending[0]?.day;
+    while (due && c.life!.calendarDay < due) advanceCalendar(c);
+  }
+  const q = c.life!.queue.find((q) => q.id === 'bug')!,
+    p = c.company!.projects[0];
+  q.status = 'selected';
+  q.explained = true;
+  q.projectId = p.id;
+  q.problemId = p.problems.find((p) => p.category === category)!.id;
+  c.phase = 'office';
+  c.time = 540;
+  c.activeTaskId = null;
+  c.schedule = makeSchedule(c);
+  c.schedule[0].status = 'completed';
+  c = act(c, { type: 'take-task' });
+  return finishPlaytestTask(c, style);
+}
+describe('v0.15 persistent company and lived career', () => {
+  it('migrates a v0.14 save and keeps a canonical company runtime after reload', () => {
+    const old = JSON.parse(JSON.stringify(start()));
+    delete old.companyRuntime;
+    old.life.worldEvents = [{ id: 'audit', day: 1, until: 20 }];
+    old.life.queue[0].expectation = { state: 'overdue', dueDay: 1 };
+    let c = migrateLegacy(old);
+    expect(c.companyRuntime!.worldEvents).toEqual(old.life.worldEvents);
+    c.life!.calendarDay = 8;
+    expect(c.companyRuntime!.calendarDay).toBe(8);
+    c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+    expect(c.life!.calendarDay).toBe(8);
+    expect(c.life!.queue[0].expectation!.state).toBe('overdue');
+  });
+  it('keeps company events, pending decisions, debt, consequences and old NPC while resetting personal state', () => {
+    let c = work(start(), 'interface', 'limited'),
+      old = activeCharacter(c);
+    old.careerNodeId = 'level-3';
+    old.stats.money = 999;
+    old.stats.stress = 70;
+    old.home = { owned: ['chair'], eveningDay: 1, paidDay: 1, lastPay: 10 };
+    old.discoveredTerms = ['null'];
+    c.life!.worldEvents.push({ id: 'audit', day: 1, until: 40 });
+    c.life!.professionalDecisions!.push({
+      decisionId: 'pending',
+      choiceId: 'local',
+      choiceLabelKey: 'ui.work',
+      profession: 'frontend',
+      characterId: old.id,
+      companyId: c.company!.id,
+      projectId: c.company!.projects[0].id,
+      day: 1,
+      minute: 600,
+      npcId: 'sergey',
+      tags: ['debt'],
+      immediateEffects: [],
+      delayedEffects: [{ target: 'techDebt', value: 5 }],
+      dueDay: 20,
+      resolved: false,
+      context: { stability: 50, techDebt: 20, culture: 'fast' },
+    });
+    c.schedule.forEach((e) => (e.status = 'completed'));
+    c.phase = 'office';
+    ensureLife(c);
+    const companyId = c.company!.id,
+      problemId = activeTask(c)!.problemId,
+      queue = JSON.stringify(c.life!.queue),
+      qa = candidates(c).find((n) => n.profession === 'qa')!;
+    c = act(c, { type: 'hire', id: qa.id });
+    expect(c.company!.id).toBe(companyId);
+    expect(c.life!.worldEvents[0].id).toBe('audit');
+    expect(c.life!.professionalDecisions![0].resolved).toBe(false);
+    expect(JSON.stringify(c.life!.queue)).toBe(queue);
+    expect(
+      c
+        .company!.projects[0].problems.find((p) => p.id === problemId)!
+        .consequences!.some((x) => !x.resolved),
+    ).toBe(true);
+    expect(c.characters.find((n) => n.id === old.id)).toMatchObject({
+      playable: false,
+      employed: true,
+      stats: { money: 999, stress: 70 },
+    });
+    expect(c.characters.find((n) => n.id === old.id)!.personalLife).not.toHaveProperty(
+      'worldEvents',
+    );
+    expect(activeCharacter(c)).toMatchObject({
+      profession: 'qa',
+      stats: { money: 45000, stress: 15 },
+      discoveredTerms: [],
+      experience: [],
+    });
+    expect(activeCharacter(c).firstDay!.onboardingCompleted).toBe(false);
+    expect(activeCharacter(c).home).toBeUndefined();
+    c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+    expect(c.life!.professionalDecisions![0].decisionId).toBe('pending');
+    expect(c.company!.projects[0].problems.find((p) => p.id === problemId)!.workaround).toBe(true);
+  });
+  it('vacation restores the character and advances the world without creating mastery', () => {
+    const c = start(),
+      ch = activeCharacter(c);
+    c.phase = 'home';
+    ch.stats.stress = 90;
+    const before = JSON.stringify(ch.experience);
+    expect(takeVacation(c, 14)).toBe(true);
+    expect(ch.stats.stress).toBeLessThan(90);
+    expect(c.life!.calendarDay).toBeGreaterThan(14);
+    expect(JSON.stringify(ch.experience)).toBe(before);
+    expect(canPromote(ch, 'level-1')).toBe(false);
+  });
+  it('actual different work situations unlock Middle without a calendar wait', () => {
+    let c = work(start(), 'interface');
+    expect(canPromote(activeCharacter(c), 'level-1')).toBe(false);
+    c = work(c, 'payment');
+    expect(canPromote(activeCharacter(c), 'level-1')).toBe(false);
+    c = work(c, 'performance');
+    c = work(c, 'interface');
+    expect(c.life!.calendarDay).toBe(1);
+    expect(canPromote(activeCharacter(c), 'level-1')).toBe(true);
+    c = act(c, { type: 'promote', nodeId: 'level-1' });
+    expect(activeCharacter(c).careerNodeId).toBe('level-1');
+    expect(
+      promotionChecks(activeCharacter(c), 'level-2').find(
+        (x) => x.key === 'mastery.mentoringOrReview',
+      )!.met,
+    ).toBe(false);
+  });
+  it('a perspective episode uses the same problem, preserves identity and resumes after reload', () => {
+    let c = work(start(), 'payment'),
+      original = activeCharacter(c).id,
+      taskId = c.activeTaskId,
+      problemId = activeTask(c)!.problemId;
+    c = act(c, { type: 'perspective-start' });
+    c = act(c, { type: 'perspective-action', id: 'reproduce' });
+    c = act(c, { type: 'perspective-action', id: 'environment' });
+    c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+    expect(c.perspective!.stage).toBe(2);
+    expect(c.perspective!.observations.some((k) => k.includes('lens.qa.payment'))).toBe(true);
+    c = act(c, { type: 'perspective-action', id: 'regression' });
+    c = act(c, { type: 'perspective-action', id: 'approve' });
+    expect(c.activeCharacterId).toBe(original);
+    expect(c.activeTaskId).toBe(taskId);
+    expect(activeTask(c)!.problemId).toBe(problemId);
+    expect(c.meta!.perspectives.qa).toContain('payment');
+    const stats = { ...activeCharacter(c).stats };
+    c = act(c, { type: 'perspective-action', id: 'approve' });
+    expect(activeCharacter(c).stats).toEqual(stats);
+  });
+  it('a temporary workaround cannot be approved away by a perspective visit', () => {
+    let c = work(start(), 'interface', 'limited');
+    c = act(c, { type: 'perspective-start' });
+    for (const id of ['reproduce', 'environment', 'regression', 'approve'])
+      c = act(c, { type: 'perspective-action', id });
+    expect(c.perspective!.choice).toBe('return');
+    expect(
+      c.company!.projects[0].problems.find((p) => p.id === activeTask(c)!.problemId)!.workaround,
+    ).toBe(true);
+  });
+  it('mentoring in a real episode contributes to Senior readiness, calendar does not', () => {
+    let c = work(start(), 'payment');
+    activeCharacter(c).careerNodeId = 'level-1';
+    c = work(c, 'performance');
+    expect(canPromote(activeCharacter(c), 'level-2')).toBe(false);
+    c = act(c, { type: 'perspective-start' });
+    for (const id of [
+      'reproduce',
+      'environment',
+      'regression',
+      'mentor',
+      'teach-case',
+      'teach-limits',
+    ])
+      c = act(c, { type: 'perspective-action', id });
+    expect(canPromote(activeCharacter(c), 'level-2')).toBe(false);
+    for (const category of ['interface', 'payment', 'performance', 'interface', 'payment'])
+      c = work(c, category);
+    expect(canPromote(activeCharacter(c), 'level-2')).toBe(true);
+  });
+  it('cancelling an optional episode permits normal continuation without granting experience', () => {
+    let c = work(start());
+    c = act(c, { type: 'perspective-start' });
+    c = act(c, { type: 'perspective-action', id: 'reproduce' });
+    c = act(c, { type: 'perspective-action', id: 'close' });
+    expect(c.perspective).toBeUndefined();
+    expect(activeCharacter(c).experience!.some((e) => e.id.startsWith('perspective:'))).toBe(false);
+    c = act(c, { type: 'reward-close' });
+    expect(c.phase).toBe('office');
+  });
 });
-it('keeps mentoring unfinished until the colleague has reproduced and checked boundaries',()=>{let c=start();activeCharacter(c).careerNodeId='level-1';c=work(c,'payment');c=act(c,{type:'perspective-start'});for(const id of ['reproduce','environment','regression','mentor'])c=act(c,{type:'perspective-action',id});expect(c.perspective!.completed).toBe(false);expect(activeCharacter(c).experience!.some(e=>e.tags.includes('mentoring'))).toBe(false);c=migrateLegacy(JSON.parse(JSON.stringify(c)));expect(c.perspective!.stage).toBe(4);const before=c.time;c=act(c,{type:'perspective-action',id:'approve'});expect(c.perspective!.stage).toBe(4);for(const id of ['teach-case','teach-limits'])c=act(c,{type:'perspective-action',id});expect(c.perspective!.completed).toBe(true);expect(c.time-before).toBe(20);expect(activeCharacter(c).experience!.some(e=>e.tags.includes('mentoring'))).toBe(true);});
-it('mentoring a workaround retains its limitation instead of approving it away',()=>{let c=start();activeCharacter(c).careerNodeId='level-1';c=work(c,'interface','limited');c=act(c,{type:'perspective-start'});for(const id of ['reproduce','environment','regression','mentor','teach-case','teach-limits'])c=act(c,{type:'perspective-action',id});expect(c.perspective!.choice).toBe('return');const problem=c.company!.projects[0].problems.find(p=>p.id===activeTask(c)!.problemId)!;expect(problem.workaround).toBe(true);expect(problem.status).toBe('planned');expect(c.perspective!.observations.at(-1)).toBe('mastery.mentorLimited');});
-it('colleagues react to silence after just one completed assignment',()=>{let c=start();activeCharacter(c).completedWork=['first-day'];c.phase='home';for(let day=0;day<7;day++){c=act(c,{type:'sleep'});const sync=c.schedule.find(e=>e.type==='sync')!;c=act(c,{type:'event',id:sync.id,choiceId:'plan'});c=act(c,{type:'end-day'});}expect(c.life!.queue.some(q=>q.expectation?.state==='escalated')).toBe(true);expect(c.company!.history.some(e=>e.key==='expect.reaction.escalated')).toBe(true);expect(activeCharacter(c).completedWork).toEqual(['first-day']);});
+it('keeps mentoring unfinished until the colleague has reproduced and checked boundaries', () => {
+  let c = start();
+  activeCharacter(c).careerNodeId = 'level-1';
+  c = work(c, 'payment');
+  c = act(c, { type: 'perspective-start' });
+  for (const id of ['reproduce', 'environment', 'regression', 'mentor'])
+    c = act(c, { type: 'perspective-action', id });
+  expect(c.perspective!.completed).toBe(false);
+  expect(activeCharacter(c).experience!.some((e) => e.tags.includes('mentoring'))).toBe(false);
+  c = migrateLegacy(JSON.parse(JSON.stringify(c)));
+  expect(c.perspective!.stage).toBe(4);
+  const before = c.time;
+  c = act(c, { type: 'perspective-action', id: 'approve' });
+  expect(c.perspective!.stage).toBe(4);
+  for (const id of ['teach-case', 'teach-limits']) c = act(c, { type: 'perspective-action', id });
+  expect(c.perspective!.completed).toBe(true);
+  expect(c.time - before).toBe(20);
+  expect(activeCharacter(c).experience!.some((e) => e.tags.includes('mentoring'))).toBe(true);
+});
+it('mentoring a workaround retains its limitation instead of approving it away', () => {
+  let c = start();
+  activeCharacter(c).careerNodeId = 'level-1';
+  c = work(c, 'interface', 'limited');
+  c = act(c, { type: 'perspective-start' });
+  for (const id of [
+    'reproduce',
+    'environment',
+    'regression',
+    'mentor',
+    'teach-case',
+    'teach-limits',
+  ])
+    c = act(c, { type: 'perspective-action', id });
+  expect(c.perspective!.choice).toBe('return');
+  const problem = c.company!.projects[0].problems.find((p) => p.id === activeTask(c)!.problemId)!;
+  expect(problem.workaround).toBe(true);
+  expect(problem.status).toBe('planned');
+  expect(c.perspective!.observations.at(-1)).toBe('mastery.mentorLimited');
+});
+it('colleagues react to silence after just one completed assignment', () => {
+  let c = start();
+  activeCharacter(c).completedWork = ['first-day'];
+  c.phase = 'home';
+  for (let day = 0; day < 7; day++) {
+    c = act(c, { type: 'sleep' });
+    const sync = c.schedule.find((e) => e.type === 'sync')!;
+    c = act(c, { type: 'event', id: sync.id, choiceId: 'plan' });
+    c = act(c, { type: 'end-day' });
+  }
+  expect(c.life!.queue.some((q) => q.expectation?.state === 'escalated')).toBe(true);
+  expect(c.company!.history.some((e) => e.key === 'expect.reaction.escalated')).toBe(true);
+  expect(activeCharacter(c).completedWork).toEqual(['first-day']);
+});
