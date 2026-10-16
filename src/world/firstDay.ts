@@ -1,6 +1,7 @@
+import { activeCharacter } from './selectors';
 import type { Campaign,FirstDay } from './types';
 export function startFirstDay(c:Campaign):FirstDay{const npcs=c.characters.filter(n=>n.id!==c.activeCharacterId&&n.employed);return {onboardingStarted:true,onboardingCompleted:false,currentOnboardingStep:'arrival',introducedNpcIds:[],visited:[],hostId:npcs.find(n=>n.profession==='designer')?.id??npcs[0].id,leadId:npcs.find(n=>n.careerNodeId==='level-3')?.id??npcs.find(n=>n.id==='sergey')?.id??npcs[0].id};}
-export function advanceFirstDay(c:Campaign,a:{choice?:string;name?:string}){const ch=c.characters.find(n=>n.id===c.activeCharacterId)!,f=ch.firstDay;if(!f||f.onboardingCompleted||c.phase!=='office')return;
+export function advanceFirstDay(c:Campaign,a:{choice?:string;name?:string}){const ch=activeCharacter(c),f=ch.firstDay;if(!f||f.onboardingCompleted||c.phase!=='office')return;
  const step=f.currentOnboardingStep;
  if(step==='arrival'){const name=a.name?.trim().slice(0,24)||'Саша';ch.name=name;f.introducedNpcIds.push(f.hostId);f.currentOnboardingStep='order';}
  else if(step==='order'){if(a.choice!=='project'&&a.choice!=='team')return;f.currentOnboardingStep=a.choice;}

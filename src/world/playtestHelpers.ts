@@ -1,6 +1,7 @@
+import { activeCharacter, activeTask } from './selectors';
 import {resolveTaskTemplate} from '../content/scenarios';
 import {transition,type Action} from './engine';
-import {activeCharacter,activeTask,emptyCampaign} from './simulation';
+import { emptyCampaign } from './simulation';
 import {availableTechnicalActions} from './technicalActions';
 import type {Campaign} from './types';
 

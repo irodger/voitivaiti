@@ -1,3 +1,4 @@
+import { activeCharacter, findActiveCharacter } from './selectors';
 import {addWorkdays,isWorkday,nextWorkdayOnOrAfter} from './calendar';
 import {changeStress} from './stress';
 import type {Campaign} from './types';
@@ -7,7 +8,7 @@ import {availableWork,workOwner} from './workLoop';
 import '../content/expectations';
 
 export function ensureWorkExpectations(c:Campaign){
- const ch=c.characters.find(x=>x.id===c.activeCharacterId);
+ const ch=findActiveCharacter(c);
  if(!ch||!c.life||ch.completedWork.length<1||!ch.firstDay?.onboardingCompleted)return;
  for(const q of c.life.queue){
   if(q.status==='done'||!availableWork(ch).includes(q.id))continue;
@@ -41,7 +42,7 @@ export function communicateExpectation(c:Campaign,id:WorkKind,choice:'postpone'|
 export function expectationPressure(c:Campaign){
  ensureWorkExpectations(c);
  if(!isWorkday(c.life!.calendarDay))return;
- const l=c.life!,ch=c.characters.find(x=>x.id===c.activeCharacterId)!;
+ const l=c.life!,ch=activeCharacter(c);
  l.obligations??=[];
  for(const q of l.queue){
   const e=q.expectation;

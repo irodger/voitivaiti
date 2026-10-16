@@ -1,3 +1,4 @@
+import { activeCharacter } from './selectors';
 import {addWorkdays,nextWorkdayOnOrAfter,isWorkday} from './calendar';
 import type {Campaign} from './types';
 import type {WorkItem,WorkKind} from './lifeTypes';
@@ -10,7 +11,7 @@ export function ensureResponsibilities(c:Campaign){
  for(const job of c.company.delegations)if(job.status==='working')job.dueDay=nextWorkdayOnOrAfter(job.dueDay);
  for(const q of c.life.queue){
   if(q.status==='done'||!q.delegatedTo||c.company.delegations.some(d=>d.work===q.id&&d.npcId===q.delegatedTo&&d.status!=='checked'))continue;
-  const ch=c.characters.find(n=>n.id===c.activeCharacterId)!;
+  const ch=activeCharacter(c);
   const problem=c.company.projects.find(p=>p.id===q.projectId)?.problems.find(p=>p.id===q.problemId);
   // Old assignments resume as pending work; their old immediate mastery tags are not restored.
   c.company.delegations.push({id:`legacy-handoff:${ch.id}:${q.id}:${c.life.calendarDay}`,actorId:ch.id,npcId:q.delegatedTo,work:q.id,projectId:q.projectId,problemId:q.problemId,context:problem?.category??q.id,grade:0,profession:ch.profession,startedDay:c.life.calendarDay,dueDay:nextWorkdayOnOrAfter(Math.max(addWorkdays(c.life.calendarDay,1),q.promisedDay??0)),status:'working'});
@@ -23,7 +24,7 @@ export function handoffCandidate(c:Campaign,q:WorkItem,reserved:string[]=[]){
   !c.life!.queue.some(item=>item.delegatedTo===n.id));
 }
 export function assignResponsibility(c:Campaign,work:WorkKind,npcId:string){
- const q=c.life!.queue.find(q=>q.id===work),ch=c.characters.find(ch=>ch.id===c.activeCharacterId)!;
+ const q=c.life!.queue.find(q=>q.id===work),ch=activeCharacter(c);
  const npc=c.characters.find(n=>n.id===npcId&&n.id!==ch.id&&n.employed);
  if(!q||q.status==='done'||q.delegatedTo||!npc||c.life!.queue.some(item=>item.delegatedTo===npcId)||c.company!.delegations?.some(d=>d.npcId===npcId&&d.status==='working'))return false;
  const {project,problem}=ordinaryProblem(c,work);c.company!.delegations??=[];

@@ -1,3 +1,4 @@
+import { findActiveCharacter } from './selectors';
 import type {Campaign} from './types';
 import {availableWork} from './workLoop';
 import type {WorkKind} from './lifeTypes';
@@ -8,7 +9,7 @@ export type DayReport={companyId:string;characterId:string;day:number;calendarDa
 
 /** Capture actual end-of-day facts; never expose future follow-up text. */
 export function captureDayReport(c:Campaign):DayReport|undefined{
- const company=c.company,life=c.life,ch=c.characters.find(ch=>ch.id===c.activeCharacterId);if(!company||!life||!ch)return;
+ const company=c.company,life=c.life,ch=findActiveCharacter(c);if(!company||!life||!ch)return;
  const completed=new Set(ch.completedWork.slice(c.dayWorkStart));
  const tasks=c.tasks.filter(task=>task.characterId===ch.id&&(task.rewarded?completed.has(task.id):task.paused||task.id===c.activeTaskId));
  return {companyId:company.id,characterId:ch.id,day:company.currentDay,calendarDay:life.calendarDay,

@@ -1,6 +1,7 @@
+import { activeCharacter } from './selectors';
 import {gameConfig} from '../config/game';
 import type {Campaign} from './types';
-import {activeCharacter} from './simulation';
+
 import {professionById} from '../content/professions';
 import {financeState,applyPersonalEvent} from './personalFinance';
 export type ConferenceVisit={id:string;day:number;profession:string;mode:'online'|'visit'|'skip';topic:'evidence'|'handoff'};

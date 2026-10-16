@@ -1,5 +1,6 @@
+import { activeTask } from '../selectors';
 import {applyEffects} from '../effects';
-import {activeTask} from '../simulation';
+
 import {trackGameEvent} from '../analytics';
 import type {Campaign,Effect,Feedback,Step,Task} from '../types';
 import type {Action} from './types';

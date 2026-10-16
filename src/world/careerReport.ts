@@ -1,3 +1,4 @@
+import { activeCharacter } from './selectors';
 import type {Campaign} from './types';
 import type {Outcome} from './lifeTypes';
 import {resolveTaskTemplate} from '../content/scenarios';
@@ -8,7 +9,7 @@ export type CareerReport={version:1;reason:ReportLine[];timeline:ReportLine[];de
 
 // A frozen evidence selection: no thresholds change, and no inferred personality scores.
 export function buildCareerReport(c:Campaign,outcome:Outcome):CareerReport{
- const ch=c.characters.find(n=>n.id===c.activeCharacterId)!,l=c.life!,end=l.calendarDay;
+ const ch=activeCharacter(c),l=c.life!,end=l.calendarDay;
  const tasks=c.tasks.filter(t=>t.characterId===ch.id&&t.rewarded),experience=(ch.experience??[]).filter(e=>e.confirmed);
  const allEvents=c.company!.history;
  const ownEvents=allEvents.filter(e=>e.actorId===ch.id||e.values?.characterId===ch.id);

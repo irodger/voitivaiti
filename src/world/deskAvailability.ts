@@ -1,5 +1,6 @@
+import { activeCharacter, activeTask } from './selectors';
 import {gameConfig} from '../config/game';
-import {activeCharacter,activeTask} from './simulation';
+
 import {availableWork} from './workLoop';
 import type {Campaign} from './types';
 /** Shared explanation for a desk that cannot offer another task. */

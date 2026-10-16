@@ -1,6 +1,7 @@
+import { activeCharacter } from './selectors';
 import {gameConfig} from '../config/game';
 import type {Campaign} from './types';
-import {activeCharacter} from './simulation';
+
 export function workClock(c:Campaign){
  const remaining=Math.max(0,gameConfig.clock.workdayEnd-c.time),overtime=Math.max(0,c.time-gameConfig.clock.workdayEnd),duration=gameConfig.clock.workdayEnd-gameConfig.clock.workdayStart;
  const first=activeCharacter(c).firstDay;

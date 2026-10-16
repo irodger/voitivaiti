@@ -1,6 +1,7 @@
+import { activeTask } from './selectors';
 import {gameConfig} from '../config/game';
 import type {Campaign,Task} from './types';
-import {activeTask} from './simulation';
+
 /** Earlier stage replies cannot make the current dependency look ready. */
 export function waitingTask(c:Campaign,task:Task){
  const dependency=task.progress[task.currentStepId]?.dependency,current=activeTask(c);

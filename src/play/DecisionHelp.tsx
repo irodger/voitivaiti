@@ -1,7 +1,9 @@
-import {useEffect,useId,useLayoutEffect,useRef,useState} from 'react';
+import { usePopoverDismissal } from '../hooks/usePopoverDismissal';
+import { popoverPosition } from '../utils/popoverPosition';
+import {useId,useLayoutEffect,useRef,useState} from 'react';
 import {useI18n} from '../content/localization';
 export function DecisionHelp(){const {t}=useI18n(),[open,setOpen]=useState(false),id=useId(),trigger=useRef<HTMLButtonElement>(null),popup=useRef<HTMLDivElement>(null);
- useLayoutEffect(()=>{if(!open)return;const node=popup.current!;node.showPopover();const r=trigger.current!.getBoundingClientRect(),height=node.offsetHeight;node.style.left=Math.max(12,Math.min(r.left,innerWidth-node.offsetWidth-12))+'px';node.style.top=Math.max(12,r.bottom+height+12<innerHeight?r.bottom+8:r.top-height-8)+'px';return()=>{if(node.matches(':popover-open'))node.hidePopover();};},[open]);
- useEffect(()=>{if(!open)return;const outside=(e:PointerEvent)=>{if(!trigger.current?.contains(e.target as Node)&&!popup.current?.contains(e.target as Node))setOpen(false);};const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();setOpen(false);trigger.current?.focus();}};const close=()=>setOpen(false);document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape,true);window.addEventListener('resize',close);document.addEventListener('scroll',close,true);return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape,true);window.removeEventListener('resize',close);document.removeEventListener('scroll',close,true);};},[open]);
+ useLayoutEffect(()=>{if(!open)return;const node=popup.current!;node.showPopover();const r=trigger.current!.getBoundingClientRect(),height=node.offsetHeight;const position=popoverPosition(r,{width:node.offsetWidth,height},{width:innerWidth,height:innerHeight},12);node.style.left=position.left+'px';node.style.top=position.top+'px';return()=>{if(node.matches(':popover-open'))node.hidePopover();};},[open]);
+ usePopoverDismissal({open,setOpen,anchor:trigger,popup,closeOnScroll:true,stopImmediateEscape:true});
  return <><button className="decision-help" ref={trigger} aria-expanded={open} aria-controls={id} onClick={()=>setOpen(v=>!v)}>{t('decision.help')}</button>{open&&<div className="decision-help-popover" ref={popup} id={id} popover="manual" role="note">{t('decision.hint')}</div>}</>;
 }

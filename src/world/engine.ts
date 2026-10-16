@@ -1,3 +1,4 @@
+import { activeCharacter, activeTask } from './selectors';
 import {newRunTiming} from './runTiming';
 import { createActionServices } from './actions/services';
 import { attendConference } from './conferences';
@@ -7,7 +8,7 @@ import { startFirstDay, advanceFirstDay } from './firstDay';
 import { glossary } from '../content/world';
 import { ensureLife, initLife, finishLife } from './life';
 import type { Campaign, Feedback } from './types';
-import { activeCharacter, activeTask, emptyCampaign, generateWorld, history, makeCharacter, makeSchedule } from './simulation';
+import { emptyCampaign, generateWorld, history, makeCharacter, makeSchedule } from './simulation';
 import { professionById } from '../content/professions';
 
 export type { Action } from './actions/types';

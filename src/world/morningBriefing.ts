@@ -1,9 +1,10 @@
+import { findActiveCharacter } from './selectors';
 import type {Campaign} from './types';
 import {causalContext} from './causalRouting';
 import {availableWork} from './workLoop';
 
 export function morningBriefing(c:Campaign){
- const report=c.life?.dayReport,ch=c.characters.find(ch=>ch.id===c.activeCharacterId);
+ const report=c.life?.dayReport,ch=findActiveCharacter(c);
  if(!report||!ch||report.companyId!==c.company?.id||report.characterId!==ch.id||report.calendarDay>=c.life!.calendarDay||c.phase!=='office')return;
  const items:{id:string;kind:'ready'|'waiting'|'carried'|'returned'|'open';taskId:string;titleKey:string;factKey?:string}[]=[];
  const seen=new Set<string>();

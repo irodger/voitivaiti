@@ -1,3 +1,4 @@
+import { activeCharacter } from './selectors';
 import type {Campaign,Character} from './types';
 export type FinanceRecord={id:string;day:number;kind:string;amount:number;bill:number};
 export type PersonalFinance={started:number;settled:number;nextEvent:number;nextBills:number;owed:number;inheritance:boolean;records:FinanceRecord[]};
@@ -15,7 +16,7 @@ export function applyPersonalEvent(ch:Character,f:PersonalFinance,day:number,kin
 }
 /** Called once per settled calendar day, including vacation/montage days. */
 export function settlePersonalFinance(c:Campaign){
- const ch=c.characters.find(p=>p.id===c.activeCharacterId)!,day=c.life!.calendarDay,f=financeState(ch,day);
+ const ch=activeCharacter(c),day=c.life!.calendarDay,f=financeState(ch,day);
  if(f.settled>=day)return {income:0,expenses:0};f.settled=day;
  let income=0,expenses=0;
  const apply=(kind:string,amount:number)=>{const actual=applyPersonalEvent(ch,f,day,kind,amount);if(actual>0)income+=actual;else expenses-=actual;};

@@ -1,5 +1,6 @@
+import { activeTask } from './selectors';
 import type {Campaign,Task} from './types';
-import {activeTask} from './simulation';
+
 import {deskAvailability} from './deskAvailability';
 import {resolveTaskTemplate} from '../content/scenarios';
 function pendingReply(task?:Task){

@@ -1,3 +1,4 @@
+import { activeCharacter } from './selectors';
 import {setWorkDeadline} from './expectations';
 import {addWorkdays} from './calendar';
 import type {Campaign} from './types';
@@ -8,7 +9,7 @@ import {availableWork,workOwner} from './workLoop';
 export type VacationArrangement='handoff'|'postpone'|'ignore'|{kind:'handoff';npcId:string};
 export type VacationArrangements=Partial<Record<WorkKind,VacationArrangement>>;
 export function absenceObligations(c:Campaign){
- const ch=c.characters.find(n=>n.id===c.activeCharacterId)!;
+ const ch=activeCharacter(c);
  return c.life!.queue.filter(q=>q.status!=='done'&&(q.expectation||q.promisedDay!==undefined||availableWork(ch).includes(q.id)));
 }
 export function arrangeAbsence(c:Campaign,returnDay:number,arrangements:VacationArrangements={}){
@@ -26,7 +27,7 @@ export function arrangeAbsence(c:Campaign,returnDay:number,arrangements:Vacation
   unagreed.push(q.id);summary.push('absence.waited.'+q.id);
   if(choice!=='ignore')summary.push('absence.notAgreed');
   c.company!.history.push({id:`absence:${c.activeCharacterId}:${c.life!.calendarDay}:${q.id}`,day:c.life!.calendarDay,kind:'absence-unagreed',key:'absence.waited.'+q.id,actorId:c.activeCharacterId,projectId:q.projectId,problemId:q.problemId,values:{work:q.id,characterId:c.activeCharacterId}});
-  const ch=c.characters.find(n=>n.id===c.activeCharacterId)!,r=ch.relationships.find(r=>r.characterId===workOwner[q.id]);if(r)r.trust=Math.max(0,r.trust-2);
+  const ch=activeCharacter(c),r=ch.relationships.find(r=>r.characterId===workOwner[q.id]);if(r)r.trust=Math.max(0,r.trust-2);
  }
  if(unagreed.length){
   c.life!.decisions.communicationFailures++;c.life!.decisionHistory.push({day:c.life!.calendarDay,kind:'communicationFailures'});

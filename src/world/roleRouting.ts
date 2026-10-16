@@ -1,3 +1,4 @@
+import { activeCharacter } from './selectors';
 import {causalContext} from './causalRouting';
 import {paymentEncounterAvailable} from './paymentCausal';
 import type {Campaign} from './types';
@@ -6,7 +7,7 @@ import {hasRoleLens,supportedLensCategory} from '../content/roleLenses';
 
 // The queue selects a world problem. A lens controls the interaction with it.
 export function ordinaryProblem(c:Campaign,kind:WorkKind='bug'){
- const ch=c.characters.find(x=>x.id===c.activeCharacterId)!;
+ const ch=activeCharacter(c);
  const project=c.company!.projects.find(p=>ch.currentProjectIds.includes(p.id))??c.company!.projects[0];
  const inherited=project.problems.find(p=>p.paymentChain?.stage==='fixed'&&p.paymentChain.fixedBy!==ch.id&&(!p.paymentCausal||p.paymentCausal.phase==='stable'));
  if(inherited)return {project,problem:inherited};
@@ -25,7 +26,7 @@ export function ordinaryProblem(c:Campaign,kind:WorkKind='bug'){
  return {project,problem:candidates[0]};
 }
 export function ordinaryTemplateId(c:Campaign,kind:WorkKind){
- const ch=c.characters.find(x=>x.id===c.activeCharacterId)!;
+ const ch=activeCharacter(c);
  const problem=ordinaryProblem(c,kind).problem;
  return hasRoleLens(ch.profession)&&problem?`lens.${ch.profession}.${problem.category}`:undefined;
 }

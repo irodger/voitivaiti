@@ -1,9 +1,10 @@
+import { activeCharacter } from './selectors';
 import {resolveTaskTemplate} from '../content/scenarios';
 import {professionById} from '../content/professions';
 import type {Campaign,Character,Task,Experience} from './types';
 export const rankOf=(ch:Character)=>Math.max(0,professionById[ch.profession].careers.findIndex(n=>n.id===ch.careerNodeId));
 export function rememberExperience(c:Campaign,tags:string[],id:string,titleKey:string,task?:Task,proof?:Partial<Experience>){
- const ch=c.characters.find(ch=>ch.id===c.activeCharacterId)!;ch.experience??=[];if(ch.experience.some(e=>e.id===id))return;
+ const ch=activeCharacter(c);ch.experience??=[];if(ch.experience.some(e=>e.id===id))return;
  const tpl=task&&resolveTaskTemplate(task);
  ch.experience.push({id,titleKey,tags,taskId:task?.id,problemId:task?.problemId,projectId:task?.projectId,profession:ch.profession,grade:rankOf(ch),day:c.life!.calendarDay,context:tpl?.category,resultKind:task?.outcome?.kind??'checked',confirmed:!!task?.rewarded,...proof});
 }
