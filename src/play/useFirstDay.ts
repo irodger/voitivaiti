@@ -1,3 +1,4 @@
+import { useAppActions } from '../hooks/useAppActions';
 import { useState } from 'react';
 import { useI18n } from '../content/localization';
 import { professionById } from '../content/professions';
@@ -5,7 +6,8 @@ import { templateById } from '../content/scenarios';
 import { lastPlayerName } from '../world/playerName';
 import { activeCharacter, plannedTemplateId } from '../world/simulation';
 import { useWorld } from '../world/store';
-export function useFirstDay(onStartWork?: () => void) {
+export function useFirstDay() {
+  const { openLaptop: onStartWork } = useAppActions();
   const w = useWorld();
   const ch = activeCharacter(w);
   const f = ch.firstDay!;

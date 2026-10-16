@@ -79,8 +79,8 @@ text('skillMap.sections', 'Разделы навыков', 'Skill sections');
 text('skillMap.jumpProfile', 'Профиль', 'Profile');
 text('skillMap.jumpRoad', 'План роста', 'Growth plan');
 text('skillMap.jumpTerms', 'Словарь', 'Glossary');
-export function Skills({ onWork }: { onWork?: () => void } = {}) {
-  const { ch, t, role, node, scale, terms, jump } = useSkills();
+export function Skills() {
+  const { onWork, ch, t, role, node, scale, terms, jump } = useSkills();
 
   return (
     <section className="collection-view world-collection skill-map">

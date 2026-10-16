@@ -60,7 +60,7 @@ it('the office prioritizes a pending morning meeting over available work', () =>
   ch.firstDay!.onboardingCompleted = true;
   ch.completedWork = ['one', 'two'];
   campaign.schedule = [{ id: 'sync', type: 'sync', key: 'meeting', status: 'pending' }];
-  const html = renderToStaticMarkup(<OfficeBrief openLaptop={() => {}} openTeam={() => {}} />);
+  const html = renderToStaticMarkup(<OfficeBrief />);
   expect(html).toContain('studio.sync');
   expect(html).toContain('studio.syncHint');
   expect(html).toContain('studio.team');

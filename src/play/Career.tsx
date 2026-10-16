@@ -9,7 +9,7 @@ import './careerUx.css';
 import { Button, Modal } from './shared';
 import { useCareer } from './useCareer';
 
-export function Career({ onWork }: { onWork?: () => void } = {}) {
+export function Career() {
   const {
     hireCandidate,
     continueHiring,
@@ -34,7 +34,7 @@ export function Career({ onWork }: { onWork?: () => void } = {}) {
       </div>
       <div className="career-next-grid">
         {node.next.map((id) => (
-          <PromotionCard onWork={onWork} key={id} nodeId={id} />
+          <PromotionCard key={id} nodeId={id} />
         ))}
         <article className="world-card hire-card">
           <p className="eyebrow">{t('ui.handoff')}</p>
@@ -46,7 +46,7 @@ export function Career({ onWork }: { onWork?: () => void } = {}) {
           {!canHire && <small>{t('ui.hireBlocked')}</small>}
         </article>
       </div>
-      <CareerMap onWork={onWork} />
+      <CareerMap />
       <CareerPacing />
       {victory && <CareerVictory onClose={() => setVictory(false)} onContinue={continueHiring} />}
       {hiring && (

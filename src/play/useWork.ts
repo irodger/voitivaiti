@@ -1,3 +1,4 @@
+import { useAppActions } from '../hooks/useAppActions';
 import { useRef, useState } from 'react';
 import { useI18n } from '../content/localization';
 import { taskContext } from '../utils/taskContext';
@@ -6,6 +7,7 @@ import { activeCharacter, activeTask } from '../world/simulation';
 import { useWorld } from '../world/store';
 import type { DayEvent } from '../world/types';
 export function useWork() {
+  const { openLaptop } = useAppActions();
   const w = useWorld();
   const ch = activeCharacter(w);
   const task = activeTask(w);
@@ -31,6 +33,7 @@ export function useWork() {
     setEventId(null);
   };
   return {
+    openLaptop,
     chooseOption,
     w,
     ch,

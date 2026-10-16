@@ -3,14 +3,9 @@ import { CharacterAvatar } from '../components/CharacterAvatar';
 import '../content/workspaceStudio';
 import { useOfficeBrief } from './useOfficeBrief';
 import './workspaceStudio.css';
-export function OfficeBrief({
-  openLaptop,
-  openTeam,
-}: {
-  openLaptop: () => void;
-  openTeam?: () => void;
-}) {
-  const { w, t, ch, state, task, current, done, reason, showCurrent } = useOfficeBrief();
+export function OfficeBrief() {
+  const { openLaptop, openTeam, w, t, ch, state, task, current, done, reason, showCurrent } =
+    useOfficeBrief();
 
   return (
     <section className="office-brief">
@@ -67,12 +62,10 @@ export function OfficeBrief({
           {t(showCurrent ? 'studio.open' : 'studio.queue')}
           <ArrowRight size={17} />
         </button>
-        {openTeam && (
-          <button className="world-secondary" onClick={openTeam}>
-            <Users size={17} />
-            {t('studio.team')}
-          </button>
-        )}
+        <button className="world-secondary" onClick={openTeam}>
+          <Users size={17} />
+          {t('studio.team')}
+        </button>
       </div>
       <footer>
         <div aria-hidden="true">

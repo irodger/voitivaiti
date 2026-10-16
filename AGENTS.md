@@ -30,6 +30,8 @@ CLI QA browser access is provided by the local v2 plugin in .opencode/plugins/qa
 
 - Keep shared pure projections/search/task calculations out of component controllers. Put reusable non-React calculations in focused utilities or domain presentation models with explicit inputs; reserve shared hooks for state and browser lifecycle. Reuse existing modules before adding a new abstraction.
 
+- Shared application navigation/settings/laptop visibility belong in the transient Zustand app/uiStore, consumed through selectors and shared useAppActions inside component controllers. Keep campaign persistence in world/store and component-local drafts/selections local. Do not persist UI navigation or pass global navigation actions through intermediate screens. Props remain appropriate for presentation inputs and local owner callbacks.
+
 ## Formatting
 
 - Run `npm run format` after editing source or tests, and `npm run format:check` before completion. Use the project Prettier configuration; keep formatting changes separate from behavior changes. CI checks formatting before building/testing.

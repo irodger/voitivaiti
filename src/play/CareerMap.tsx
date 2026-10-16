@@ -17,8 +17,8 @@ import { PromotionRequirements } from './PromotionRequirements';
 import { Modal } from './shared';
 import { useCareerMap } from './useCareerMap';
 const icons = [Sprout, Compass, ShieldCheck, Users, Crown, Network];
-export function CareerMap({ onWork }: { onWork?: () => void } = {}) {
-  const { ch, role, t, setSelected, columns, points, chosen, edges } = useCareerMap();
+export function CareerMap() {
+  const { onWork, ch, role, t, setSelected, columns, points, chosen, edges } = useCareerMap();
 
   return (
     <section className="career-map" aria-label={t('careerMap.title')}>
@@ -134,14 +134,10 @@ export function CareerMap({ onWork }: { onWork?: () => void } = {}) {
               {chosen.state === 'future' && <p>{t('promotionClarity.future')}</p>}
               <PromotionRequirements
                 nodeId={chosen.node.id}
-                onWork={
-                  onWork
-                    ? () => {
-                        setSelected(null);
-                        onWork();
-                      }
-                    : undefined
-                }
+                onWork={() => {
+                  setSelected(null);
+                  onWork();
+                }}
               />
             </>
           ) : (

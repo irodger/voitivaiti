@@ -1,3 +1,6 @@
+import { useShallow } from 'zustand/react/shallow';
+import { useAppUI } from './uiStore';
+import { useAppActions } from '../hooks/useAppActions';
 import {
   BriefcaseBusiness,
   Building2,
@@ -6,14 +9,13 @@ import {
   House,
   UsersRound,
 } from 'lucide-react';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useI18n, usePreferences } from '../content/localization';
 import { useRunTiming } from '../hooks/useRunTiming';
 import { useViewEntrance } from '../hooks/useViewEntrance';
 import { activeCharacter } from '../world/simulation';
 import { useWorld } from '../world/store';
 import { useAmbientAudio } from './useAmbientAudio';
-export type Tab = 'work' | 'team' | 'skills' | 'home' | 'career' | 'company';
 const tabs = [
   { id: 'work', Icon: BriefcaseBusiness },
   { id: 'team', Icon: UsersRound },
@@ -26,14 +28,13 @@ export function useApp() {
   useRunTiming();
   useAmbientAudio();
   const w = useWorld();
-  const { t, locale, contentMode } = useI18n();
+  const { t, locale } = useI18n();
   const prefs = usePreferences();
   const ch = w.company ? activeCharacter(w) : undefined;
-  const [tab, setTab] = useState<Tab>('work');
-  const [settings, setSettings] = useState(false);
-  const [confirm, setConfirm] = useState(false);
-  const [laptop, setLaptop] = useState(false);
-  const [toast, setToast] = useState('');
+  const { tab, settings, laptop, toast } = useAppUI(
+    useShallow((s) => ({ tab: s.tab, settings: s.settings, laptop: s.laptop, toast: s.toast })),
+  );
+  const { setTab, setLaptop, setToast, closeLaptop, openFocus } = useAppActions();
   const firstDay = !!ch?.firstDay && !ch.firstDay.onboardingCompleted;
   const firstScene = firstDay && ch!.firstDay!.currentOnboardingStep !== 'work';
   const onboarding = w.phase === 'start' || w.phase === 'create';
@@ -52,11 +53,6 @@ export function useApp() {
       window.scrollTo({ top: 0, behavior: 'instant' });
   }, [tab]);
   useViewEntrance(pageRef, onboarding ? 'onboarding' : tab);
-  const closeLaptop = useCallback(() => {
-    if (useWorld.getState().phase === 'reward')
-      useWorld.getState().dispatch({ type: 'reward-close' });
-    setLaptop(false);
-  }, []);
   useEffect(() => {
     if (w.phase === 'home') {
       setTab('home');
@@ -78,41 +74,6 @@ export function useApp() {
     document.documentElement.lang = locale;
     document.title = t('ui.brand');
   }, [locale]);
-  const toggleMode = () => {
-    prefs.toggleMode();
-    setToast(contentMode === 'clean' ? 'ui.adultOn' : 'ui.adultOff');
-  };
-  const openSettings = () => setSettings(true);
-  const closeSettings = () => {
-    setSettings(false);
-    setConfirm(false);
-  };
-  const resetGame = () => {
-    w.reset();
-    setConfirm(false);
-    setSettings(false);
-    setLaptop(false);
-    setTab('work');
-  };
-  const openLaptop = () => setLaptop(true);
-  const openTeam = () => setTab('team');
-  const openCompany = () => setTab('company');
-  const openWork = () => setTab('work');
-  const openCareerWork = () => setTab(w.phase === 'home' ? 'home' : 'work');
-  const openTeamWork = () => {
-    setTab('work');
-    setLaptop(true);
-  };
-  const openFocus = (target: import('../play/currentFocus').FocusTarget) => {
-    setTab(target === 'home' ? 'home' : 'work');
-    if (target === 'task') setLaptop(true);
-    else
-      requestAnimationFrame(() =>
-        document
-          .querySelector('.world-task-panel,.first-day,.home-view')
-          ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }),
-      );
-  };
   const visibleTabs = tabs.filter(
     ({ id }) =>
       !firstDay ||
@@ -138,15 +99,6 @@ export function useApp() {
         event.status === 'pending' && (event.type === 'incident' || event.type === 'dialogue'),
     );
   return {
-    openSettings,
-    closeSettings,
-    resetGame,
-    openLaptop,
-    openTeam,
-    openCompany,
-    openWork,
-    openCareerWork,
-    openTeamWork,
     openFocus,
     visibleTabs,
     feedback,
@@ -159,9 +111,6 @@ export function useApp() {
     tab,
     setTab,
     settings,
-    setSettings,
-    confirm,
-    setConfirm,
     laptop,
     setLaptop,
     toast,
@@ -170,6 +119,5 @@ export function useApp() {
     onboarding,
     pageRef,
     closeLaptop,
-    toggleMode,
   };
 }

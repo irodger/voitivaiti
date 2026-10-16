@@ -4,10 +4,10 @@ import { ProfessionIcon } from '../components/ProfessionIcon';
 import { professionById } from '../content/professions';
 import { VersionPanel } from '../play/VersionPanel';
 import { formatCalendarDate, formatTime } from '../utils/format';
-import { useAppHeader, type AppHeaderProps } from './useAppHeader';
+import { useAppHeader } from './useAppHeader';
 
-export function AppHeader({ onboarding, onToggleMode: toggleMode, onSettings }: AppHeaderProps) {
-  const { w, t, locale, contentMode, ch } = useAppHeader();
+export function AppHeader() {
+  const { onboarding, toggleMode, openSettings, w, t, locale, contentMode, ch } = useAppHeader();
 
   return (
     <header className="app-header">
@@ -70,7 +70,7 @@ export function AppHeader({ onboarding, onToggleMode: toggleMode, onSettings }: 
         <button
           className="icon-button settings-button"
           aria-label={t('ui.settings')}
-          onClick={onSettings}
+          onClick={openSettings}
         >
           <Settings2 size={20} />
         </button>

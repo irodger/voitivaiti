@@ -27,9 +27,7 @@ it('task acquisition lives in the laptop desk, not in the office panel', () => {
   useWorld.setState(c);
   const desk = renderToStaticMarkup(<WorkDesk onResume={() => {}} />);
   expect(desk).toContain(translate('queue.start'));
-  const office = renderToStaticMarkup(
-    <Work openLaptop={() => {}} openCompany={() => {}} laptopOpen={false} />,
-  );
+  const office = renderToStaticMarkup(<Work />);
   expect(office).not.toContain(translate('queue.start'));
   expect(office).toContain(translate('studio.queue'));
 });

@@ -42,27 +42,23 @@ const eventContent: Record<string, { body: string; choices: [string, string][] }
   },
 };
 
-export function Work({
-  openLaptop,
-  openCompany,
-  laptopOpen,
-  openTeam,
-}: {
-  openLaptop: () => void;
-  openCompany: () => void;
-  laptopOpen: boolean;
-  openTeam?: () => void;
-}) {
-  const { chooseOption, w, ch, template, t, contentRef, pending, event, project, chooseEvent } =
-    useWork();
+export function Work() {
+  const {
+    openLaptop,
+    chooseOption,
+    w,
+    ch,
+    template,
+    t,
+    contentRef,
+    pending,
+    event,
+    project,
+    chooseEvent,
+  } = useWork();
   return (
     <div className="world-work work-screen">
-      <OfficeWorkspace
-        project={project}
-        laptopOpen={laptopOpen}
-        openLaptop={openLaptop}
-        openCompany={openCompany}
-      />
+      <OfficeWorkspace project={project} />
       <ActionPanel
         desktopOnly
         className={`world-task-panel panel-${w.phase === 'reward' ? 'reward' : (event?.type ?? 'day-end')}`}
@@ -108,7 +104,7 @@ export function Work({
               <Button onClick={openLaptop}>{t('result.open')}</Button>
             </div>
           ) : event?.type === 'task' ? (
-            <OfficeBrief openLaptop={openLaptop} openTeam={openTeam} />
+            <OfficeBrief />
           ) : event?.type === 'sync' && ch.firstDay?.onboardingCompleted ? (
             <>
               <h1>{t('loop.dailyTitle')}</h1>
@@ -139,7 +135,7 @@ export function Work({
               {event.type === 'survey' && <small>{t('ui.surveyLocal')}</small>}
             </>
           ) : ch.firstDay?.onboardingCompleted ? (
-            <OfficeBrief openLaptop={openLaptop} openTeam={openTeam} />
+            <OfficeBrief />
           ) : (
             <>
               <EveningScene />

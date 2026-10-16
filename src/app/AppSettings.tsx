@@ -3,16 +3,22 @@ import { ProfileName } from '../play/ProfileName';
 import { PwaSettings } from '../play/PwaSettings';
 import { Button, Modal } from '../play/shared';
 import { ThemeSettings } from '../play/ThemeSettings';
-import { useAppSettings, type AppSettingsProps } from './useAppSettings';
+import { useAppSettings } from './useAppSettings';
 
-export function AppSettings({
-  confirm,
-  setConfirm,
-  onClose,
-  onReset,
-  onToggleMode: toggleMode,
-}: AppSettingsProps) {
-  const { hasCharacter, t, locale, contentMode, prefs, exportEvents } = useAppSettings();
+export function AppSettings() {
+  const {
+    confirm,
+    setConfirm,
+    onClose,
+    onReset,
+    toggleMode,
+    hasCharacter,
+    t,
+    locale,
+    contentMode,
+    prefs,
+    exportEvents,
+  } = useAppSettings();
 
   return (
     <Modal title={t(confirm ? 'ui.resetTitle' : 'ui.settings')} onClose={onClose}>

@@ -4,8 +4,8 @@ import './spaces.css';
 import { useHomeStatus } from './useHomeStatus';
 import { useOfficeStatus } from './useOfficeStatus';
 
-export function OfficeStatus({ openLaptop }: { openLaptop: () => void }) {
-  const { w, t, current, ch, queue } = useOfficeStatus();
+export function OfficeStatus() {
+  const { openLaptop, w, t, current, ch, queue } = useOfficeStatus();
 
   return (
     <div className="space-status office-status">

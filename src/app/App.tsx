@@ -31,15 +31,6 @@ const EndedCareer = lazy(() =>
 
 export default function App() {
   const {
-    openSettings,
-    closeSettings,
-    resetGame,
-    openLaptop,
-    openTeam,
-    openCompany,
-    openWork,
-    openCareerWork,
-    openTeamWork,
     openFocus,
     visibleTabs,
     feedback,
@@ -50,15 +41,12 @@ export default function App() {
     tab,
     setTab,
     settings,
-    confirm,
-    setConfirm,
     laptop,
     toast,
     firstScene,
     onboarding,
     pageRef,
     closeLaptop,
-    toggleMode,
   } = useApp();
 
   return (
@@ -67,7 +55,7 @@ export default function App() {
         <div
           className={`app-shell world-game theme-${prefs.colorScheme ?? 'green'} ${onboarding ? 'onboarding-shell' : 'game-shell'}`}
         >
-          <AppHeader onboarding={onboarding} onToggleMode={toggleMode} onSettings={openSettings} />
+          <AppHeader />
           {w.saveWarning && (
             <div className="save-error" role="alert">
               {t('ui.saveError')}
@@ -84,28 +72,23 @@ export default function App() {
                 <div className="game-view" ref={pageRef} role="region" aria-label={t(`ui.${tab}`)}>
                   <Suspense fallback={<p role="status">{t('ui.loading')}</p>}>
                     {firstScene && tab === 'work' ? (
-                      <FirstDay onStartWork={openLaptop} />
+                      <FirstDay />
                     ) : w.phase === 'ended' ? (
                       <EndedCareer />
                     ) : tab === 'work' ? (
                       w.phase === 'home' ? (
                         <Home />
                       ) : (
-                        <Work
-                          openTeam={openTeam}
-                          openLaptop={openLaptop}
-                          openCompany={openCompany}
-                          laptopOpen={laptop}
-                        />
+                        <Work />
                       )
                     ) : tab === 'home' ? (
-                      <Home onWork={openWork} />
+                      <Home returnToWork />
                     ) : tab === 'career' ? (
-                      <Career onWork={openCareerWork} />
+                      <Career />
                     ) : tab === 'team' ? (
-                      <Team onWork={openTeamWork} />
+                      <Team />
                     ) : tab === 'skills' ? (
-                      <Skills onWork={openCareerWork} />
+                      <Skills />
                     ) : (
                       <Company />
                     )}
@@ -158,15 +141,7 @@ export default function App() {
               {t(toast)}
             </div>
           )}
-          {settings && (
-            <AppSettings
-              confirm={confirm}
-              setConfirm={setConfirm}
-              onToggleMode={toggleMode}
-              onClose={closeSettings}
-              onReset={resetGame}
-            />
-          )}
+          {settings && <AppSettings />}
         </div>
       </LayoutGroup>
     </MotionConfig>

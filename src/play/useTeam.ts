@@ -1,8 +1,10 @@
+import { useAppActions } from '../hooks/useAppActions';
 import { useState } from 'react';
 import { useI18n } from '../content/localization';
 import { useWorld } from '../world/store';
 import { teamDirectory } from './teamDirectory';
 export function useTeam() {
+  const { openTeamWork: onWork } = useAppActions();
   const world = useWorld();
   const { t } = useI18n();
   const [query, setQuery] = useState('');
@@ -13,6 +15,7 @@ export function useTeam() {
     topic?: string;
   } | null>(null);
   return {
+    onWork,
     t,
     ...teamDirectory(world, { query, onlyNew, profession }, t),
     query,

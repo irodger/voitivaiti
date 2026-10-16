@@ -16,8 +16,8 @@ text(
 );
 text('careerUx.remaining', 'Что осталось для повышения', 'What remains before promotion');
 text('careerUx.confirmed', 'Уже подтверждено · {count}', 'Already confirmed · {count}');
-export function PromotionCard({ nodeId, onWork }: { nodeId: string; onWork?: () => void }) {
-  const { promote, w, t, open, setOpen, node, ready, checks } = usePromotionCard(nodeId);
+export function PromotionCard({ nodeId }: { nodeId: string }) {
+  const { onWork, promote, w, t, open, setOpen, node, ready, checks } = usePromotionCard(nodeId);
 
   const guidance = checks.some((c) => !c.met && c.key.startsWith('mastery.')) ? (
     <details>
@@ -103,14 +103,10 @@ export function PromotionCard({ nodeId, onWork }: { nodeId: string; onWork?: () 
           <p>{t(ready ? 'promotion.ready' : 'promotion.notYet')}</p>
           <PromotionRequirements
             nodeId={nodeId}
-            onWork={
-              onWork
-                ? () => {
-                    setOpen(false);
-                    onWork();
-                  }
-                : undefined
-            }
+            onWork={() => {
+              setOpen(false);
+              onWork();
+            }}
           />
           {ready ? (
             <Button onClick={promote}>{t('promotion.confirm')}</Button>

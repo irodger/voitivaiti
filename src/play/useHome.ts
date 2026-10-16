@@ -1,3 +1,4 @@
+import { useAppActions } from '../hooks/useAppActions';
 import { useRef, useState } from 'react';
 import { gameConfig } from '../config/game';
 import { useI18n } from '../content/localization';
@@ -6,6 +7,7 @@ import { formatNumber } from '../utils/format';
 import { activeCharacter } from '../world/simulation';
 import { useWorld } from '../world/store';
 export function useHome() {
+  const { openWork } = useAppActions();
   const w = useWorld();
   const ch = activeCharacter(w);
   const { t, locale } = useI18n();
@@ -28,5 +30,5 @@ export function useHome() {
       w.dispatch({ type: 'inspect-delivery', itemId: parcel.itemId });
     else openView('market');
   };
-  return { openMarket, w, ch, t, view, setView, panelRef, money, openView };
+  return { openWork, openMarket, w, ch, t, view, setView, panelRef, money, openView };
 }

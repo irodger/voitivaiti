@@ -11,9 +11,9 @@ import { TeamHighlights } from './TeamHighlights';
 import { TeamMemberCard } from './TeamMemberCard';
 import './spaces.css';
 import './team.css';
-export function Team({ onWork }: { onWork?: () => void } = {}) {
+export function Team() {
   const directory = useTeam(),
-    { t } = directory;
+    { t, onWork } = directory;
   return (
     <section className="collection-view world-collection team-view">
       <TeamBanner directory={directory} />

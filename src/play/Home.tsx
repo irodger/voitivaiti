@@ -16,12 +16,8 @@ import { Button } from './shared';
 import { HomeStatus } from './SpaceStatus';
 import { useHome } from './useHome';
 import { Walk } from './Walk';
-export function Home({
-  onWork,
-}: {
-  onWork?: () => void;
-} = {}) {
-  const { openMarket, w, ch, t, view, setView, panelRef, money, openView } = useHome();
+export function Home({ returnToWork = false }: { returnToWork?: boolean } = {}) {
+  const { openWork, openMarket, w, ch, t, view, setView, panelRef, money, openView } = useHome();
   if (w.phase === 'home' && currentDelivery(ch, w.life!.calendarDay))
     return <Delivery onBack={setView} />;
   if (w.phase === 'home' && currentWalk(ch, w.company!.currentDay)) return <Walk />;
@@ -64,9 +60,9 @@ export function Home({
               <HomeStatus />
               <h1>{t('workspace.atWork')}</h1>
               <p>{t('workspace.homePreview')}</p>
-              {onWork && (
+              {returnToWork && (
                 <ActionDock>
-                  <Button onClick={onWork}>{t('workspace.backToWork')}</Button>
+                  <Button onClick={openWork}>{t('workspace.backToWork')}</Button>
                 </ActionDock>
               )}
             </>

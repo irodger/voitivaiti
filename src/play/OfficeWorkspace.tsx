@@ -7,13 +7,8 @@ import { OfficeContacts } from './OfficeContacts';
 import { OfficeStatus } from './SpaceStatus';
 import { useOfficeWorkspace, type OfficeWorkspaceProps } from './useOfficeWorkspace';
 
-export function OfficeWorkspace({
-  project,
-  laptopOpen,
-  openLaptop,
-  openCompany,
-}: OfficeWorkspaceProps) {
-  const { w, t, contact, setContact } = useOfficeWorkspace();
+export function OfficeWorkspace({ project }: OfficeWorkspaceProps) {
+  const { laptopOpen, openLaptop, openCompany, w, t, contact, setContact } = useOfficeWorkspace();
 
   return (
     <section className="world-office">
@@ -46,7 +41,7 @@ export function OfficeWorkspace({
           </motion.button>
         )}
       </div>
-      <OfficeStatus openLaptop={openLaptop} />
+      <OfficeStatus />
       <div className="office-shortcuts">
         <ConferenceInvitation />
         <button onClick={openCompany}>

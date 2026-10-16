@@ -55,7 +55,7 @@ it('recorded recent issues are separate from the recovery rule', () => {
 it('the skills growth plan uses the same warning recovery explanation as career', () => {
   activeCharacter(campaign).reviewStage = 1;
   campaign.life!.goodDays = 2;
-  const html = renderToStaticMarkup(<Skills onWork={() => {}} />);
+  const html = renderToStaticMarkup(<Skills />);
   expect(html).toContain('promotionClarity.blocked');
   expect(html).toContain('&quot;days&quot;:1');
   expect(html).toContain('promotionClarity.work');

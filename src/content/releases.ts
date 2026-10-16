@@ -1,6 +1,15 @@
 import { text } from './localization';
-export const GAME_VERSION = '0.63.1';
+export const GAME_VERSION = '0.63.2';
 export const releases = [
+  {
+    version: '0.63.2',
+    items: [
+      [
+        'Общая навигация, настройки и открытие ноутбука управляются единым состоянием интерфейса без цепочек обработчиков через экраны',
+        'Shared navigation, settings and laptop visibility use a single UI store without callback chains through screens',
+      ],
+    ],
+  },
   {
     version: '0.63.1',
     items: [

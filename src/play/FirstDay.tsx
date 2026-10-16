@@ -7,9 +7,9 @@ import { ActionDock, ActionPanel } from './ActionDock';
 import { FirstRunGuide } from './FirstRunGuide';
 import { Button, Speech, characterName } from './shared';
 import { useFirstDay } from './useFirstDay';
-export function FirstDay({ onStartWork }: { onStartWork?: () => void }) {
+export function FirstDay() {
   const { introduce, startWork, w, ch, f, t, name, setName, step, project, npcs, role, task, go } =
-    useFirstDay(onStartWork);
+    useFirstDay();
   return (
     <div className="world-work first-day">
       <section className="world-office">

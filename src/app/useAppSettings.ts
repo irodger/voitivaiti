@@ -1,14 +1,11 @@
+import { useAppUI } from './uiStore';
+import { useAppActions } from '../hooks/useAppActions';
 import { useI18n, usePreferences } from '../content/localization';
 import { readAnalytics } from '../world/analytics';
 import { useWorld } from '../world/store';
-export type AppSettingsProps = {
-  confirm: boolean;
-  setConfirm: (confirm: boolean) => void;
-  onClose: () => void;
-  onReset: () => void;
-  onToggleMode: () => void;
-};
 export function useAppSettings() {
+  const confirm = useAppUI((s) => s.confirm);
+  const { setConfirm, closeSettings: onClose, resetGame: onReset, toggleMode } = useAppActions();
   const hasCharacter = useWorld(
     (w) => !!w.company && !!w.characters.find((c) => c.id === w.activeCharacterId),
   );
@@ -24,5 +21,17 @@ export function useAppSettings() {
     a.click();
     URL.revokeObjectURL(url);
   };
-  return { hasCharacter, t, locale, contentMode, prefs, exportEvents };
+  return {
+    confirm,
+    setConfirm,
+    onClose,
+    onReset,
+    toggleMode,
+    hasCharacter,
+    t,
+    locale,
+    contentMode,
+    prefs,
+    exportEvents,
+  };
 }

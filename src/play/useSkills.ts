@@ -1,9 +1,11 @@
+import { useAppActions } from '../hooks/useAppActions';
 import { useI18n } from '../content/localization';
 import { professionById } from '../content/professions';
 import { glossary } from '../content/world';
 import { activeCharacter } from '../world/simulation';
 import { useWorld } from '../world/store';
 export function useSkills() {
+  const { openCareerWork: onWork } = useAppActions();
   const ch = useWorld(activeCharacter);
   const { t } = useI18n();
   const role = professionById[ch.profession];
@@ -18,5 +20,5 @@ export function useSkills() {
     });
     target?.focus({ preventScroll: true });
   };
-  return { ch, t, role, node, scale, terms, jump };
+  return { onWork, ch, t, role, node, scale, terms, jump };
 }

@@ -1,3 +1,4 @@
+import { useAppActions } from '../hooks/useAppActions';
 import { useState } from 'react';
 import { useI18n } from '../content/localization';
 import { professionById } from '../content/professions';
@@ -5,6 +6,7 @@ import { promotionChecks } from '../world/mastery';
 import { activeCharacter, activeTask, canPromote } from '../world/simulation';
 import { useWorld } from '../world/store';
 export function usePromotionCard(nodeId: string) {
+  const { openCareerWork: onWork } = useAppActions();
   const w = useWorld();
   const ch = activeCharacter(w);
   const { t } = useI18n();
@@ -26,5 +28,5 @@ export function usePromotionCard(nodeId: string) {
     w.dispatch({ type: 'promote', nodeId });
     setOpen(false);
   };
-  return { promote, w, t, open, setOpen, node, ready, checks };
+  return { onWork, promote, w, t, open, setOpen, node, ready, checks };
 }
