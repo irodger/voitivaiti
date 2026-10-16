@@ -1,5 +1,5 @@
 import { ProfessionIcon } from '../components/ProfessionIcon';
-import { professionDilemma } from '../content/professionExperience';
+import '../content/professionExperience';
 import './professionPreview.css';
 import { useProfessionPreview } from './useProfessionPreview';
 
@@ -20,7 +20,7 @@ export function ProfessionPreview({ role }: { role: string }) {
           <h3>{t(profession.titleKey)}</h3>
         </div>
       </div>
-      <p>{t(professionDilemma[role])}</p>
+      <p>{t(profession.descriptionKey)}</p>
       <p className="profession-preview-first">
         <b>{t('roleExperience.first')}: </b>
         {t(first.titleKey)}

@@ -57,7 +57,10 @@ export function VersionPanel({ autoOpen = true }: { autoOpen?: boolean } = {}) {
                   <p>{t(item.bodyKey)}</p>
                 </article>
               ))
-            : (tab === 'news' ? releases.slice(0, 1) : releases).map((r) => (
+            : (tab === 'news'
+                ? releases.filter((r) => r.keys.length).slice(0, 1)
+                : releases.filter((r) => r.keys.length)
+              ).map((r) => (
                 <section key={r.version}>
                   <h3>v{r.version}</h3>
                   <ul>

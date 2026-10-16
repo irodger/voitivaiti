@@ -68,6 +68,12 @@ const ui: Record<string, [string, string]> = {
   avatar: ['Выбери аватар', 'Choose an avatar'],
   profession: ['Кем хочешь войти в IT?', 'How will you enter IT?'],
   workStart: ['Выйти на работу', 'Start working'],
+  characterName: ['Имя', 'Name'],
+  characterReady: ['Начало карьеры', 'Your career begins'],
+  replaceCampaign: [
+    'Текущее прохождение будет заменено: персонажи, проекты и история этой компании будут удалены.',
+    'This will replace your current playthrough and delete its characters, projects and company history.',
+  ],
   seed: ['Код мира (необязательно)', 'World seed (optional)'],
   seedHint: ['Одинаковый код создаст одинаковый мир.', 'The same code creates the same world.'],
   searchRoles: ['Найти профессию', 'Find a profession'],

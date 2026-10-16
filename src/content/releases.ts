@@ -1,32 +1,34 @@
 import { text } from './localization';
-export const GAME_VERSION = '0.63.3';
+export const GAME_VERSION = '0.63.4';
 export const releases = [
   {
-    version: '0.63.3',
+    version: '0.63.4',
     items: [
       [
-        'Экран ноутбука отделён от оболочки, общая команда закрытия убрана из цепочек пропсов, фильтрация материалов вынесена в чистую модель',
-        'Laptop screen separated from its shell, shared close command removed from prop chains, evidence filtering extracted into a pure model',
+        'Все 22 профессии получили описания повседневной работы без сложных терминов.',
+        'All 22 professions now explain their everyday work in plain language.',
+      ],
+      [
+        'Перед началом карьеры можно проверить имя, аватар и профессию и вернуться к их выбору.',
+        'Before starting a career, review the name, avatar and profession or return to change them.',
+      ],
+      [
+        'История обновлений описывает изменения, заметные игроку.',
+        'Update history now describes changes players can see.',
       ],
     ],
+  },
+  {
+    version: '0.63.3',
+    items: [],
   },
   {
     version: '0.63.2',
-    items: [
-      [
-        'Общая навигация, настройки и открытие ноутбука управляются единым состоянием интерфейса без цепочек обработчиков через экраны',
-        'Shared navigation, settings and laptop visibility use a single UI store without callback chains through screens',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.63.1',
-    items: [
-      [
-        'Общие вычисления задач, поиск и подготовка почты вынесены из компонентных хуков; код приведён к единому стилю',
-        'Shared task calculations, search and mail projections extracted from component hooks; code formatting unified',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.63.0',
@@ -40,37 +42,27 @@ export const releases = [
         'Smooth view, dialog and profession-preview entrances with reduced-motion support',
       ],
       [
-        'Рабочие дилеммы при выборе профессии и восемь задач с разными подходами, затратами и границами решения',
-        'Profession dilemmas and eight tasks with distinct approaches, costs and scope',
+        'В восьми рабочих задачах появились разные способы решения со своими затратами времени и последствиями.',
+        'Eight work tasks now offer different approaches with their own time costs and consequences.',
       ],
     ],
   },
   {
     version: '0.62.11',
-    items: [
-      [
-        'Экран команды и разговоры разделены на небольшие представления, селекторы и хуки без изменения правил общения',
-        'Team and conversations are split into focused views, selectors and hooks without changing dialogue rules',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.62.10',
     items: [
       [
-        'Материалы приложений разделены на независимые представления; инструменты ноутбука адаптированы к профессии',
-        'App evidence is split into focused views; laptop tools now adapt to the profession',
+        'Инструменты в ноутбуке соответствуют выбранной профессии.',
+        'Laptop tools match the selected profession.',
       ],
     ],
   },
   {
     version: '0.62.9',
-    items: [
-      [
-        'Ноутбук и рабочие этапы разделены на небольшие компоненты и хуки с сохранением текущего поведения',
-        'Laptop navigation and work stages are split into focused components and hooks while preserving existing behavior',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.62.8',
@@ -197,8 +189,8 @@ export const releases = [
     version: '0.60.3',
     items: [
       [
-        'Product review кампании отличает прошлый результат от новой версии и запрашивает проверку у настоящего владельца Platform',
-        'Campaign Product review distinguishes prior results from the next version and asks the actual Platform owner for verification',
+        'При проверке рекламной кампании видны прошлый результат и новая версия; запрос на проверку получает ответственный за работу сайта.',
+        'Advertising campaign reviews show the previous result and new version; verification requests reach the colleague responsible for the website.',
       ],
     ],
   },
@@ -206,8 +198,8 @@ export const releases = [
     version: '0.60.2',
     items: [
       [
-        'Выбор и проверка в кампании объясняют границу 2× и ожидаемый поток 3× без изменения последствий',
-        'Campaign choices and verification explain the double-traffic boundary and expected triple traffic without changing consequences',
+        'В истории рекламной кампании поясняется, что сайт проверен при двукратной нагрузке, а ожидается трёхкратная.',
+        'The advertising story explains that the website was checked at twice the traffic, while three times the traffic is expected.',
       ],
     ],
   },
@@ -251,11 +243,11 @@ export const releases = [
     version: '0.59.2',
     items: [
       [
-        'Рабочая почта сохраняет обращения, запросы и результаты цепочки Marketing campaign',
-        'Work mail preserves requests, replies and results from the Marketing campaign chain',
+        'В рабочей почте остаются обращения, запросы и результаты рекламной кампании.',
+        'Work mail keeps requests, replies and results from the advertising campaign.',
       ],
       [
-        'Inbox хранит прочтение; письма возвращают к существующей работе, сохраняя её проверки и последствия',
+        'Почта запоминает прочитанные письма; письма возвращают к существующей работе, сохраняя её проверки и последствия',
         'Inbox retains read state; messages return to existing work while preserving its checks and consequences',
       ],
     ],
@@ -264,12 +256,12 @@ export const releases = [
     version: '0.59.1',
     items: [
       [
-        'Кампания использует реальные ownership и зависимости; владелец нагрузки отвечает на запрос игрока',
-        'Campaigns use real ownership and dependencies; the capacity owner replies to the player request',
+        'В истории рекламной кампании на запрос о нагрузке отвечает коллега, который отвечает за работу сайта.',
+        'In the advertising campaign story, capacity questions are answered by the colleague responsible for running the website.',
       ],
       [
-        'Ограниченный результат оставляет незакрытый поток, полноценная проверка передаёт продолжение Product',
-        'Bounded results leave traffic uncovered; verified work hands the continuation to Product',
+        'Если проверена только часть ожидаемой нагрузки, риск остаётся; полная проверка открывает продолжение для продуктовой команды.',
+        'Checking only part of the expected traffic leaves a risk; a full check opens follow-up work for the product team.',
       ],
     ],
   },
@@ -278,11 +270,11 @@ export const releases = [
     items: [
       [
         'Новая компания сохраняет продукт, подразделения, команды, их зоны ответственности и зависимости',
-        'New companies retain their product, departments, teams, ownership and dependencies',
+        'New companies retain their product, departments, teams, responsibilities and dependencies',
       ],
       [
-        'Кампания Marketing создаёт реальную проверку риска нагрузки для Platform; контакт появляется при совместной работе',
-        'A Marketing campaign creates real capacity-risk work owned by Platform; contacts appear when work brings you together',
+        'Рекламная кампания приводит к задаче о нагрузке на сайт; нужный коллега появляется в контактах при совместной работе.',
+        'An advertising campaign leads to a website capacity task; the relevant colleague appears in contacts when working together.',
       ],
     ],
   },
@@ -294,7 +286,7 @@ export const releases = [
         'Continuation materials show the source decision and actual return cause, not the latest unrelated result',
       ],
       [
-        'В review можно открыть контекст прошлой работы без дополнительных обязательных проверок',
+        'При проверке работы можно открыть контекст прошлой работы без дополнительных обязательных проверок',
         'Reviews include optional previous-work context without extra required checks',
       ],
     ],
@@ -316,7 +308,7 @@ export const releases = [
         'The next payment situation follows a concrete new fact; handled causes do not restart the task',
       ],
       [
-        'История объясняет источник обращения, а ответ коллеги и артефакты меняют дальнейшую проверку',
+        'История объясняет источник обращения, а ответ коллеги и рабочие материалы меняют дальнейшую проверку',
         'History explains why the report arrived; colleague replies and artifacts change the investigation',
       ],
     ],
@@ -329,7 +321,7 @@ export const releases = [
         'Team work expectations are separate from conversation topics; promotion paths and promotion discussions have distinct actions',
       ],
       [
-        'Компактные Team и Skills на низких экранах; один возврат в пустых приложениях ноутбука',
+        'Компактные экраны команды и навыков на низких экранах; один возврат в пустых приложениях ноутбука',
         'Compact Team and Skills on short screens; one return action in empty laptop apps',
       ],
     ],
@@ -364,8 +356,8 @@ export const releases = [
         'Payment history evolves from decisions, teammate replies and unresolved limits',
       ],
       [
-        'Ревью проверяет переработку коллеги; инцидент требует увидеть эффект ограничения',
-        'Review verifies colleague rework; incidents require observing containment effects',
+        'При проверке работы нужно изучить исправления коллеги, а при устранении сбоя — проверить результат временной меры.',
+        'Reviewing work requires inspecting a colleague’s changes; resolving an outage requires checking whether the temporary measure helped.',
       ],
     ],
   },
@@ -572,8 +564,8 @@ export const releases = [
         'Before hiring the next hero: a victory summary and New game+ in the same world',
       ],
       [
-        'Время прохождения сохраняется отдельно от игровых дней; старые сессии не выдумываются',
-        'Run time is saved separately from game days; older sessions are never invented',
+        'В итогах карьеры видно время прохождения отдельно от игровых дней; время старых прохождений без записи не показывается.',
+        'Career results show play time separately from game days; older runs without timing records do not show a duration.',
       ],
     ],
   },
@@ -592,29 +584,11 @@ export const releases = [
   },
   {
     version: '0.51.0',
-    items: [
-      [
-        'Движок разделён на обработчики дома, дня, карьеры, команды, очереди и рабочих действий',
-        'The engine is split into home, day, career, team, queue and task action handlers',
-      ],
-      [
-        'Общие правила переходов сохранены; новые действия проверяются на полноту маршрутизации',
-        'Shared transition rules are preserved; routing coverage is checked for new actions',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.50.0',
-    items: [
-      [
-        'Общий конфиг баланса и коэффициент роста стресса для всех источников нагрузки',
-        'Shared balance config and a stress gain multiplier for all load sources',
-      ],
-      [
-        'Дом, навигация ноутбука, эффекты и повторяющееся поведение интерфейса разделены на самостоятельные модули',
-        'Home, laptop navigation, effects and shared UI behavior are separated into reusable modules',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.49.0',
@@ -776,8 +750,8 @@ export const releases = [
         'Laptop evidence has type icons, dedicated code blocks and network record styling',
       ],
       [
-        'Сравнения экрана и компонента расположены рядом на широком экране и последовательно на телефоне',
-        'Screen and component comparisons sit side by side on wide screens and stack on mobile',
+        'Сравнения рабочего экрана и его отдельных частей расположены рядом на широком экране и последовательно на телефоне',
+        'Comparisons of work screens and their individual parts sit side by side on wide screens and stack on mobile',
       ],
     ],
   },
@@ -789,7 +763,7 @@ export const releases = [
         'Laptop apps have distinct palettes: blue IDE, cyan Browser, graphite and amber Console, warm rose Chat',
       ],
       [
-        'Оформление кода, сообщений, артефактов и действий помогает различать рабочие приложения',
+        'Оформление кода, сообщений, рабочих материалов и действий помогает различать рабочие приложения',
         'Code, messages, artifacts and actions visually distinguish the work apps',
       ],
     ],
@@ -850,11 +824,11 @@ export const releases = [
     version: '0.44.3',
     items: [
       [
-        'Фиолетово-жёлтая тема: табы, улучшения дома, подложки портретов и фон вокруг сцен используют выбранную палитру',
+        'Фиолетово-жёлтая тема: вкладки, улучшения дома, подложки портретов и фон вокруг сцен используют выбранную палитру',
         'Violet and yellow: tabs, home upgrades, portrait backdrops and scene surrounds follow the selected palette',
       ],
       [
-        'Архивные артефакты компактнее; клавиатурная навигация ноутбука учитывает раскрываемую историю',
+        'Архивные рабочие материалы компактнее; клавиатурная навигация ноутбука учитывает раскрываемую историю',
         'Archived artifacts are more compact; laptop keyboard navigation includes expandable history',
       ],
     ],
@@ -880,7 +854,7 @@ export const releases = [
         'On mobile current work comes before the office; colleague expectations no longer obscure the task',
       ],
       [
-        'Ноутбук переключает приложение вместе с шагом; артефакты объясняют прогресс, прежние наблюдения свернуты',
+        'Ноутбук переключает приложение вместе с шагом; рабочие материалы объясняют прогресс, прежние наблюдения свернуты',
         'The laptop switches apps with the step; artifacts explain progress and earlier observations are folded',
       ],
       [
@@ -897,8 +871,8 @@ export const releases = [
         'One payment history: workaround, lost-response recurrence, shared fix and successor verification',
       ],
       [
-        'Профессиональный опыт и XP начисляются за выполненные действия и проверки, а не за название шаблона',
-        'Professional experience and XP come from performed actions and checks rather than template names',
+        'Профессиональный опыт начисляется за выполненные действия и проверки',
+        'Professional experience is earned through completed actions and checks',
       ],
     ],
   },
@@ -915,7 +889,7 @@ export const releases = [
     version: '0.42.4',
     items: [
       [
-        'Фиолетовая тема: hover-состояния, подложки офиса и квартиры, прокрутка и курсоры',
+        'Фиолетовая тема: подсветка при наведении, подложки офиса и квартиры, прокрутка и курсоры',
         'Violet theme: hover states, office/apartment backdrops, scrollbars and cursors',
       ],
     ],
@@ -924,8 +898,8 @@ export const releases = [
     version: '0.42.3',
     items: [
       [
-        'Исправлен приоритет цветовой схемы: основные кнопки, HUD, навигация и диалоги больше не возвращаются к зелёным стилям',
-        'Fixed theme precedence: primary buttons, HUD, navigation and dialogs no longer fall back to green styles',
+        'Исправлен приоритет цветовой схемы: основные кнопки, панель показателей, навигация и диалоги больше не возвращаются к зелёным стилям',
+        'Fixed theme precedence: primary buttons, status bar, navigation and dialogs no longer fall back to green styles',
       ],
     ],
   },
@@ -933,8 +907,8 @@ export const releases = [
     version: '0.42.2',
     items: [
       [
-        'HUD учитывает высоту предупреждений и событий: сообщения больше не обрезаются по нижнему краю',
-        'HUD accommodates warning and event text without clipping its bottom edge',
+        'Панель показателей учитывает высоту предупреждений и событий: сообщения больше не обрезаются по нижнему краю',
+        'status bar accommodates warning and event text without clipping its bottom edge',
       ],
     ],
   },
@@ -996,8 +970,8 @@ export const releases = [
     version: '0.40.0',
     items: [
       [
-        'Навыки: рабочий профиль, иконки, схема получения опыта и роадмап по реальным требованиям следующего грейда',
-        'Skills: work profile, icons, experience cycle and a roadmap based on actual next-grade requirements',
+        'На экране навыков видны опыт, рабочий профиль и требования следующей карьерной ступени.',
+        'The skills screen shows experience, the work profile and requirements for the next career level.',
       ],
     ],
   },
@@ -1054,8 +1028,8 @@ export const releases = [
     version: '0.38.0',
     items: [
       [
-        'Тихий фоновый эмбиент и сохраняемый переключатель звука в настройках',
-        'Quiet ambient background and a saved sound toggle in Settings',
+        'Появился тихий фоновый звук; его можно отключить в настройках, и выбор сохранится.',
+        'Quiet background audio is available; it can be disabled in settings and the choice is saved.',
       ],
     ],
   },
@@ -1117,8 +1091,8 @@ export const releases = [
     version: '0.35.0',
     items: [
       [
-        'Офис реагирует на дейли и ревью: состав встречи соответствует работе, у коллег видны роли и занятия',
-        'Office meetings follow daily syncs and reviews; colleagues show their roles and activities',
+        'На утренние встречи и проверки работы приходят нужные коллеги; в офисе видны их роли и занятия.',
+        'The relevant colleagues attend morning meetings and work reviews; their roles and activities are visible in the office.',
       ],
     ],
   },
@@ -1191,8 +1165,8 @@ export const releases = [
         'Team introductions are compact: clear introductions, labels instead of unavailable conversations, and a visible next step',
       ],
       [
-        'Дейли по-русски объясняется как регулярная встреча команды; словарь работает прямо в реплике',
-        'Daily is localized in Russian and explained as a recurring team meeting, with an inline glossary',
+        'Утренняя встреча команды получила понятное русское название и объяснение; термины можно открыть прямо в реплике.',
+        'The recurring morning team meeting has a plain Russian name and explanation; terms can be opened directly in dialogue.',
       ],
       [
         'Метрики показывают время и контекст измерения; вывод требует сопоставления с конкретным обращением QA',
@@ -1230,8 +1204,8 @@ export const releases = [
     version: '0.27.0',
     items: [
       [
-        'Рабочие артефакты: сравни экран, запросы, окружения и метрики перед выводом; открытые данные сохраняются',
-        'Work artifacts: compare screens, requests, environments and metrics before drawing conclusions; inspected data persists',
+        'Перед выводом можно сравнить рабочий экран, запросы, условия запуска и показатели; открытые данные сохраняются.',
+        'Before drawing a conclusion, compare the work screen, requests, run conditions and figures; inspected data is saved.',
       ],
       [
         'Приложения ноутбука показывают контекст задачи и собранные наблюдения; ключевые термины можно открыть прямо в данных',
@@ -1264,7 +1238,7 @@ export const releases = [
         'Problems remember approaches, observations and limitations; workarounds recur under changed conditions and repairs persist',
       ],
       [
-        'Структура работы меняется с опытом: артефакты, инциденты, review, зависимости, согласование и делегирование',
+        'Структура работы меняется с опытом: рабочие материалы, инциденты, проверки коллегами, зависимости, согласование и делегирование',
         'Work structure changes with experience: artifacts, incidents, review, dependencies, coordination and delegation',
       ],
       [
@@ -1307,30 +1281,21 @@ export const releases = [
     version: '0.23.2',
     items: [
       [
-        'Офисная картинка переведена в WebP с сохранением разрешения; второстепенные экраны загружаются при открытии',
-        'Office artwork uses WebP at its original resolution; secondary screens load when opened',
-      ],
-      [
-        'Игровой контент выделен в отдельную часть сборки; офлайн-кеш включает все экраны',
-        'Game content has a dedicated bundle; the offline cache includes every screen',
+        'Офисная иллюстрация загружается быстрее и сохраняет прежнюю детализацию.',
+        'The office illustration loads faster with the same level of detail.',
       ],
     ],
   },
   {
     version: '0.23.1',
-    items: [
-      [
-        'Экраны, панели карьеры, очередь работы и офис выделены в отдельные компоненты без изменения игрового поведения',
-        'Screens, career panels, work queue and office are split into dedicated components without changing gameplay',
-      ],
-    ],
+    items: [],
   },
   {
     version: '0.23.0',
     items: [
       [
-        'Solution Architect и Software Architect исследуют совместимость, границы и владение состоянием',
-        'Solution and software architects investigate compatibility, boundaries and state ownership',
+        'Архитекторы получили задачи о совместной работе программ, разделении обязанностей и хранении данных.',
+        'Architects now investigate how programs work together, share responsibilities and store information.',
       ],
       [
         'Все 22 профессии получили собственные исследования трёх проблем после стартовых задач',
@@ -1342,8 +1307,8 @@ export const releases = [
     version: '0.22.0',
     items: [
       [
-        'Project Manager исследует зависимости и реальные сроки; Delivery Manager проверяет условия выпуска и возврата',
-        'Project managers investigate dependencies and feasible dates; delivery managers verify release and rollback conditions',
+        'Менеджеры проектов получили задачи о сроках и порядке работ, а менеджеры выпуска — о готовности новой версии и возврате к прежней.',
+        'Project managers now investigate deadlines and work order; delivery managers check release readiness and returning to an earlier version.',
       ],
       [
         'Согласованный план и готовность выпуска отделены от выполненной работы и доставленной версии',
@@ -1355,12 +1320,12 @@ export const releases = [
     version: '0.21.0',
     items: [
       [
-        'Системный администратор исследует доступы; Security Engineer проверяет границы защиты и обычный пользовательский путь',
-        'System administrators investigate access; security engineers check protection boundaries and legitimate user journeys',
+        'У системного администратора появились задачи о доступе к рабочим программам, у специалиста по безопасности — о защите данных.',
+        'System administrators now have tasks about access to work programs; security specialists investigate data protection.',
       ],
       [
-        'Проверки на тестовых данных сохраняются и не выдаются за изменение рабочих прав или выпуск защиты',
-        'Checks with test data persist without claiming changed production access or deployed protection',
+        'Результаты проверки на копии данных сохраняются; рабочие права сотрудников после такой проверки не меняются.',
+        'Results of checks on copied data are saved; these checks do not change employees’ actual access.',
       ],
     ],
   },
@@ -1368,8 +1333,8 @@ export const releases = [
     version: '0.20.0',
     items: [
       [
-        'Аналитик данных проверяет расчёты и группы; Data Engineer исследует загрузку, дубли и поздние события',
-        'Data analysts verify calculations and groups; data engineers investigate ingestion, duplicates and late events',
+        'Аналитик данных получил задачи о расчётах и сравнении групп пользователей, инженер данных — о пропусках и повторных записях.',
+        'Data analysts now check calculations and compare user groups; data engineers investigate missing and duplicate records.',
       ],
       [
         'Проверенные выводы и изменения на копии не выдаются за исправление рабочего продукта',
@@ -1385,8 +1350,8 @@ export const releases = [
         'System and business analysis now investigate rules, goals and exceptions after their starting tasks',
       ],
       [
-        'Уточнение владельца результата сохраняется; согласованные требования не выдаются за исправление продукта',
-        'Clarified outcome ownership persists; agreed requirements are not presented as product repairs',
+        'В задаче сохраняется, кто отвечает за результат; согласование требований больше не показывается как исправление программы.',
+        'Tasks remember who is responsible for the result; agreeing requirements is no longer shown as a software repair.',
       ],
     ],
   },
@@ -1394,8 +1359,8 @@ export const releases = [
     version: '0.18.0',
     items: [
       [
-        'Автоматизация тестов исследует нестабильные проверки; UX Research наблюдает самостоятельный путь пользователя',
-        'Test automation investigates unstable checks; UX Research observes independent user journeys',
+        'У специалиста по автоматическим проверкам появились задачи о непостоянных ошибках, у исследователя пользователей — наблюдение за покупкой в приложении.',
+        'Automation specialists now investigate intermittent failures; user researchers observe purchases in the app.',
       ],
       [
         'Исследование и проверка дают вклад своей профессии, без фиктивного исправления продукта',
@@ -1407,8 +1372,8 @@ export const releases = [
     version: '0.17.0',
     items: [
       [
-        'DevOps исследует доставку и настройки окружений; DBA — чтение, правила хранения и проверенный путь возврата',
-        'DevOps investigates delivery and environment settings; DBA investigates reads, storage rules and verified rollback',
+        'Специалисты по выпуску программ получили задачи об установке новых версий, администраторы данных — о поиске записей и восстановлении после сбоя.',
+        'Release specialists now investigate software installation; database administrators investigate record searches and recovery after failures.',
       ],
       [
         'Проверка окружения и восстановление копии дают новые наблюдения; незавершённые исследования сохраняются',
@@ -1441,7 +1406,7 @@ export const releases = [
         'Mentoring requires demonstrating a case and checking boundaries; a workaround cannot receive full approval',
       ],
       [
-        'Оценки времени профессиональных сценариев учитывают исследование, решение и review',
+        'Оценки времени профессиональных сценариев учитывают исследование, решение и проверку коллегой',
         'Professional scenario estimates include investigation, resolution and review',
       ],
     ],
@@ -1556,7 +1521,7 @@ export const releases = [
     version: '0.10.15',
     items: [
       [
-        'Подсказка выбора показывается только при наличии альтернатив и скрывается после решения, при review и ожидании',
+        'Подсказка выбора показывается только при наличии альтернатив и скрывается после решения, при проверке работы и ожидании',
         'Choice help appears only with alternatives and is hidden after commitment, during review and while waiting',
       ],
     ],
@@ -1604,7 +1569,7 @@ export const releases = [
         'Results stay in the laptop: chosen approach, limitations and actual time versus estimate',
       ],
       [
-        'Закрытие итогов возвращает к офису; убраны внутренние идентификаторы и неподходящая реплика о сроках',
+        'Закрытие итогов возвращает в офис; в отчёте больше нет непонятных кодов и неуместной реплики о сроках',
         'Closing results returns to the office; removed internal identifiers and misleading timing commentary',
       ],
     ],
@@ -1613,8 +1578,8 @@ export const releases = [
     version: '0.10.10',
     items: [
       [
-        'Текущий контекст встроен между деньгами и стрессом в единый HUD; на мобильном — нижней строкой того же блока',
-        'Current focus sits between money and stress in one HUD, with a shared lower row on mobile',
+        'Текущий шаг виден на панели показателей между деньгами и стрессом, а на телефоне — в нижней строке той же панели.',
+        'The current step appears between money and stress in the status bar, or on its bottom row on phones.',
       ],
       [
         'Убрана карьерная дата из текущего контекста',
@@ -1626,8 +1591,8 @@ export const releases = [
     version: '0.10.9',
     items: [
       [
-        'Компактная строка «Сейчас» стала заметной частью HUD: текущий шаг, ожидание review, ответ коллеги и очередь работ',
-        'A compact focus bar in the HUD highlights the current step, review waiting, replies and queued work',
+        'Строка «Сейчас» показывает текущий шаг, ожидание проверки, ответ коллеги и очередь работ.',
+        'The current-focus bar shows the current step, pending review, colleague replies and queued work.',
       ],
       [
         'Статус открывает существующий контекст, когда переход однозначен; мобильный вариант занимает до двух строк',
@@ -1639,12 +1604,8 @@ export const releases = [
     version: '0.10.8',
     items: [
       [
-        'Обновление больше не предлагает текущую или старую версию и не применяет предыдущую сборку во время загрузки новой',
-        'Updates no longer offer current or older versions, or apply a previous build while a new one downloads',
-      ],
-      [
-        'Исправлен выход установленного PWA из старого кеша на локальном сервере разработки без удаления сохранений',
-        'Installed PWAs can leave a stale cache on the local development server without deleting saves',
+        'Игра больше не предлагает установить текущую или старую версию и не прерывает загрузку новой версии установкой предыдущей',
+        'The game no longer offers the current or an older version, or interrupts a new version download by installing the previous one',
       ],
     ],
   },
@@ -1700,8 +1661,8 @@ export const releases = [
     version: '0.10.3',
     items: [
       [
-        'Обновления PWA обнаруживаются при запуске и возвращении в игру; индикатор появляется рядом с версией без открытия окна',
-        'PWA updates are detected on startup and return; an indicator appears beside the version without opening the dialog',
+        'Обновления игры обнаруживаются при запуске и возвращении в игру; рядом с версией появляется индикатор.',
+        'Updates are detected when starting or returning to the game; an indicator appears beside the version.',
       ],
       [
         'Мобильная шапка: компактный бренд и сгруппированные кнопки версии и настроек',
@@ -1721,12 +1682,12 @@ export const releases = [
         'Technical tasks: actions, observations and new steps instead of repeated questions',
       ],
       [
-        'Исследование сохраняется после перезапуска; два рабочих способа исправить обработчик',
-        'Investigation survives reload; two working ways to fix the handler',
+        'Исследование сохраняется после перезапуска; ошибку обработки запроса можно исправить двумя способами',
+        'Investigation survives reload; request processing can be repaired in two ways',
       ],
       [
-        'PWA: видимая проверка и загрузка обновлений, выход из старого кеша без удаления прогресса',
-        'PWA: visible update checks and downloads, recovery from old caches without deleting progress',
+        'Видно, когда игра проверяет и загружает обновление; обновление сохраняет прогресс.',
+        'The game shows when it checks for and downloads updates; updating preserves progress.',
       ],
     ],
   },
@@ -1734,8 +1695,8 @@ export const releases = [
     version: '0.10.1',
     items: [
       [
-        'Локальные исправления: компактные подсказки, понятные реплики знакомства и список работы',
-        'Local fixes: compact hints, clearer introductions and work choices',
+        'Подсказки стали компактнее, реплики знакомства и список работы — понятнее.',
+        'Hints are more compact, with clearer introductions and work lists.',
       ],
       [
         'Профессиональные решения принимаются сразу; последствия сохраняются. Ответ коллеги появляется после отправки',
@@ -1784,8 +1745,8 @@ export const releases = [
         'Home and the end of work follow the clock; stress accumulates',
       ],
       [
-        'В HUD остаются деньги и стресс; термины открываются нажатием поверх текста',
-        'Money and stress remain in the HUD; terms open on click over the text',
+        'На панели показателей остаются деньги и стресс; нажатие на термин открывает объяснение поверх текста.',
+        'Money and stress remain in the status bar; tapping a term opens its explanation over the text.',
       ],
       [
         'Исправлены ответы коллегам во время знакомства и мобильные поля ввода',

@@ -91,7 +91,7 @@ const dilemmas: Record<string, Pair> = {
     'The customer just wants it fixed. How do you provide a safe workaround and keep ownership after escalation?',
   ],
 };
-text('roleExperience.title', 'В чём твоя работа', 'What your work is about');
+text('roleExperience.title', 'О профессии', 'About the profession');
 text('roleExperience.first', 'Первая рабочая история', 'Your first work story');
 export const professionDilemma = Object.fromEntries(
   Object.entries(dilemmas).map(([id, pair]) => [id, text(`roleExperience.${id}`, ...pair)]),

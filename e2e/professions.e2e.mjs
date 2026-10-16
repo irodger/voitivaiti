@@ -107,10 +107,21 @@ async function firstDay(page, role) {
   await clickText(page, 'ENTER');
   await page.waitForSelector(`[data-profession="${role.id}"]`);
   await page.click(`[data-profession="${role.id}"]`);
-  await page.type('.creation-row input', '1427');
+  await page.type('.creation-row input[type="number"]', '1427');
+  await page.type('#character-name', `E2E ${role.id}`);
+  await clickText(page, 'Continue');
+  await page.waitForSelector('dialog[open]');
+  assert.equal((await campaign(page)).company, null, 'Review must not create the world');
+  assert.match(
+    await page.$eval('dialog[open]', (el) => el.textContent),
+    new RegExp(`E2E ${role.id}`),
+  );
+  await clickText(page, 'Back');
+  assert.equal(await page.$eval('#character-name', (el) => el.value), `E2E ${role.id}`);
+  await clickText(page, 'Continue');
   await clickText(page, 'Start working');
   await page.waitForSelector('#intro-name');
-  await page.type('#intro-name', `E2E ${role.id}`);
+  assert.equal(await page.$eval('#intro-name', (el) => el.value), `E2E ${role.id}`);
   await clickText(page, 'Introduce yourself');
   await clickText(page, 'See the project');
   await clickText(page, 'Let’s continue');

@@ -11,7 +11,7 @@ import { professions } from '../content/professions';
 import { professionDilemma } from '../content/professionExperience';
 import { dictionary, usePreferences } from '../content/localization';
 
-it('every profession presents its own dilemma and actual first task in both languages', () => {
+it('every profession explains its work and shows its actual first task in both languages', () => {
   expect(Object.keys(professionDilemma).sort()).toEqual(professions.map((p) => p.id).sort());
   for (const locale of ['ru', 'en'] as const) {
     usePreferences.setState({ locale });
@@ -22,7 +22,7 @@ it('every profession presents its own dilemma and actual first task in both lang
       dilemmas.add(dilemma);
       const html = renderToStaticMarkup(<ProfessionPreview role={profession.id} />);
       expect(html).toContain(dictionary[profession.titleKey][locale]);
-      expect(html).toContain(dilemma);
+      expect(html).toContain(dictionary[profession.descriptionKey][locale]);
       expect(html).not.toContain('undefined');
     }
     expect(dilemmas.size).toBe(professions.length);

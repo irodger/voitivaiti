@@ -12,7 +12,9 @@ export function useFirstDay() {
   const ch = activeCharacter(w);
   const f = ch.firstDay!;
   const { t } = useI18n();
-  const [name, setName] = useState(lastPlayerName);
+  const [name, setName] = useState(() =>
+    ch.name === t('first.provisional') ? lastPlayerName() : ch.name,
+  );
   const step = f.currentOnboardingStep;
   const project =
     w.company!.projects.find((p) => ch.currentProjectIds.includes(p.id)) ?? w.company!.projects[0];

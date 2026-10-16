@@ -3,7 +3,7 @@ import { CharacterAvatar } from '../components/CharacterAvatar';
 import { OfficeScene } from '../components/OfficeScene';
 import { ProfessionIcon } from '../components/ProfessionIcon';
 import { ProfessionPreview } from './ProfessionPreview';
-import { Button, Speech } from './shared';
+import { Button, Modal, Speech } from './shared';
 import { useOnboarding } from './useOnboarding';
 import { useStartLanguage } from './useStartLanguage';
 
@@ -21,6 +21,14 @@ export function Onboarding() {
     setSearch,
     seed,
     setSeed,
+    name,
+    setName,
+    characterName,
+    profession,
+    replacesCampaign,
+    confirming,
+    reviewCharacter,
+    closeConfirmation,
   } = useOnboarding();
   return (
     <main className={`world-onboarding ${w.phase === 'create' ? 'creating' : ''}`}>
@@ -48,6 +56,16 @@ export function Onboarding() {
           <>
             <h1>{t('ui.create')}</h1>
             <div className="creation-row">
+              <label>
+                {t('ui.characterName')}
+                <input
+                  id="character-name"
+                  value={name}
+                  maxLength={24}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="off"
+                />
+              </label>
               <label>
                 {t('ui.seed')}
                 <input
@@ -94,7 +112,22 @@ export function Onboarding() {
               ))}
             </div>
             <ProfessionPreview role={role} />
-            <Button onClick={startWork}>{t('ui.workStart')}</Button>
+            <Button onClick={reviewCharacter} disabled={!characterName}>
+              {t('ui.continue')}
+            </Button>
+            {confirming && (
+              <Modal title={t('ui.characterReady')} onClose={closeConfirmation}>
+                <CharacterAvatar id={avatar} size={86} />
+                <h3>{characterName}</h3>
+                <h4>{t(profession.titleKey)}</h4>
+                <p>{t(profession.descriptionKey)}</p>
+                {replacesCampaign && <p role="alert">{t('ui.replaceCampaign')}</p>}
+                <Button secondary onClick={closeConfirmation}>
+                  {t('ui.back')}
+                </Button>
+                <Button onClick={startWork}>{t('ui.workStart')}</Button>
+              </Modal>
+            )}
           </>
         )}
       </section>
