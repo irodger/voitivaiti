@@ -1,3 +1,4 @@
+import { taskStepSummary } from '../utils/taskContext';
 import { Code2 } from 'lucide-react';
 import { useI18n } from '../content/localization';
 import { useLaptopTools } from '../hooks/useLaptopTools';
@@ -14,7 +15,6 @@ export function useTaskJourney(props: { task: Task; steps: Step[] }) {
   const { task, steps } = props;
   const { t } = useI18n();
   const tools = useLaptopTools();
-  const done = steps.filter((s) => task.progress[s.id]?.status === 'completed').length;
-  const current = steps.find((s) => s.id === task.currentStepId);
+  const { done, current } = taskStepSummary(task, steps);
   return { t, tools, done, current };
 }

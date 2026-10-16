@@ -1,6 +1,15 @@
 import { text } from './localization';
-export const GAME_VERSION = '0.63.0';
+export const GAME_VERSION = '0.63.1';
 export const releases = [
+  {
+    version: '0.63.1',
+    items: [
+      [
+        'Общие вычисления задач, поиск и подготовка почты вынесены из компонентных хуков; код приведён к единому стилю',
+        'Shared task calculations, search and mail projections extracted from component hooks; code formatting unified',
+      ],
+    ],
+  },
   {
     version: '0.63.0',
     items: [

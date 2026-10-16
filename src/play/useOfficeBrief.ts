@@ -1,5 +1,5 @@
 import { useI18n } from '../content/localization';
-import { resolveTaskTemplate } from '../content/scenarios';
+import { taskContext } from '../utils/taskContext';
 import { deskAvailability } from '../world/deskAvailability';
 import { activeCharacter, activeTask } from '../world/simulation';
 import { useWorld } from '../world/store';
@@ -9,10 +9,7 @@ export function useOfficeBrief() {
   const ch = activeCharacter(w);
   const state = deskAvailability(w);
   const task = activeTask(w);
-  const template = task && !task.rewarded ? resolveTaskTemplate(task) : undefined;
-  const current = template?.steps.find((s) => s.id === task?.currentStepId);
-  const done =
-    template?.steps.filter((s) => task?.progress[s.id]?.status === 'completed').length ?? 0;
+  const { template, step: current, done } = taskContext(task && !task.rewarded ? task : undefined);
   const reason =
     state.reason === 'current'
       ? 'current'

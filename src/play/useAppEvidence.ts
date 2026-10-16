@@ -1,3 +1,4 @@
+import { useTextSearch } from '../hooks/useTextSearch';
 import type { EditorKind } from '../content/laptopTools';
 import { useEffect, useState } from 'react';
 import { collectAppEvidence } from './appEvidence';
@@ -8,7 +9,7 @@ export function useAppEvidence(task: Task, app: AppId, editorKind: EditorKind = 
   const evidence = collectAppEvidence(task, app, editorKind);
   const { t } = useI18n();
   const [sourceIndex, setSourceIndex] = useState<number | null>(null);
-  const [query, setQuery] = useState('');
+  const { query, setQuery, active, matches: matchesText } = useTextSearch();
   useEffect(() => {
     setSourceIndex(null);
     setQuery('');
@@ -17,14 +18,7 @@ export function useAppEvidence(task: Task, app: AppId, editorKind: EditorKind = 
     sourceIndex === null
       ? evidence.sources.length - 1
       : Math.min(sourceIndex, evidence.sources.length - 1);
-  const normalized = query.trim().toLocaleLowerCase();
-  const matches = (keys: string[]) =>
-    !normalized ||
-    keys
-      .map((key) => t(key))
-      .join(' ')
-      .toLocaleLowerCase()
-      .includes(normalized);
+  const matches = (keys: string[]) => matchesText(keys.map((key) => t(key)));
   const visibleNotes = evidence.notes.filter((key) => matches([key]));
   const visibleRecords = evidence.records.filter(({ row, title }) =>
     matches([title, row.labelKey, row.detailKey ?? '']),
@@ -33,7 +27,7 @@ export function useAppEvidence(task: Task, app: AppId, editorKind: EditorKind = 
     app === 'chat' ? evidence.completed.filter((s) => matches([s.titleKey, s.bodyKey])) : [];
   const visibleSources = evidence.sources
     .map((code, index) => ({ code, index }))
-    .filter((x) => !normalized || x.code.toLocaleLowerCase().includes(normalized));
+    .filter((x) => matchesText([x.code]));
   const empty =
     evidence.notes.length === 0 && evidence.records.length === 0 && evidence.sources.length === 0;
   return {
@@ -49,7 +43,7 @@ export function useAppEvidence(task: Task, app: AppId, editorKind: EditorKind = 
     empty,
     hasEvidence: !empty || (app === 'chat' && evidence.completed.length > 0),
     noMatches:
-      !!normalized &&
+      active &&
       !visibleNotes.length &&
       !visibleRecords.length &&
       !visibleMessages.length &&

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { resolveTaskTemplate } from '../content/scenarios';
+import { taskContext } from '../utils/taskContext';
 import { useWorkspaceScroll } from '../hooks/useWorkspaceScroll';
 import type { CompanyMailMessage } from '../world/companyMailTypes';
 import { activeTask } from '../world/simulation';
@@ -12,8 +12,7 @@ import { mailWorkTarget } from './mailWorkTarget';
 export function useLaptopWorkspace() {
   const world = useWorld();
   const task = activeTask(world);
-  const template = task ? resolveTaskTemplate(task) : undefined;
-  const step = template?.steps.find((s) => s.id === task?.currentStepId);
+  const { template, step } = taskContext(task);
   const [app, setApp] = useState<LaptopAppId>(step?.app ?? 'ide');
   const [view, setView] = useState<Step | null>(null);
   const [board, setBoard] = useState(!task || (task.rewarded && world.phase !== 'reward'));
@@ -53,7 +52,7 @@ export function useLaptopWorkspace() {
       return;
     }
     if (target.paused) world.dispatch({ type: 'resume-task', id: target.id });
-    const current = resolveTaskTemplate(target).steps.find((s) => s.id === target.currentStepId);
+    const current = taskContext(target).step;
     setBoard(false);
     setView(null);
     if (current) setApp(current.app);

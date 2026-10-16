@@ -1,6 +1,6 @@
 import { FileCheck2, ShieldAlert, Trophy } from 'lucide-react';
 import { useI18n } from '../content/localization';
-import { resolveTaskTemplate } from '../content/scenarios';
+import { taskContext } from '../utils/taskContext';
 import { activeTask } from '../world/simulation';
 import { useWorld } from '../world/store';
 export function useTaskResult() {
@@ -8,7 +8,7 @@ export function useTaskResult() {
   const task = activeTask(w);
   const { t } = useI18n();
   if (!task) return null;
-  const template = resolveTaskTemplate(task);
+  const { template, done: completed } = taskContext(task);
   const choiceStep = template.steps.find(
     (step) =>
       step.type !== 'review' &&
@@ -28,9 +28,6 @@ export function useTaskResult() {
           : 'finished';
   const ResultIcon =
     resultKind === 'temporary' ? ShieldAlert : resultKind === 'evidence' ? FileCheck2 : Trophy;
-  const completed = template.steps.filter(
-    (s) => task.progress[s.id]?.status === 'completed',
-  ).length;
   const delta = task.taskElapsedMinutes - template.estimate;
   return {
     w,

@@ -1,3 +1,4 @@
+import { textSearch } from '../utils/textSearch';
 import type { Campaign } from '../world/types';
 import { activeCharacter } from '../world/simulation';
 import { availableTopics } from '../content/contextDialogue';
@@ -41,19 +42,16 @@ export function teamDirectory(w: Campaign, filters: TeamFilters, t: (key: string
       return true;
     })
     .slice(0, 3);
-  const query = filters.query.trim().toLocaleLowerCase();
+  const search = textSearch(filters.query);
   const visible = members.filter(
     ({ person, role, fresh }) =>
       (!filters.onlyNew || fresh) &&
       (filters.profession === 'all' || person.profession === filters.profession) &&
-      [
+      search.matches([
         characterName(person, t),
         t(role.titleKey),
         t(role.careers.find((node) => node.id === person.careerNodeId)?.titleKey ?? ''),
-      ]
-        .join(' ')
-        .toLocaleLowerCase()
-        .includes(query),
+      ]),
   );
   return {
     people,

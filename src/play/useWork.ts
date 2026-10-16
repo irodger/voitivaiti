@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useI18n } from '../content/localization';
-import { resolveTaskTemplate } from '../content/scenarios';
+import { taskContext } from '../utils/taskContext';
 import { useScrollReset } from '../hooks/useScrollReset';
 import { activeCharacter, activeTask } from '../world/simulation';
 import { useWorld } from '../world/store';
@@ -9,7 +9,7 @@ export function useWork() {
   const w = useWorld();
   const ch = activeCharacter(w);
   const task = activeTask(w);
-  const template = task ? resolveTaskTemplate(task) : undefined;
+  const { template } = taskContext(task);
   const { t } = useI18n();
   const [eventId, setEventId] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);

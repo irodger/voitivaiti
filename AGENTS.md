@@ -28,6 +28,12 @@ CLI QA browser access is provided by the local v2 plugin in .opencode/plugins/qa
 - Components that only render props or use a single presentation hook (for example useI18n) do not need an empty controller wrapper. Keep component-specific controllers next to their views; only hooks reused across owners or application-wide mechanisms belong in shared hooks/.
 - Controller hooks return data and actions, not JSX. Preserve hook invocation order, initializers, early-return guards, effect dependencies and cleanup while extracting logic. Do not change gameplay, persistence or callback sequencing as part of this refactor.
 
+- Keep shared pure projections/search/task calculations out of component controllers. Put reusable non-React calculations in focused utilities or domain presentation models with explicit inputs; reserve shared hooks for state and browser lifecycle. Reuse existing modules before adding a new abstraction.
+
 ## Formatting
 
 - Run `npm run format` after editing source or tests, and `npm run format:check` before completion. Use the project Prettier configuration; keep formatting changes separate from behavior changes. CI checks formatting before building/testing.
+
+## Releases and push
+
+- Before every requested push, increment GAME_VERSION in src/content/releases.ts and prepend a matching bilingual release entry. Use a patch bump for maintenance/refactoring. This version drives PWA update/version UI; package.json is not the source of the game version. Include the bump in the pushed changes and validate the resulting build.

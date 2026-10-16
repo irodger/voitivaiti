@@ -1,50 +1,23 @@
+import { useTextSearch } from '../hooks/useTextSearch';
+import { mailInboxModel, type MailFilter } from './mailInboxModel';
 import { useState } from 'react';
 import { useI18n } from '../content/localization';
-import { unreadCompanyMail } from '../world/companyMail';
 import type { CompanyMailMessage } from '../world/companyMailTypes';
 import { useWorld } from '../world/store';
-import { mailThreads } from './mailThreads';
 import { mailWorkTarget } from './mailWorkTarget';
-import { characterName } from './shared';
 export function useMailInbox() {
   const w = useWorld();
   const { t } = useI18n();
   const [selected, setSelected] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'unread' | 'sent'>('all');
-  const [query, setQuery] = useState('');
-  const messages = [...(w.company?.mail?.messages ?? [])].reverse();
-  const mail = messages.find((m) => m.id === selected);
-  const unread = unreadCompanyMail(w);
-  const team = (id?: string) => {
-    const team = w.company?.structure?.teams.find((team) => team.id === id);
-    return team ? t(team.nameKey) : '';
-  };
-  const sender = (m: CompanyMailMessage) => {
-    const person = w.characters.find((c) => c.id === m.senderCharacterId);
-    return m.direction === 'outgoing' && m.senderCharacterId === w.activeCharacterId
-      ? t('mail.you')
-      : person
-        ? characterName(person, t)
-        : team(m.senderTeamId) || t('mail.sent');
-  };
-  const threads = mailThreads(w.company?.mail?.messages ?? [], w.activeCharacterId);
-  const thread = threads.find((th) => th.id === mail?.threadId);
-  const position = thread?.letters.findIndex((m) => m.id === mail?.id) ?? -1;
-  const search = query.trim().toLocaleLowerCase();
-  const visible = (m: CompanyMailMessage) =>
-    (filter === 'all' ||
-      (filter === 'sent' && m.direction === 'outgoing') ||
-      (filter === 'unread' &&
-        m.direction === 'incoming' &&
-        !m.readBy.includes(w.activeCharacterId))) &&
-    (!search ||
-      [sender(m), team(m.senderTeamId), t(m.subjectKey)]
-        .join(' ')
-        .toLocaleLowerCase()
-        .includes(search));
-  const visibleThreads = threads
-    .map((th) => ({ ...th, visibleLetters: th.letters.filter(visible) }))
-    .filter((th) => th.visibleLetters.length);
+  const [filter, setFilter] = useState<MailFilter>('all');
+  const { query, setQuery } = useTextSearch();
+  const { messages, mail, unread, team, sender, thread, position, visibleThreads } = mailInboxModel(
+    w,
+    selected,
+    filter,
+    query,
+    t,
+  );
   const select = (m: CompanyMailMessage) => {
     setSelected(m.id);
     w.dispatch({ type: 'mail-read', id: m.id });
